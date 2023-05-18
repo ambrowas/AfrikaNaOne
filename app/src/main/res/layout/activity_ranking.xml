@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/trivialbackground"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textviewclasificacion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:screenReaderFocusable="true"
+        android:text="CLASIFICACION GLOBAL DE SABELOTODOS"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:layout_marginTop="120dp"
+        android:layout_marginBottom="20dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TableLayout
+            android:id="@+id/tableLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*"
+            android:paddingLeft="10dp">
+
+            <!-- Table header -->
+            <TableRow
+                android:background="@color/default_radio_button_background"
+                android:padding="8dp">
+
+                <TextView
+                        android:id="@+id/tvName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="      Nombre"
+                    android:gravity="start"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvCity"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="        Ciudad"
+                    android:textColor="@color/black"
+                    android:gravity="center"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvScore"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="                  Fcfa"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+
+            </TableRow>
+
+            <!-- Table row example -->
+            <TableRow>
+
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:text="John Doe"
+                    />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    android:text="New York" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="1200" />
+
+            </TableRow>
+
+            <!-- Add more table rows as needed -->
+        </TableLayout>
+    </ScrollView>
+
+
+
+    <Button
+
+        android:id="@+id/buttonatras"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="VOLVER"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/radio_normal2"
+        app:strokeWidth="3dp"/>
+
+
+</LinearLayout>
+

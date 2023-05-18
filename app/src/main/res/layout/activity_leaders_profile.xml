@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/trivialbackground"
+    tools:context=".LeadersProfileActivity">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profilepic"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="100dp"
+        android:src="@drawable/baseline_account_circle_24"
+        android:background="@drawable/oval"
+        app:civ_border_width="5dp"
+        app:civ_border_color="#000000"
+        android:scaleType="centerCrop"
+        />
+
+
+
+    <TextView
+        android:id="@+id/posicion"
+        android:hint="posicion"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/black"
+        android:textColorHighlight="@color/black"
+        android:button="@android:color/transparent"
+        android:background="@drawable/radio_normal3"
+        android:elevation="4dp"
+        android:textStyle="bold"
+        app:strokeWidth="3dp"
+        android:textSize="8pt"
+        android:freezesText="true"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"/>
+
+
+    <TextView
+        android:id="@+id/nameTitle"
+        android:hint="Nombre Completo"
+        android:layout_width="350dp"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_upload"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/black"
+        android:textColorHighlight="@color/black"
+        android:button="@android:color/transparent"
+        android:background="@drawable/radio_normal3"
+        android:elevation="4dp"
+        android:textStyle="bold"
+        app:strokeWidth="3dp"
+        android:textSize="8pt"
+        android:freezesText="true"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:paddingLeft="20dp"/>
+
+
+
+
+    <TextView
+        android:id="@+id/textViewBarrio"
+        android:hint="Barrio"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/black"
+        android:textColorHighlight="@color/black"
+        android:button="@android:color/transparent"
+        android:background="@drawable/radio_normal3"
+        android:elevation="4dp"
+        android:textStyle="bold"
+        app:strokeWidth="3dp"
+        android:textSize="8pt"
+        android:freezesText="true"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:paddingLeft="20dp"/>
+
+    <TextView
+        android:id="@+id/textViewCiudad"
+        android:hint="Ciudad"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/black"
+        android:textColorHighlight="@color/black"
+        android:button="@android:color/transparent"
+        android:background="@drawable/radio_normal3"
+        android:elevation="4dp"
+        android:textStyle="bold"
+        app:strokeWidth="3dp"
+        android:textSize="8pt"
+        android:freezesText="true"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:paddingLeft="20dp"
+        />
+
+    <TextView
+        android:id="@+id/textViewPais"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:hint="País"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/black"
+        android:textColorHighlight="@color/black"
+        android:button="@android:color/transparent"
+        android:background="@drawable/radio_normal3"
+        android:elevation="4dp"
+        android:textStyle="bold"
+        app:strokeWidth="3dp"
+        android:textSize="8pt"
+        android:freezesText="true"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:paddingLeft="20dp"/>
+
+    <TextView
+        android:id="@+id/textViewRecord"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:hint="Record"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/black"
+        android:textColorHighlight="@color/black"
+        android:button="@android:color/transparent"
+        android:background="@drawable/radio_normal3"
+        android:elevation="4dp"
+        android:textStyle="bold"
+        app:strokeWidth="3dp"
+        android:textSize="8pt"
+        android:freezesText="true"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:paddingLeft="20dp" />
+
+    <TextView
+        android:id="@+id/textViewpuntosacumulados"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:hint="Puntos acumulados"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/black"
+        android:textColorHighlight="@color/black"
+        android:button="@android:color/transparent"
+        android:background="@drawable/radio_normal3"
+        android:elevation="4dp"
+        android:textStyle="bold"
+        app:strokeWidth="3dp"
+        android:textSize="8pt"
+        android:freezesText="true"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:paddingLeft="20dp" />
+
+    <TextView
+        android:id="@+id/textViewdineroacumulado"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:hint="Dinero acumulado"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/black"
+        android:textColorHighlight="@color/black"
+        android:button="@android:color/transparent"
+        android:background="@drawable/radio_normal3"
+        android:elevation="4dp"
+        android:textStyle="bold"
+        app:strokeWidth="3dp"
+        android:textSize="8pt"
+        android:freezesText="true"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:paddingLeft="20dp" />
+
+    <TextView
+        android:id="@+id/textViewaciertosacumulados"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:hint="Aciertos acumulados"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/black"
+        android:textColorHighlight="@color/black"
+        android:button="@android:color/transparent"
+        android:background="@drawable/radio_normal3"
+        android:elevation="4dp"
+        android:textStyle="bold"
+        app:strokeWidth="3dp"
+        android:textSize="8pt"
+        android:freezesText="true"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:paddingLeft="20dp" />
+
+
+    <Button
+
+        android:id="@+id/buttonatras"
+        android:layout_width="175dp"
+        android:layout_height="wrap_content"
+        android:text="VOLVER"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_marginTop="20dp"
+       android:layout_gravity="center_horizontal"
+       android:background="@drawable/radio_normal2"
+        app:strokeWidth="3dp"/>
+
+
+
+
+
+
+
+</LinearLayout>

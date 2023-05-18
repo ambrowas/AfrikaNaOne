@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Guinealogia Edicion Trivial</string>
+    <string name="ingresar">INGRESAR</string>
+    <string name="contrase_a">Contraseña</string>
+    <string name="email">Email</string>
+    <string name="registrar">REGISTRAR</string>
+    <string name="login">login</string>
+    <string name="conectar">conectar</string>
+    <string name="click_para_ingresar">Click para ingresar</string>
+    <string name="click_para_registrar">CLICK PARA REGISTRAR</string>
+    <string name="desconectar">DESCONECTAR</string>
+    <string name="facebook_application_id" translatable="false">YOUR_APP_ID</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fbYOUR_APP_ID</string>
+    <string name="nombre">Nombre</string>
+    <string name="edad">Edad</string>
+    <string name="foto">Foto</string>
+    <string name="telefono">Telefono</string>
+    <string name="ciudad">Ciudad</string>
+    <string name="pa_s">País</string>
+    <string name="correct_answer">RESPUESTA CORRECTA: %1$s</string>
+    <string name="tiempo">tiempo</string>
+    <string name="aciertos">Aciertos: %1$d</string>
+    <string name="fallos">Fallos: %1$d</string>
+    <string name="puntuacion">Puntuación: %1$d</string>
+
+
+</resources>

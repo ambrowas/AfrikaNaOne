@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/coolbackground"
+    tools:context=".ClassficationActivity">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="40dp">
+
+        <ImageView
+            android:id="@+id/profilepicture"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/baseline_account_circle_24" />
+
+        <View
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:background="@drawable/rectangulo" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/textviewhola"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:text="SALUDO:"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical">
+
+        <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
+            android:id="@+id/textviewaciertos2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ACIERTOS:"
+            android:textColor="@color/black"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:button="@android:color/transparent"
+            android:background="@drawable/radio_normal3"
+            android:elevation="4dp"
+            android:paddingLeft="10dp"
+            />
+
+        <TextView
+            android:id="@+id/TextViewFallos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="ERRORES:"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:button="@android:color/transparent"
+            android:background="@drawable/radio_normal3"
+            android:elevation="4dp"
+            android:paddingLeft="10dp"/>
+
+        <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
+            android:id="@+id/textviewpuntuacion2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PUNTUACION:"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textStyle="bold"
+            android:button="@android:color/transparent"
+            android:background="@drawable/radio_normal3"
+            android:elevation="4dp"
+            android:paddingLeft="10dp"/>
+
+        <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
+            android:id="@+id/textviewganancias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="GANANCIAS:"
+            android:textColor="@color/black"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:button="@android:color/transparent"
+            android:background="@drawable/radio_normal3"
+            android:elevation="4dp"
+            android:paddingLeft="10dp"/>
+
+        <TextView
+            android:id="@+id/textviewclasificacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/blue"
+            android:text="CLASIFICACION GLOBAL:"
+            android:button="@android:color/transparent"
+            android:background="@drawable/radio_normal3"
+            android:elevation="4dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingLeft="10dp"
+            />
+
+        <TextView
+            android:id="@+id/textviewrecord"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/blue"
+            android:text="RECORD:"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:button="@android:color/transparent"
+            android:background="@drawable/radio_normal3"
+            android:elevation="4dp"
+            android:paddingLeft="10dp"/>
+
+        <TextView
+            android:id="@+id/textviewgrandtotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TOTAL ACUMULADO:"
+            android:textColor="@color/blue"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:button="@android:color/transparent"
+            android:background="@drawable/radio_normal3"
+            android:elevation="4dp"
+            android:paddingLeft="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        >
+
+        <Button
+            android:id="@+id/buttoncodigocobro"
+            android:layout_width="250dp"
+            android:layout_height="75dp"
+            android:background="@drawable/radio_normal3"
+            android:freezesText="true"
+            android:text="GENERAR COBRO"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:strokeWidth="3dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/buttonranking2"
+            android:layout_width="250dp"
+            android:layout_height="75dp"
+            android:background="@drawable/radio_selector"
+            android:freezesText="true"
+            android:text="RANKING"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:strokeWidth="3dp"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/buttonmenuprincipal"
+            android:layout_width="250dp"
+            android:layout_height="75dp"
+            android:background="@drawable/radio_normal2"
+            android:freezesText="true"
+            android:text="MENU PRINCIPAL"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:strokeWidth="3dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>
+

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/coolbackground"
+    tools:context=".ModoLibre">
+
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:src="@drawable/logotrivial"
+         />
+
+
+    <EditText
+        android:id="@+id/editTextNombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:hint="INTRODUCE TU NOMBRE"
+        android:textColor="@color/black"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@id/logo"
+        android:textSize="8pt"
+        android:layout_marginTop="50dp"
+        android:inputType="textPersonName"/>
+
+    <Button
+        android:id="@+id/button_save"
+        android:layout_width="250dp"
+        android:layout_height="55dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/radio_normal3"
+        android:gravity="center"
+        android:text="GUARDAR"
+
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+    <TextView
+        android:id="@+id/TextViewSaludo2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:text="HOLA POR AQUI"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/black"
+        android:textSize="10pt"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/TextViewRecord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/TextViewSaludo2"
+        android:layout_centerInParent="true"
+        android:text="HIGH SCORE"
+        android:layout_gravity="center_horizontal"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/black"
+        android:textSize="8pt"
+        android:textStyle="bold"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"/>
+
+
+
+    <Button
+        android:id="@+id/button_jugar"
+        android:layout_width="250dp"
+        android:layout_height="85dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/radio_selected"
+        android:layout_below="@id/TextViewRecord"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:text="JUGAR"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:layout_marginTop="20dp"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+    <Button
+        android:id="@+id/button_salir"
+        android:layout_width="250dp"
+        android:layout_height="85dp"
+        android:background="@drawable/radio_normal2"
+        android:layout_below="@id/button_jugar"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:text="SALIR"
+        android:textColor="@color/white"
+        android:layout_marginTop="10dp"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+
+    <Button
+        android:id="@+id/button_reset"
+        android:layout_width="150dp"
+        android:layout_height="55dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@id/button_jugar"
+        android:backgroundTint="@color/red"
+        android:gravity="center"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:text="RESET"
+        android:visibility="invisible"
+        app:strokeWidth="3dp" />
+
+
+
+
+
+
+</LinearLayout>
