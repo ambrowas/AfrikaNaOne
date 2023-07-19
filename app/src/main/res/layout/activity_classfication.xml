@@ -29,11 +29,33 @@
     </FrameLayout>
 
     <TextView
+        android:id="@+id/textviewclasificacion"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_marginLeft="300dp"
+        android:layout_marginTop="-50dp"
+        android:layout_above="@+id/btn_upload"
+        android:background="@drawable/radio_normal3"
+        android:button="@android:color/transparent"
+        android:elevation="4dp"
+        android:freezesText="true"
+        android:gravity="center"
+        android:hint="8"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:textColor="@color/black"
+        android:textColorHighlight="@color/black"
+        android:textSize="15pt"
+        android:textStyle="bold"
+        app:strokeWidth="3dp" />
+
+    <TextView
         android:id="@+id/textviewhola"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
         android:text="SALUDO:"
         android:textAlignment="center"
         android:textColor="@color/black"
@@ -47,113 +69,108 @@
         android:layout_marginTop="20dp"
         android:orientation="vertical">
 
-        <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
-            android:id="@+id/textviewaciertos2"
-            android:layout_width="match_parent"
+        <TableLayout
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:text="ACIERTOS:"
-            android:textColor="@color/black"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:button="@android:color/transparent"
-            android:background="@drawable/radio_normal3"
-            android:elevation="4dp"
-            android:paddingLeft="10dp"
-            />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="1dp"
+            android:background="@drawable/rectangulo"
+            android:stretchColumns="*">
 
-        <TextView
-            android:id="@+id/TextViewFallos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:text="ERRORES:"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:button="@android:color/transparent"
-            android:background="@drawable/radio_normal3"
-            android:elevation="4dp"
-            android:paddingLeft="10dp"/>
+            <TableRow
+                android:layout_width="300dp"
+                android:layout_height="wrap_content">
+                <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
+                    android:id="@+id/textviewaciertos2"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="ACIERTOS:"
+                    android:textColor="@color/black"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    android:background="@drawable/radio_normal3"
+                    android:padding="10dp"/>
+            </TableRow>
 
-        <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
-            android:id="@+id/textviewpuntuacion2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="PUNTUACION:"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:textStyle="bold"
-            android:button="@android:color/transparent"
-            android:background="@drawable/radio_normal3"
-            android:elevation="4dp"
-            android:paddingLeft="10dp"/>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/TextViewFallos"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="ERRORES:"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/radio_normal3"
+                    android:padding="10dp"/>
+            </TableRow>
 
-        <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
-            android:id="@+id/textviewganancias"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="GANANCIAS:"
-            android:textColor="@color/black"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:button="@android:color/transparent"
-            android:background="@drawable/radio_normal3"
-            android:elevation="4dp"
-            android:paddingLeft="10dp"/>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
+                    android:id="@+id/textviewpuntuacion2"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="PUNTUACION:"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/radio_normal3"
+                    android:padding="10dp"/>
+            </TableRow>
 
-        <TextView
-            android:id="@+id/textviewclasificacion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/blue"
-            android:text="CLASIFICACION GLOBAL:"
-            android:button="@android:color/transparent"
-            android:background="@drawable/radio_normal3"
-            android:elevation="4dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:paddingLeft="10dp"
-            />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
+                    android:id="@+id/textviewganancias"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="GANANCIAS:"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/radio_normal3"
+                    android:padding="10dp"/>
+            </TableRow>
 
-        <TextView
-            android:id="@+id/textviewrecord"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/blue"
-            android:text="RECORD:"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:button="@android:color/transparent"
-            android:background="@drawable/radio_normal3"
-            android:elevation="4dp"
-            android:paddingLeft="10dp"/>
 
-        <TextView
-            android:id="@+id/textviewgrandtotal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TOTAL ACUMULADO:"
-            android:textColor="@color/blue"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:button="@android:color/transparent"
-            android:background="@drawable/radio_normal3"
-            android:elevation="4dp"
-            android:paddingLeft="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/textviewrecord"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="RECORD:"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/radio_normal3"
+                    android:padding="10dp"/>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/textviewgrandtotal"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="TOTAL ACUMULADO:"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/radio_normal3"
+                    android:padding="10dp"/>
+            </TableRow>
+
+        </TableLayout>
+
 
     </LinearLayout>
 
@@ -168,7 +185,7 @@
 
         <Button
             android:id="@+id/buttoncodigocobro"
-            android:layout_width="250dp"
+            android:layout_width="300dp"
             android:layout_height="75dp"
             android:background="@drawable/radio_normal3"
             android:freezesText="true"
@@ -181,7 +198,7 @@
 
         <Button
             android:id="@+id/buttonranking2"
-            android:layout_width="250dp"
+            android:layout_width="300dp"
             android:layout_height="75dp"
             android:background="@drawable/radio_selector"
             android:freezesText="true"
@@ -193,7 +210,7 @@
 
         <Button
             android:id="@+id/buttonmenuprincipal"
-            android:layout_width="250dp"
+            android:layout_width="300dp"
             android:layout_height="75dp"
             android:background="@drawable/radio_normal2"
             android:freezesText="true"

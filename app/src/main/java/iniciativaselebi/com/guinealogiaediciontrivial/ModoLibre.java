@@ -17,6 +17,9 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import iniciativaselebi.com.guinealogiaediciontrivial.R;
+
+
 public class ModoLibre extends AppCompatActivity {
 
     SharedPreferences sp;

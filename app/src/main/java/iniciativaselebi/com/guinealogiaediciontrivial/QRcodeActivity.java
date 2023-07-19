@@ -56,6 +56,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import Model.User;
+import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
 
 public class QRcodeActivity extends AppCompatActivity {
 

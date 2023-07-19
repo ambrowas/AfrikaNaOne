@@ -22,6 +22,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import iniciativaselebi.com.guinealogiaediciontrivial.R;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
@@ -81,6 +83,8 @@ public class Preguntas extends AppCompatActivity {
     int newPuntuacion;
     private DatabaseReference gameStatsRef;
     private boolean isProcessing = false;
+    boolean hasShownToast = false;
+
 
 
     @Override
@@ -279,11 +283,15 @@ public class Preguntas extends AppCompatActivity {
         radio_button2.setText(currentQuestion.get("optionB").toString());
         radio_button3.setText(currentQuestion.get("optionC").toString());
         textviewcategoria.setText(currentQuestion.get("category").toString());
+
         String imageUrl = currentQuestion.get("image").toString();
-        Glide.with(this).load(imageUrl).into(quizImage);
+
+        Glide.with(this)
+                .load(imageUrl)
+                .error(R.drawable.logotrivial) // Set a placeholder image or a fallback image
+                .into(quizImage);
 
         radio_group.clearCheck();
-
         resetRadioButtonColors();
 
         for (int i = 0; i < radio_group.getChildCount(); i++) {
@@ -361,10 +369,13 @@ public class Preguntas extends AppCompatActivity {
         textviewpuntuacion.setText("PUNTUACION: " + score);
         textviewfallos.setText("FALLOS: " + incorrectAnswers);
 
-        if (incorrectAnswers >= 4) {
+        if (incorrectAnswers >= 4 && !hasShownToast) {
             textviewfallos.setTextColor(Color.RED);
+            Toast.makeText(Preguntas.this, "Atención: 4 errores, uno más y se acabará la partida", Toast.LENGTH_LONG).show();
+            hasShownToast = true;
         }
-        // Check if the number of incorrect answers is greater than 5
+
+
         if (incorrectAnswers >= 5) {
 
             finishGame();

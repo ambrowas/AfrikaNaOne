@@ -9,6 +9,8 @@ import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -17,6 +19,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.snackbar.Snackbar;
+
+import iniciativaselebi.com.guinealogiaediciontrivial.R;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -202,25 +209,30 @@ public class PreguntasModoLibre extends AppCompatActivity {
             textviewpregunta.setTextColor(getColor(R.color.green));
             textviewpregunta.setTypeface(null, Typeface.BOLD);
             textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-
-
         } else {
             MediaPlayer mediaPlayer2 = MediaPlayer.create(this, R.raw.notright);
             mediaPlayer2.start();
             errores = errores + 1;
+
+            // Add a listener to know when the sound has finished playing
+            mediaPlayer2.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+
+                }
+            });
+
             textviewpregunta.setText("RESPUESTA INCORRECTA");
             textviewpregunta.setTextColor(getColor(R.color.red));
             textviewpregunta.setTypeface(null, Typeface.BOLD);
             textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-
-
-
         }
 
         textviewpuntuacion.setText("Puntuación: " + scoretotal);
         textviewaciertos.setText("Aciertos: " + score);
         showSolution();
     }
+
 
     private void showSolution() {
         if (questionCounter < questionCountTotal) {

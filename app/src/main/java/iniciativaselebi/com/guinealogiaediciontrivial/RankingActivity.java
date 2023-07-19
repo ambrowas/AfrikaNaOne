@@ -3,15 +3,18 @@ package iniciativaselebi.com.guinealogiaediciontrivial;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -40,13 +43,14 @@ public class RankingActivity extends AppCompatActivity {
     Button buttonatras;
     Animation flashAnimation;
     ValueAnimator animator;
+    private Activity toastLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranking);
 
-        buttonatras = (Button)findViewById(R.id.buttonatras);
+        buttonatras = (Button) findViewById(R.id.buttonatras);
         buttonatras.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,8 +150,6 @@ public class RankingActivity extends AppCompatActivity {
                     });
 
 
-
-
                     TextView tvCity = new TextView(RankingActivity.this);
                     tvCity.setText(user.ciudad);
                     tvCity.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
@@ -197,13 +199,25 @@ public class RankingActivity extends AppCompatActivity {
     private void checkAndLaunchNumberOneActivity(User user, int rank) {
         String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         if (rank == 1 && currentUserUid.equals(user.getUid())) {
-            Toast.makeText(getApplicationContext(), "Felicidades, eres el No.1 del ranking ", Toast.LENGTH_SHORT).show();
-           // Intent becomingNumberOneIntent = new Intent(RankingActivity.this, BecomingNumberOneActivity.class);
-            //startActivity(becomingNumberOneIntent);
+            LayoutInflater inflater = getLayoutInflater();
+            View toastLayout = inflater.inflate(R.layout.toast_custom, findViewById(R.id.toast_layout));
+
+            ImageView toastImage = toastLayout.findViewById(R.id.toast_image);
+            TextView toastText = toastLayout.findViewById(R.id.toast_text);
+
+            toastImage.setImageResource(R.drawable.logotrivial);
+            toastText.setText("Felicidades, eres el No.1 del ranking");
+            toastText.setGravity(Gravity.CENTER);
+
+            Toast toast = new Toast(getApplicationContext());
+            toast.setDuration(Toast.LENGTH_SHORT);
+            toast.setView(toastLayout);
+            toast.show();
         }
     }
 
-
+    // Intent becomingNumberOneIntent = new Intent(RankingActivity.this, BecomingNumberOneActivity.class);
+    //startActivity(becomingNumberOneIntent);
 }
 
 

@@ -6,11 +6,15 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import iniciativaselebi.com.guinealogiaediciontrivial.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -229,7 +233,22 @@ public class Modocompeticion extends AppCompatActivity {
                             button_jugar2.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    Toast.makeText(getApplicationContext(), "        FIN DE PARTIDA.\nINTRODUCE UN NUEVO \n  CODIGO DE JUEGO.", Toast.LENGTH_LONG).show();
+                                    Toast toast = new Toast(getApplicationContext());
+                                    LayoutInflater inflater = getLayoutInflater();
+                                    View toastLayout = inflater.inflate(R.layout.toast_custom, findViewById(R.id.toast_layout));
+
+                                    ImageView toastImage = toastLayout.findViewById(R.id.toast_image);
+                                    TextView toastText = toastLayout.findViewById(R.id.toast_text);
+
+                                    toastImage.setImageResource(R.drawable.logotrivial);
+                                    toastText.setText("FIN DE PARTIDA.\nINTRODUCE UN NUEVO \nCODIGO DE JUEGO.");
+                                    toastText.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL); // Justify the text to the center
+
+                                    toast.setDuration(Toast.LENGTH_SHORT);
+                                    toast.setView(toastLayout);
+                                    toast.show();
+
+                                    toast.show();
 
                                 }
                             });

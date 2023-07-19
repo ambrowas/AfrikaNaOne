@@ -10,6 +10,9 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import iniciativaselebi.com.guinealogiaediciontrivial.R;
+
+
 public class GameOverActivity extends AppCompatActivity {
 
     Button gameOverText;

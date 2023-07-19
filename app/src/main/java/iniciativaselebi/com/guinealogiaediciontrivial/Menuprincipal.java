@@ -10,6 +10,9 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import iniciativaselebi.com.guinealogiaediciontrivial.R;
+
+
 public class Menuprincipal extends AppCompatActivity {
 
         Button button_modolibre, button_modocompeticion, button_contactanos;

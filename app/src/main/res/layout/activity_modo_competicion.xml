@@ -62,7 +62,7 @@
 
     <Button
         android:id="@+id/button_jugar2"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="85dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_normal"
@@ -80,7 +80,7 @@
 
     <Button
         android:id="@+id/button_clasificacion"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="85dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_normal2"
@@ -97,7 +97,7 @@
 
     <Button
         android:id="@+id/button_perfil"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="85dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_normal3"
@@ -115,7 +115,7 @@
 
     <Button
         android:id="@+id/button_login"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="85dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_selector_blue"
@@ -133,7 +133,7 @@
 
     <Button
         android:id="@+id/buttoncodigo"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="85dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_normal"
@@ -150,7 +150,7 @@
         />
     <Button
         android:id="@+id/button_register"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="85dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_normal"

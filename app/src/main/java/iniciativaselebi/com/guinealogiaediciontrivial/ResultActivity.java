@@ -20,6 +20,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import iniciativaselebi.com.guinealogiaediciontrivial.R;
+
+
 import java.util.ArrayList;
 import java.util.Collections;
 

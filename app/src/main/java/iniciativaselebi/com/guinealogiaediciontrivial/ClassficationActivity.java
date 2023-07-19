@@ -1,5 +1,7 @@
 package iniciativaselebi.com.guinealogiaediciontrivial;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -18,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import iniciativaselebi.com.guinealogiaediciontrivial.R;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -48,6 +52,7 @@ public class ClassficationActivity extends AppCompatActivity {
         int grandtotal;
         FirebaseDatabase database;
         DatabaseReference myRef;
+        private ValueAnimator animator;
 
 
     @Override
@@ -72,6 +77,24 @@ public class ClassficationActivity extends AppCompatActivity {
         blueColor = Color.parseColor("#0000FF");
 
         textviewclasificacion = (TextView)findViewById(R.id.textviewclasificacion);
+        final int[] colors = {Color.RED, Color.GREEN, Color.BLUE}; // array of colors to cycle through
+        animator = ValueAnimator.ofInt(colors); // create value animator with the array of colors
+        animator.setDuration(1000); // set the duration for each color change
+        animator.setEvaluator(new ArgbEvaluator()); // set the evaluator to interpolate between the colors
+        animator.setRepeatCount(ValueAnimator.INFINITE); // set the repeat count to infinite
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                int color = (int) animator.getAnimatedValue(); // get the current color from the animator
+                textviewclasificacion.setTextColor(color); // set the text color to the current color
+            }
+        });
+        animator.start(); // start the animator
+
+
+
+
+
         TextViewFallos = (TextView)findViewById(R.id.TextViewFallos);
         textviewgrandtotal = (TextView) findViewById(R.id.textviewgrandtotal);
 
@@ -86,7 +109,7 @@ public class ClassficationActivity extends AppCompatActivity {
                     User userData = dataSnapshot.getValue(User.class);
                     if (userData != null) {
                         position = userData.getPositionInLeaderboard();
-                        textviewclasificacion.setText("RANKING GLOBAL: " + String.valueOf(position) + " PUESTO");
+                        textviewclasificacion.setText( String.valueOf(position));
                         grandtotal = userData.getAccumulatedPuntuacion();
                         textviewgrandtotal.setText("GANANCIAS ACUMULADAS: " + String.valueOf(grandtotal) + " FCFA");
 

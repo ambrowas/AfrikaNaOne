@@ -11,6 +11,9 @@ import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import iniciativaselebi.com.guinealogiaediciontrivial.R;
+
+
 public class ContactanosActivity extends AppCompatActivity {
 
     ImageButton imagebuttonwhatsap;
