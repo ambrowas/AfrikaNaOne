@@ -98,7 +98,7 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary">
+            android:background="@color/white">
 
             <TextView
                 android:id="@+id/emailAddressTitle"
@@ -134,7 +134,7 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="@color/white"
             >
 
             <TextView
@@ -171,7 +171,7 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary">
+            android:background="@color/white">
 
             <TextView
                 android:id="@+id/textViewPais"

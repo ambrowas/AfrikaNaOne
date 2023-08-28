@@ -89,7 +89,7 @@ public class QRcodeActivity extends AppCompatActivity {
 
             String base64QRCode = generateQRcode(code);
 
-            saveQRCodeToDatabase(userId, base64QRCode, fullname, email, lastGameScore, lastGamePuntuacion, timestamp)
+            saveQRCodeToDatabase(userId, base64QRCode, userName, userEmail, lastGameScore, lastGamePuntuacion, timestamp)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             String qrCodeKey = task.getResult();

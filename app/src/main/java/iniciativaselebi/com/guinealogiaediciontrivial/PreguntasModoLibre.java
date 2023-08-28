@@ -130,6 +130,7 @@ public class PreguntasModoLibre extends AppCompatActivity {
             radio_button3.setText(currentQuestion.getOption3());
             questionCounter++;
             textviewcontadorpreguntas.setText("PREGUNTA: " + questionCounter + "/" + questionCountTotal);
+            textviewcontadorpreguntas.setTextColor(getColor(R.color.blue));
             answered = false;
             buttonconfirmar.setText("CONFIRMAR");
             timeLeftInMillis = COUNTDOWN_IN_MILLIS;
@@ -146,8 +147,8 @@ public class PreguntasModoLibre extends AppCompatActivity {
                 resetRadioButtonColors();
 
                 if (selectedRadioButton != null) {
-                    selectedRadioButton.setBackgroundResource(R.drawable.radio_normal3);
-                    selectedRadioButton.setTextColor(Color.BLACK);
+                    selectedRadioButton.setBackgroundResource(R.drawable.blackbackground);
+                    selectedRadioButton.setTextColor(Color.WHITE);
                 }
             }
 
@@ -182,9 +183,8 @@ public class PreguntasModoLibre extends AppCompatActivity {
     }
 
     private void updateCountdownText() {
-        int minutes = (int) (timeLeftInMillis / 1000) / 60;
-        int seconds = (int) (timeLeftInMillis / 1000) % 60;
-        String timeFormatted = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
+        int seconds = (int) (timeLeftInMillis / 1000);
+        String timeFormatted = String.format(Locale.getDefault(), "%02d", seconds);
         textviewtiempo.setText(timeFormatted);
         if (timeLeftInMillis < 10000) {
             textviewtiempo.setTextColor(Color.RED);
@@ -192,6 +192,7 @@ public class PreguntasModoLibre extends AppCompatActivity {
             textviewtiempo.setTextColor(textColorDefaultCd);
         }
     }
+
 
     private void checkAnswer() {
         answered = true;
@@ -228,8 +229,10 @@ public class PreguntasModoLibre extends AppCompatActivity {
             textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         }
 
-        textviewpuntuacion.setText("Puntuación: " + scoretotal);
-        textviewaciertos.setText("Aciertos: " + score);
+        textviewpuntuacion.setText("PUNTUACION: " + scoretotal);
+        textviewpuntuacion.setTextColor(getColor(R.color.blue));
+        textviewaciertos.setText("ACIERTOS: " + score);
+        textviewaciertos.setTextColor(getColor(R.color.blue));
         showSolution();
     }
 

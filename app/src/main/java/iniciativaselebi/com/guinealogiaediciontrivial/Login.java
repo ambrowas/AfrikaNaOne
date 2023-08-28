@@ -22,6 +22,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class Login extends AppCompatActivity {
@@ -55,7 +57,6 @@ public class Login extends AppCompatActivity {
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
         buttonLogIn = findViewById(R.id.btn_login);
-        buttonLogout = findViewById(R.id.btn_logout);
         btn_crear = findViewById(R.id.btn_crear);
         progressBar = findViewById(R.id.progressBar);
 
@@ -89,12 +90,12 @@ public class Login extends AppCompatActivity {
                 password = String.valueOf(editTextPassword.getText());
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(Login.this, "Introducir datos", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Login.this, "Introduce tu email", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
                 if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(Login.this, "Introducir datos", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Login.this, "Introduce tu contraseña", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
@@ -118,6 +119,7 @@ public class Login extends AppCompatActivity {
                                         startActivity(intent);
                                         finish();
                                     }
+
                                 }
                             }
                         })
@@ -125,9 +127,16 @@ public class Login extends AppCompatActivity {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 progressBar.setVisibility(View.GONE);
-                                Toast.makeText(Login.this, "La cuenta no existe, ¿quieres registrarte?", Toast.LENGTH_LONG).show();
+                                if (e instanceof FirebaseAuthInvalidUserException) {
+                                    Toast.makeText(Login.this, "No hay ninguna cuenta asociada con ese email. Quieres registrarte?", Toast.LENGTH_LONG).show();
+                                } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                                    Toast.makeText(Login.this, "Contraseña incorrecta. Intentalo de nuevo", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(Login.this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                                }
                             }
                         });
+
             }
         });
         }}

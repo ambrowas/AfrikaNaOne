@@ -200,7 +200,7 @@ public class ClassficationActivity extends AppCompatActivity {
             textviewaciertos2.setText("HAS OBTENIDO " + aciertos + " ACIERTOS");
             textviewpuntuacion2.setText("TU PUNTUACION ES DE  " + puntuacion + " PUNTOS");
             textiviewganancias.setText("TUS GANANCIAS SON DE  " + puntuacion + " FCFA");
-            TextViewFallos.setText("HAS TENIDO " + errores + " ERRORES");
+            TextViewFallos.setText("ACUMULASTE " + errores + " ERRORES");
 
 
             if (user != null) {
@@ -260,7 +260,7 @@ public class ClassficationActivity extends AppCompatActivity {
                         Toast.makeText(ClassficationActivity.this, "¡Nuevo récord alcanzado!", Toast.LENGTH_SHORT).show();
                         highestScore = newScore; // Update the variable with the new score
                     }
-                    textviewrecord.setText("PUNTUACION MAS ALTA: " + (highestScore == null ? 0 : highestScore + " PUNTOS"));
+                    textviewrecord.setText("RECORD: " + (highestScore == null ? 0 : highestScore + " PUNTOS"));
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {

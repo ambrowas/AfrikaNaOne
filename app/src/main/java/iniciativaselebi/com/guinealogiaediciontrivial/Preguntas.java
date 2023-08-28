@@ -1,5 +1,7 @@
 package iniciativaselebi.com.guinealogiaediciontrivial;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -10,6 +12,8 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -48,7 +52,7 @@ import java.util.Map;
 public class Preguntas extends AppCompatActivity {
 
 
-    private ImageView quizImage;
+    private ImageView quizImage,resultImage;
     private TextView textviewpregunta, textviewcategoria, textviewaciertos, textviewpuntuacion, textviewfallos, textviewtiempo;
     private RadioButton radio_button1, radio_button2, radio_button3;
     private Button buttonconfirmar, buttonsiguiente, buttonterminar;
@@ -84,6 +88,7 @@ public class Preguntas extends AppCompatActivity {
     private DatabaseReference gameStatsRef;
     private boolean isProcessing = false;
     boolean hasShownToast = false;
+    private boolean continueAnimation = true;
 
 
 
@@ -141,19 +146,201 @@ public class Preguntas extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isSolutionDisplayed) {
-                    currentQuestionIndex++;
-                    if (currentQuestionIndex < preguntasList.size()) {
-                        displayQuestion();
-                    } else {
-                        // Show end game message or navigate to the results activity
+                    moveToNextQuestion();
+                }
+                isSolutionDisplayed = false;
+                adjustButtonVisibility();
+            }
+        }
+        );};
+    private void moveToNextQuestion() {
+
+        stopImageAnimation();
+        currentQuestionIndex++;
+        if (currentQuestionIndex < preguntasList.size()) {
+            displayQuestion();
+        } else {
+            // Show end game message or navigate to the results activity
+            // Maybe you want to create a method like endGame() here.
+        }
+
+        // If you have any animation running on the resultImage, ensure it's stopped here.
+        ImageView resultImage = findViewById(R.id.resultImage);
+        resultImage.animate().cancel();
+        resultImage.setVisibility(View.INVISIBLE);
+    }
+
+    private void stopImageAnimation() {
+        ImageView resultImage = findViewById(R.id.resultImage);
+        resultImage.animate().cancel();
+
+        resultImage.setScaleX(1f); // reset the scale
+        resultImage.setScaleY(1f); // reset the scale
+
+        resultImage.setVisibility(View.INVISIBLE);
+    }
+
+    private void displayQuestion() {
+        resetImageAndAnimation();
+        resetTextView();
+        currentQuestion = preguntasList.get(currentQuestionIndex);
+
+        textviewpregunta.setText(currentQuestion.get("question").toString());
+        radio_button1.setText(currentQuestion.get("optionA").toString());
+        radio_button2.setText(currentQuestion.get("optionB").toString());
+        radio_button3.setText(currentQuestion.get("optionC").toString());
+        textviewcategoria.setText(currentQuestion.get("category").toString());
+
+        String imageUrl = currentQuestion.get("image").toString();
+
+        Glide.with(this)
+                .load(imageUrl)
+                .error(R.drawable.logotrivial) // Set a placeholder image or a fallback image
+                .into(quizImage);
+
+        radio_group.clearCheck();
+        resetRadioButtonColors();
+
+        for (int i = 0; i < radio_group.getChildCount(); i++) {
+            radio_group.getChildAt(i).setEnabled(true);
+        }
+
+        // Set the countdown timer to 16 seconds and start it
+        timer = new CountDownTimer(16000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                int seconds = (int) (millisUntilFinished / 1000) % 60;
+                String timeLeftFormatted = (seconds < 10) ? String.format(Locale.getDefault(), "0%d", seconds)
+                        : String.format(Locale.getDefault(), "%d", seconds);
+                textviewtiempo.setText(timeLeftFormatted);
+
+                if (seconds <= 10) {
+                    textviewtiempo.setTextColor(Color.RED); // set font color to red
+                } else {
+                    textviewtiempo.setTextColor(Color.BLACK); // set font color to black
+                }
+
+                if (seconds <= 5) {
+                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                        mediaPlayer.stop();
                     }
-                    isSolutionDisplayed = false;
-                    buttonconfirmar.setVisibility(View.VISIBLE);
-                    buttonsiguiente.setVisibility(View.GONE);
-                    buttonterminar.setVisibility(View.GONE);
+                    mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.countdown);
+                    mediaPlayer.start();
                 }
             }
-        });
+
+            @Override
+            public void onFinish() {
+                processAnswer();
+                showSolution();
+                buttonconfirmar.setVisibility(View.GONE);
+                buttonsiguiente.setVisibility(View.VISIBLE);
+                buttonterminar.setVisibility(View.VISIBLE);
+            }
+        }.start();
+    }
+
+    private void processAnswer() {
+        int selectedRadioButtonId = radio_group.getCheckedRadioButtonId();
+        if (selectedRadioButtonId == -1) {
+            MediaPlayer mediaPlayer2 = MediaPlayer.create(getApplicationContext(), R.raw.notright);
+            mediaPlayer2.start();
+            score -= 500;
+            incorrectAnswers++;
+        } else {
+            RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
+            String selectedOption = selectedRadioButton.getText().toString();
+            if (selectedOption.equals(currentQuestion.get("answer"))) {
+                correctAnswers++;
+                currentGameAciertos++;
+                MediaPlayer mediaPlayer1 = MediaPlayer.create(getApplicationContext(), R.raw.right);
+                mediaPlayer1.start();
+                score += 500;
+            } else {
+                incorrectAnswers++;
+                currentGameFallos++;
+                MediaPlayer mediaPlayer2 = MediaPlayer.create(getApplicationContext(), R.raw.notright);
+                mediaPlayer2.start();
+                score -= 500;
+            }
+        }
+
+        textviewaciertos.setText("ACIERTOS: " + correctAnswers);
+        textviewpuntuacion.setText("PUNTUACION: " + score);
+        textviewfallos.setText("FALLOS: " + incorrectAnswers);
+
+        if (incorrectAnswers >= 4 && !hasShownToast) {
+            textviewfallos.setTextColor(Color.RED);
+            Toast.makeText(Preguntas.this, "Atención: 4 errores, uno más y se acabará la partida", Toast.LENGTH_LONG).show();
+            hasShownToast = true;
+        }
+
+
+        if (incorrectAnswers >= 5) {
+
+            finishGame();
+
+        }
+    }
+
+    private void showSolution() {
+        int selectedRadioButtonId = radio_group.getCheckedRadioButtonId();
+        RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
+        String selectedOption = selectedRadioButton != null ? selectedRadioButton.getText().toString() : null;
+        String correctAnswer = currentQuestion.get("answer").toString();
+
+        ImageView resultImage = findViewById(R.id.resultImage);
+
+        if (selectedOption != null && selectedOption.equals(correctAnswer)) {
+            textviewpregunta.setText("RESPUESTA CORRECTA");
+            textviewpregunta.setTextColor(getColor(R.color.green));
+            resultImage.setImageResource(R.drawable.baseline_check_24);
+            resultImage.setColorFilter(getColor(R.color.green));
+        } else {
+            textviewpregunta.setText("RESPUESTA INCORRECTA");
+            textviewpregunta.setTextColor(getColor(R.color.red));
+            resultImage.setImageResource(R.drawable.baseline_clear_24);
+            resultImage.setColorFilter(getColor(R.color.red));
+        }
+
+        // Animation for image
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(resultImage, "scaleX", 0.5f, 1f);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(resultImage, "scaleY", 0.5f, 1f);
+        AnimatorSet scaleSet = new AnimatorSet();
+        scaleSet.play(scaleX).with(scaleY);
+        scaleSet.setDuration(500);
+        scaleSet.start();
+
+        resultImage.setVisibility(View.VISIBLE);  // Now show the image
+
+        textviewpregunta.setTypeface(null, Typeface.BOLD);
+        textviewpregunta.setGravity(Gravity.CENTER);
+
+        isSolutionDisplayed = true;
+        buttonconfirmar.setVisibility(View.GONE);
+        buttonsiguiente.setVisibility(View.VISIBLE);
+        buttonterminar.setVisibility(View.VISIBLE);
+    }
+
+    private void resetImageAndAnimation() {
+        ImageView resultImage = findViewById(R.id.resultImage);
+        resultImage.setImageResource(0); // remove the previous image
+        resultImage.animate().cancel();
+        resultImage.setVisibility(View.INVISIBLE);
+    }
+
+
+
+    private void adjustButtonVisibility() {
+        if (isSolutionDisplayed) {
+            buttonconfirmar.setVisibility(View.GONE);
+            buttonsiguiente.setVisibility(View.VISIBLE);
+            buttonterminar.setVisibility(View.VISIBLE);
+        } else {
+            buttonconfirmar.setVisibility(View.VISIBLE);
+            buttonsiguiente.setVisibility(View.GONE);
+            buttonterminar.setVisibility(View.GONE);
+        }
     }
 
     private void initializeUIElements() {
@@ -170,6 +357,26 @@ public class Preguntas extends AppCompatActivity {
         buttonconfirmar = findViewById(R.id.buttonconfirmar);
         radio_group = findViewById(R.id.radio_group);
         buttonsiguiente = findViewById(R.id.buttonsiguiente);
+        resultImage = findViewById(R.id.resultImage);
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.grow_animation);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if (continueAnimation) {
+                    resultImage.startAnimation(animation);  // Restart the animation only if flag is set
+                }
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+
+        resultImage.startAnimation(animation);
+
 
         buttonterminar = findViewById(R.id.buttonterminar);
         buttonterminar.setVisibility(View.GONE);
@@ -202,9 +409,6 @@ public class Preguntas extends AppCompatActivity {
                 }
             }
         });
-
-
-
 
         radio_button1.setTextColor(Color.WHITE);
         radio_button2.setTextColor(Color.WHITE);
@@ -273,66 +477,6 @@ public class Preguntas extends AppCompatActivity {
         });
     }
 
-    private void displayQuestion() {
-
-        resetTextView();
-        currentQuestion = preguntasList.get(currentQuestionIndex);
-
-        textviewpregunta.setText(currentQuestion.get("question").toString());
-        radio_button1.setText(currentQuestion.get("optionA").toString());
-        radio_button2.setText(currentQuestion.get("optionB").toString());
-        radio_button3.setText(currentQuestion.get("optionC").toString());
-        textviewcategoria.setText(currentQuestion.get("category").toString());
-
-        String imageUrl = currentQuestion.get("image").toString();
-
-        Glide.with(this)
-                .load(imageUrl)
-                .error(R.drawable.logotrivial) // Set a placeholder image or a fallback image
-                .into(quizImage);
-
-        radio_group.clearCheck();
-        resetRadioButtonColors();
-
-        for (int i = 0; i < radio_group.getChildCount(); i++) {
-            radio_group.getChildAt(i).setEnabled(true);
-        }
-
-        // Set the countdown timer to 16 seconds and start it
-        timer = new CountDownTimer(16000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                int seconds = (int) (millisUntilFinished / 1000) % 60;
-                String timeLeftFormatted = (seconds < 10) ? String.format(Locale.getDefault(), "0%d", seconds)
-                        : String.format(Locale.getDefault(), "%d", seconds);
-                textviewtiempo.setText(timeLeftFormatted);
-
-                if (seconds <= 10) {
-                    textviewtiempo.setTextColor(Color.RED); // set font color to red
-                } else {
-                    textviewtiempo.setTextColor(Color.BLACK); // set font color to black
-                }
-
-                if (seconds <= 5) {
-                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                        mediaPlayer.stop();
-                    }
-                    mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.countdown);
-                    mediaPlayer.start();
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                processAnswer();
-                showSolution();
-                buttonconfirmar.setVisibility(View.GONE);
-                buttonsiguiente.setVisibility(View.VISIBLE);
-                buttonterminar.setVisibility(View.VISIBLE);
-            }
-        }.start();
-    }
-
     private void resetTextView() {
         textviewpregunta.setText("");
         textviewpregunta.setTextColor(getColor(R.color.black)); // replace with your default color
@@ -340,80 +484,11 @@ public class Preguntas extends AppCompatActivity {
         textviewpregunta.setGravity(Gravity.START);
     }
 
-    private void processAnswer() {
-        int selectedRadioButtonId = radio_group.getCheckedRadioButtonId();
-        if (selectedRadioButtonId == -1) {
-            MediaPlayer mediaPlayer2 = MediaPlayer.create(getApplicationContext(), R.raw.notright);
-            mediaPlayer2.start();
-            score -= 500;
-            incorrectAnswers++;
-        } else {
-            RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
-            String selectedOption = selectedRadioButton.getText().toString();
-            if (selectedOption.equals(currentQuestion.get("answer"))) {
-                correctAnswers++;
-                currentGameAciertos++;
-                MediaPlayer mediaPlayer1 = MediaPlayer.create(getApplicationContext(), R.raw.right);
-                mediaPlayer1.start();
-                score += 500;
-            } else {
-                incorrectAnswers++;
-                currentGameFallos++;
-                MediaPlayer mediaPlayer2 = MediaPlayer.create(getApplicationContext(), R.raw.notright);
-                mediaPlayer2.start();
-                score -= 500;
-            }
-        }
-
-        textviewaciertos.setText("ACIERTOS: " + correctAnswers);
-        textviewpuntuacion.setText("PUNTUACION: " + score);
-        textviewfallos.setText("FALLOS: " + incorrectAnswers);
-
-        if (incorrectAnswers >= 4 && !hasShownToast) {
-            textviewfallos.setTextColor(Color.RED);
-            Toast.makeText(Preguntas.this, "Atención: 4 errores, uno más y se acabará la partida", Toast.LENGTH_LONG).show();
-            hasShownToast = true;
-        }
-
-
-        if (incorrectAnswers >= 5) {
-
-            finishGame();
-
-        }
-    }
-
     private void resetRadioButtonColors() {
         radio_button1.setBackgroundResource(R.drawable.radio_selector);
         radio_button2.setBackgroundResource(R.drawable.radio_selector);
         radio_button3.setBackgroundResource(R.drawable.radio_selector);
     }
-
-    private void showSolution() {
-        int selectedRadioButtonId = radio_group.getCheckedRadioButtonId();
-        RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
-        String selectedOption = selectedRadioButton != null ? selectedRadioButton.getText().toString() : null;
-
-        String correctAnswer = currentQuestion.get("answer").toString();
-        if (selectedOption != null && selectedOption.equals(correctAnswer)) {
-            textviewpregunta.setText("RESPUESTA CORRECTA");
-            textviewpregunta.setTextColor(getColor(R.color.green));
-            textviewpregunta.setTypeface(null, Typeface.BOLD);
-            textviewpregunta.setGravity(Gravity.CENTER);
-        } else {
-            textviewpregunta.setText("RESPUESTA INCORRECTA");
-            textviewpregunta.setTextColor(getColor(R.color.red));
-            textviewpregunta.setTypeface(null, Typeface.BOLD);
-            textviewpregunta.setGravity(Gravity.CENTER);
-        }
-
-        isSolutionDisplayed = true;
-        buttonconfirmar.setVisibility(View.GONE);
-        buttonsiguiente.setVisibility(View.VISIBLE);
-        buttonterminar.setVisibility(View.VISIBLE);
-    }
-
-
 
     private void updateAccumulatedValues(String userId, int newAciertos, int newFallos, int newPuntuacion) {
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(userId);
@@ -479,7 +554,6 @@ public class Preguntas extends AppCompatActivity {
         });
     }
 
-
     private void finishGame() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -522,7 +596,6 @@ public class Preguntas extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "ACUMULASTE CINCO FALLOS.\n             FIN DE PARTIDA", Toast.LENGTH_LONG).show();
         finish();
     }
-
 
     @Override
     public void onBackPressed() {

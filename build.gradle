@@ -1,7 +1,7 @@
 buildscript {
     repositories {
-        // Check that you have the following line (if not, add it):
-        google() // Google's Maven repository}
+        google()
+        mavenCentral()  // add this line
     }
     dependencies {
         classpath 'com.google.gms:google-services:4.3.15'
@@ -10,8 +10,9 @@ buildscript {
     }
 }
 
-
-plugins {
-    id 'com.android.application' version '8.0.2' apply false
-    id 'com.android.library' version '8.0.2' apply false
+allprojects {
+    repositories {
+        google()
+        mavenCentral()  // add this line
+    }
 }

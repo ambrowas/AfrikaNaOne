@@ -51,15 +51,10 @@ public class Modocompeticion extends AppCompatActivity {
 
                 @Override
                 public void onClick(View v) {
-                    if (System.currentTimeMillis() - lastClickTime < 2000) {
                         Intent intent = new Intent(Modocompeticion.this, Menuprincipal.class);
                         startActivity(intent);
                         finish();
-                    } else {
-                        lastClickTime = System.currentTimeMillis();
-                        Toast.makeText(getApplicationContext(), "Clickea otra vez para volver", Toast.LENGTH_SHORT).show();
 
-                    }
                 }
             });
 
@@ -241,7 +236,7 @@ public class Modocompeticion extends AppCompatActivity {
                                     TextView toastText = toastLayout.findViewById(R.id.toast_text);
 
                                     toastImage.setImageResource(R.drawable.logotrivial);
-                                    toastText.setText("FIN DE PARTIDA.\nINTRODUCE UN NUEVO \nCODIGO DE JUEGO.");
+                                    toastText.setText("INTRODUCE UN NUEVO \nCODIGO DE JUEGO.");
                                     toastText.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL); // Justify the text to the center
 
                                     toast.setDuration(Toast.LENGTH_SHORT);

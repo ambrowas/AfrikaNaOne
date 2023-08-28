@@ -15,9 +15,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ACIERTOS : 0 "
-            android:textColor="@color/black"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="10dp"
+            android:textColor="@color/blue"
+            android:layout_marginTop="60dp"
+            android:layout_marginLeft="30dp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
@@ -25,9 +26,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/textviewaciertos"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="30dp"
+            android:textSize="20sp"
             android:text="PUNTUACION : 0 "
-            android:textColor="@color/black"
+            android:textColor="@color/blue"
             android:textStyle="bold" />
 
 
@@ -36,42 +38,43 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/textviewpuntuacion"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="30dp"
             android:text="PREGUNTA : 1/X"
-            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textColor="@color/blue"
             android:textStyle="bold" />
+
 
     <TextView
         android:id="@+id/textviewtiempo"
         android:layout_width="114dp"
-        android:layout_height="61dp"
+        android:layout_height="70dp"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="30dp"
-        android:layout_marginRight="15dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginRight="10dp"
         android:fontFamily="?android:attr/fontFamily"
         android:paddingRight="10dp"
         android:shadowColor="@color/black"
         android:shadowDx="4"
         android:shadowDy="4"
-        android:shadowRadius="6"
-        android:text="30"
+        android:shadowRadius="4"
         android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textSize="60sp"
         android:textStyle="bold" />
 
-
-        <TextView
-            android:id="@+id/textviewpregunta"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/textviewtiempo"
-            android:layout_marginTop="50dp"
-            android:layout_marginBottom="50dp"
-            android:paddingLeft="20dp"
-            android:text="¿Quien descubrió America el 12 de Octubre de 1492?"
-            android:textAlignment="viewStart"
-            android:textColor="@color/black"
-            android:textSize="18sp" />
+    <TextView
+        android:id="@+id/textviewpregunta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textviewtiempo"
+        android:layout_marginTop="80dp"
+        android:layout_marginBottom="50dp"
+        android:paddingLeft="20dp"
+        android:text="¿Quien descubrió America el 12 de Octubre de 1492?"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 
         <RadioGroup
             android:id="@+id/radio_group"
