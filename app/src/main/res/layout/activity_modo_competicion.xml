@@ -1,64 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout
-
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-
     android:background="@drawable/trivialbackground"
     tools:context=".Modocompeticion">
-
-
-    <ImageButton
-        android:id="@+id/button_back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/baseline_arrow_back_24"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="20dp"
-        />
-
-
-
 
     <TextView
         android:id="@+id/TextViewSaludo2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="180dp"
         android:shadowColor="@color/white"
-        android:layout_marginTop="150dp"
         android:shadowDx="4"
         android:shadowDy="4"
         android:shadowRadius="6"
-        android:layout_gravity="center_horizontal"
         android:text="INICIA SESION O REGISTRATE"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/black"
-        android:textSize="10pt"
+        android:textSize="8pt"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/TextViewRecord"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/TextViewSaludo2"
-        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/TextViewSaludo2"
         android:text=""
+        android:layout_marginBottom="10dp"
         android:textAlignment="center"
-        android:layout_gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/black"
-        android:textSize="8pt"
+        android:textSize="6pt"
         android:textStyle="bold"
         android:shadowDx="4"
         android:shadowDy="4"
         android:shadowRadius="6"/>
-
 
     <Button
         android:id="@+id/button_jugar2"
@@ -66,17 +48,31 @@
         android:layout_height="85dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_normal"
-        android:textColor="@color/white"
-        android:layout_below="@id/TextViewRecord"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/TextViewRecord"
+        android:layout_marginTop="60dp"
         android:text="JUGAR"
+        android:textColor="@color/white"
+        android:gravity="center"
         android:shadowDx="4"
         android:shadowDy="4"
-        android:layout_marginBottom="10dp"
         android:shadowRadius="6"
         app:strokeWidth="3dp" />
+
+    <Button
+        android:id="@+id/buttoncodigo"
+        android:layout_width="300dp"
+        android:layout_height="85dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/radio_normal"
+        android:layout_below="@+id/button_jugar2"
+        android:text="CODIGO"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/button_clasificacion"
@@ -84,16 +80,15 @@
         android:layout_height="85dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_normal2"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/buttoncodigo"
         android:text="CLASIFICACION"
         android:textColor="@color/white"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
         android:shadowDx="4"
         android:shadowDy="4"
-        android:layout_marginBottom="10dp"
         android:shadowRadius="6"
         app:strokeWidth="3dp" />
-
 
     <Button
         android:id="@+id/button_perfil"
@@ -101,13 +96,11 @@
         android:layout_height="85dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_normal3"
-        android:layout_below="@id/TextViewRecord"
-        android:gravity="center"
+        android:layout_below="@+id/button_clasificacion"
         android:text="PERFIL"
-        android:layout_marginBottom="10dp"
-        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
         android:textColor="@color/blue"
-        android:shadowColor="@color/white"
+        android:gravity="center"
         android:shadowDx="4"
         android:shadowDy="4"
         android:shadowRadius="6"
@@ -119,57 +112,49 @@
         android:layout_height="85dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_selector_blue"
-        android:layout_below="@id/TextViewRecord"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/button_perfil"
         android:text="INICIAR SESION"
         android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
         android:shadowDx="4"
         android:shadowDy="4"
-        android:layout_marginBottom="10dp"
         android:shadowRadius="6"
         app:strokeWidth="3dp" />
 
-
-    <Button
-        android:id="@+id/buttoncodigo"
-        android:layout_width="300dp"
-        android:layout_height="85dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/radio_normal"
-        android:layout_below="@id/TextViewRecord"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:text="CODIGO"
-        android:textColor="@color/white"
-        android:shadowDx="4"
-        android:shadowDy="4"
-        android:shadowRadius="6"
-        app:strokeWidth="3dp"
-        android:visibility="gone"
-        />
     <Button
         android:id="@+id/button_register"
         android:layout_width="300dp"
         android:layout_height="85dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_normal"
-        android:layout_below="@id/TextViewRecord"
-        android:gravity="center"
+        android:layout_below="@+id/button_login"
+        android:text="REGISTRAR"
         android:textColor="@color/white"
-        android:layout_gravity="center_horizontal"
-        android:text="CODIGO"
+        android:gravity="center"
         android:shadowDx="4"
         android:shadowDy="4"
         android:shadowRadius="6"
         app:strokeWidth="3dp"
-        android:visibility="invisible"
-        />
+        android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/TextViewVolver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/button_login"
+        android:layout_marginTop="30dp"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:text="VOLVER"
+        android:letterSpacing=".20"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/black"
+        android:textSize="10pt"
+        android:textStyle="bold" />
 
-
-
-
-
-
-</LinearLayout>
+</RelativeLayout>

@@ -12,7 +12,7 @@
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="400dp"
+        android:layout_width="200dp"
         android:layout_height="350dp"
         android:src="@drawable/logotrivial"
         android:layout_centerHorizontal="true"

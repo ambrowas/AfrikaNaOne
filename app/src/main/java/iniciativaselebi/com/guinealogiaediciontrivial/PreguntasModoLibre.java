@@ -25,6 +25,7 @@ import com.google.android.material.snackbar.Snackbar;
 import iniciativaselebi.com.guinealogiaediciontrivial.R;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,8 +34,6 @@ import java.util.Locale;
 public class PreguntasModoLibre extends AppCompatActivity {
 
 
-    public static final String EXTRA_SCORE = "extraScore";
-    public static final String EXTRA_SCORE2 = "extraScore2";
     public static final long COUNTDOWN_IN_MILLIS = 16000;
     private TextView textviewpuntuacion;
     private TextView textviewcontadorpreguntas;
@@ -59,9 +58,13 @@ public class PreguntasModoLibre extends AppCompatActivity {
     int scoretotal;
     private boolean answered;
     private long backPressedTime;
-    int marcador = 0;
-
+    private MediaPlayer mediaPlayer;
     RadioButton selectedRadioButton;
+    MediaPlayer mediaPlayerCountdown;
+    MediaPlayer mediaPlayerRight;
+    MediaPlayer mediaPlayerNotRight;
+
+    MediaPlayer swooshPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +86,10 @@ public class PreguntasModoLibre extends AppCompatActivity {
         score = 0;
         scoretotal = 0;
         errores = 0;
+        mediaPlayerCountdown = MediaPlayer.create(this, R.raw.countdown);
+        mediaPlayerRight = MediaPlayer.create(this, R.raw.right);
+        mediaPlayerNotRight = MediaPlayer.create(this, R.raw.notright);
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
 
         QuizDBHelper dbHelper = new QuizDBHelper(this);
         ArrayList<Question> questions = dbHelper.getRandomQuestions(10);
@@ -130,7 +137,6 @@ public class PreguntasModoLibre extends AppCompatActivity {
             radio_button3.setText(currentQuestion.getOption3());
             questionCounter++;
             textviewcontadorpreguntas.setText("PREGUNTA: " + questionCounter + "/" + questionCountTotal);
-            textviewcontadorpreguntas.setTextColor(getColor(R.color.blue));
             answered = false;
             buttonconfirmar.setText("CONFIRMAR");
             timeLeftInMillis = COUNTDOWN_IN_MILLIS;
@@ -164,7 +170,6 @@ public class PreguntasModoLibre extends AppCompatActivity {
 
     }
 
-
     private void startCountDown() {
         countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
             @Override
@@ -182,10 +187,16 @@ public class PreguntasModoLibre extends AppCompatActivity {
         }.start();
     }
 
+
     private void updateCountdownText() {
         int seconds = (int) (timeLeftInMillis / 1000);
         String timeFormatted = String.format(Locale.getDefault(), "%02d", seconds);
         textviewtiempo.setText(timeFormatted);
+
+        if (seconds <= 5 && !mediaPlayerCountdown.isPlaying()) {
+            mediaPlayerCountdown.start();
+        }
+
         if (timeLeftInMillis < 10000) {
             textviewtiempo.setTextColor(Color.RED);
         } else {
@@ -194,47 +205,43 @@ public class PreguntasModoLibre extends AppCompatActivity {
     }
 
 
-    private void checkAnswer() {
-        answered = true;
-        countDownTimer.cancel();
+        private void checkAnswer () {
+            answered = true;
+            countDownTimer.cancel();
 
-        RadioButton rbSelected = findViewById(radio_group.getCheckedRadioButtonId());
-        int answerNr = radio_group.indexOfChild(rbSelected) + 1;
+            RadioButton rbSelected = findViewById(radio_group.getCheckedRadioButtonId());
+            int answerNr = radio_group.indexOfChild(rbSelected) + 1;
 
-        if (answerNr == currentQuestion.getAnswerNr()) {
-            score = score + 1;
-            scoretotal = scoretotal + 500;
-            MediaPlayer mediaPlayer1 = MediaPlayer.create(this, R.raw.right);
-            mediaPlayer1.start();
-            textviewpregunta.setText("RESPUESTA CORRECTA");
-            textviewpregunta.setTextColor(getColor(R.color.green));
-            textviewpregunta.setTypeface(null, Typeface.BOLD);
-            textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        } else {
-            MediaPlayer mediaPlayer2 = MediaPlayer.create(this, R.raw.notright);
-            mediaPlayer2.start();
-            errores = errores + 1;
+            if (answerNr == currentQuestion.getAnswerNr()) {
+                score = score + 1;
+                scoretotal = scoretotal + 500;
+                mediaPlayerRight.start();
+                textviewpregunta.setText("RESPUESTA CORRECTA");
+                textviewpregunta.setTextColor(getColor(R.color.green));
+                textviewpregunta.setTypeface(null, Typeface.BOLD);
+                textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            } else {
+                mediaPlayerNotRight.start();
+                errores = errores + 1;
 
-            // Add a listener to know when the sound has finished playing
-            mediaPlayer2.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
+                // Add a listener to know when the sound has finished playing
+//                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//                    @Override
+//                    public void onCompletion(MediaPlayer mp) {
+//
+//                    }
+   //             });
 
-                }
-            });
+                textviewpregunta.setText("RESPUESTA INCORRECTA");
+                textviewpregunta.setTextColor(getColor(R.color.red));
+                textviewpregunta.setTypeface(null, Typeface.BOLD);
+                textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            }
 
-            textviewpregunta.setText("RESPUESTA INCORRECTA");
-            textviewpregunta.setTextColor(getColor(R.color.red));
-            textviewpregunta.setTypeface(null, Typeface.BOLD);
-            textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            textviewpuntuacion.setText("PUNTUACION: " + scoretotal);
+            textviewaciertos.setText("ACIERTOS: " + score);
+            showSolution();
         }
-
-        textviewpuntuacion.setText("PUNTUACION: " + scoretotal);
-        textviewpuntuacion.setTextColor(getColor(R.color.blue));
-        textviewaciertos.setText("ACIERTOS: " + score);
-        textviewaciertos.setTextColor(getColor(R.color.blue));
-        showSolution();
-    }
 
 
     private void showSolution() {
@@ -244,7 +251,6 @@ public class PreguntasModoLibre extends AppCompatActivity {
             buttonconfirmar.setText("TERMINAR");
         }
     }
-
 
 
     private void finishQuiz() {
@@ -268,9 +274,9 @@ public class PreguntasModoLibre extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (backPressedTime + 2000 > System.currentTimeMillis()){
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
             finishQuiz();
-        }else {
+        } else {
             Toast.makeText(this, "Pulsa otra vez para finalizar", Toast.LENGTH_SHORT).show();
         }
         backPressedTime = System.currentTimeMillis();
@@ -278,12 +284,29 @@ public class PreguntasModoLibre extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (countDownTimer != null){
+        if (countDownTimer != null) {
             countDownTimer.cancel();
-
         }
 
+        if (mediaPlayerCountdown != null) {
+            mediaPlayerCountdown.release();
+        }
+        if (mediaPlayerRight != null) {
+            mediaPlayerRight.release();
+        }
+        if (mediaPlayerNotRight != null) {
+            mediaPlayerNotRight.release();
+        }
     }
 }

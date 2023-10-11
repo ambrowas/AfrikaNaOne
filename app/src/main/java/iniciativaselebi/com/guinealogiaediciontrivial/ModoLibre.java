@@ -6,8 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,46 +24,21 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R;
 
 
 public class ModoLibre extends AppCompatActivity {
-
-    SharedPreferences sp;
-
-    private static final int REQUEST_CODE_PUNTAJE = 1;
-    public static final int REQUEST_CODE_PREGUNTAS_MODO_LIBRE = 1;
-
-    public static final String SHARED_PUTAJE = "sharedPuntaje";
-
-    public static final String KEY_HIGHPUNTAJE = "keyHighpuntaje";
-
-    private int highpuntaje;
-
     Button button_jugar;
-    Button button_salir;
-    Button button_reset;
-    Button button_save;
-
-    ImageView logo;
+    Button button_save, buttonvolver;
     TextView TextViewSaludo2;
     TextView TextViewRecord;
     EditText editTextNombre;
-    String saludo2;
-    String record;
-    int score;
     int scoretotal;
-    int marcador;
-    int highscore;
-
-    SharedPreferences prefs;
-    SharedPreferences my_preferences;
-    SharedPreferences myPrefs;
-    private int newScore;
-    private Typewriter writer;
     private SharedPreferences sharedPreferences;
     private ValueAnimator animator;
     String savedName;
     String message;
     String highScoreText;
-
     int highScore;
+    MediaPlayer swooshPlayer;
+    ImageView logo;
+    private Animation pulseAnimation;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,36 +46,74 @@ public class ModoLibre extends AppCompatActivity {
         setContentView(R.layout.activity_menu_modo_libre);
 
 
+        editTextNombre = (EditText) findViewById(R.id.editTextNombre);
+        TextViewRecord = (TextView) findViewById(R.id.TextViewRecord);
+        button_save = (Button) findViewById(R.id.button_save);
+        logo = (ImageView) findViewById(R.id.logo);
+        pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);
+        logo.startAnimation(pulseAnimation);
 
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
         sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
-        savedName = sharedPreferences.getString("nombre", "usuario");
-        message = "Bienvenid@ " + savedName;
+        savedName = sharedPreferences.getString("nombre", "");
         TextViewSaludo2 = findViewById(R.id.TextViewSaludo2);
-        TextViewSaludo2.setText(message);
 
-        editTextNombre = findViewById(R.id.editTextNombre);
+        if (!savedName.isEmpty()) {
+            // Display the greeting and record
+            message = "¡Mbolan " + savedName + "!";
+            TextViewSaludo2.setText(message);
+            button_save.setText("CAMBIAR JUGADOR");
+            highScore = sharedPreferences.getInt("highscore", 0);
+            highScoreText = "EL RECORD ACTUAL ES DE " + highScore + " PUNTOS";
+            TextViewRecord.setText(highScoreText);
+            editTextNombre.setVisibility(View.GONE); // Hide the EditText
+        } else {
+            // Display the EditText for name input
+            button_save.setText("GUARDAR");
+            editTextNombre.setVisibility(View.VISIBLE); // Show the EditText
+        }
 
-
-        button_save = (Button)findViewById(R.id.button_save);
         button_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText editTextNombre = findViewById(R.id.editTextNombre);
+                if (button_save.getText().toString().equals("CAMBIAR JUGADOR")) {
+                    // Clear the name from Shared Preferences and update the UI
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove("nombre");
+                    editor.apply();
+
+                    TextViewSaludo2.setText("");
+                    TextViewRecord.setText("EL RECORD ACTUAL ES DE 0 PUNTOS");
+                    editTextNombre.setText("");
+                    editTextNombre.setVisibility(View.VISIBLE); // Show the EditText
+
+                    button_save.setText("GUARDAR");
+                    return;
+                }
+
+                // If button says "GUARDAR", save the name and update the UI
                 String nombre = editTextNombre.getText().toString();
-                SharedPreferences sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("nombre", nombre);
                 editor.apply();
 
-                Toast.makeText(getApplicationContext(), "nombre guardado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Nombre Guardado", Toast.LENGTH_SHORT).show();
+                playSwoosh();
 
-                TextView textViewSaludo2 = findViewById(R.id.TextViewSaludo2);
-                String message = "Bienvenid@ " + sharedPreferences.getString("nombre", "usuario");
-                textViewSaludo2.setText(message);
+                String message = "¡Mbolan " + nombre + " !";
+                TextViewSaludo2.setText(message);
+                editTextNombre.setVisibility(View.GONE); // Hide the EditText
+
+                highScore = sharedPreferences.getInt("highscore", 0);
+                highScoreText = "EL RECORD ACTUAL ES DE " + highScore + " PUNTOS";
+                TextViewRecord.setText(highScoreText);
+
+                button_save.setText("CAMBIAR JUGADOR");
             }
         });
 
-        sharedPreferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
+
+
         scoretotal = sharedPreferences.getInt("scoretotal", 0);
         highScore = sharedPreferences.getInt("highscore", 0);
 
@@ -122,28 +138,62 @@ public class ModoLibre extends AppCompatActivity {
             }
         });
         animator.start(); // start the animator
-            highScoreText = "EL RECORD ACTUAL ES DE " + highScore + " PUNTOS";
-            TextViewRecord.setText(highScoreText);
+        highScoreText = "EL RECORD ACTUAL ES DE " + highScore + " PUNTOS";
+        TextViewRecord.setText(highScoreText);
 
 
         button_jugar = (Button) findViewById(R.id.button_jugar);
         button_jugar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                playSwoosh();
                 Intent intent = new Intent(ModoLibre.this, PreguntasModoLibre.class);
                 startActivity(intent);
                 finish();
             }
         });
 
-        button_salir = (Button) findViewById(R.id.button_salir);
-        button_salir.setOnClickListener(new View.OnClickListener() {
+        buttonvolver = (Button) findViewById(R.id.buttonvolver);
+        buttonvolver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                playSwoosh();
                 Intent intent = new Intent(ModoLibre.this, Menuprincipal.class);
                 startActivity(intent);
                 finish();
             }
         });
 
-;}}
+        ;
+    }
+
+    private void playSwoosh() {
+        if (swooshPlayer != null) {
+            swooshPlayer.seekTo(0);
+            swooshPlayer.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (swooshPlayer != null) {
+            swooshPlayer.release();
+            swooshPlayer = null;
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (logo != null && pulseAnimation != null) {
+            logo.clearAnimation();
+        }
+
+        if (animator != null) {
+            animator.cancel();
+        }
+    }
+
+}

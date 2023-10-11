@@ -2,11 +2,15 @@ package iniciativaselebi.com.guinealogiaediciontrivial;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -15,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -43,16 +48,18 @@ public class ClassficationActivity extends AppCompatActivity {
         textviewgrandtotal;
         ImageView profilepicture;
         Button buttonranking2, buttonmenuprincipal, buttoncodigocobro;
-        SharedPreferences preferences;
+
         String profilePictureUri;
-        int aciertos, puntuacion, ganancias, redColor, blueColor, errores, code;
+        int aciertos, puntuacion, ganancias, redColor, blueColor, errores, highestScore;
         String uui, name;
         int position;
         long lastClickTime;
         int grandtotal;
-        FirebaseDatabase database;
-        DatabaseReference myRef;
         private ValueAnimator animator;
+        MediaPlayer swooshPlayer;
+       SharedPreferences sharedPreferences;
+     private long lastSavedTimestamp = 0;
+
 
 
     @Override
@@ -60,16 +67,35 @@ public class ClassficationActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_classfication);
 
+
+
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             aciertos = extras.getInt("aciertos", 0);
             puntuacion = extras.getInt("puntuacion", 0);
-            errores  = extras.getInt("errores", 0);
+            errores = extras.getInt("errores", 0);
+
+            // Log values from intent
+            Log.d("DEBUG_TAG", "Aciertos from intent: " + aciertos);
+            Log.d("DEBUG_TAG", "Puntuacion from intent: " + puntuacion);
+            Log.d("DEBUG_TAG", "Errores from intent: " + errores);
+
+            // Since you mentioned ganancias and highestScore, ensure you're getting those values either from intent or SharedPreferences.
+
         } else {
-            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences("GameStats", Context.MODE_PRIVATE);
+
             aciertos = sharedPreferences.getInt("aciertos", 0);
             puntuacion = sharedPreferences.getInt("puntuacion", 0);
-            errores  = sharedPreferences.getInt("errores", 0);
+            errores = sharedPreferences.getInt("errores", 0);
+
+            // Log values from SharedPreferences
+            Log.d("DEBUG_TAG", "Aciertos from SharedPreferences: " + aciertos);
+            Log.d("DEBUG_TAG", "Puntuacion from SharedPreferences: " + puntuacion);
+            Log.d("DEBUG_TAG", "Errores from SharedPreferences: " + errores);
+
+            // If ganancias and highestScore are important, make sure to retrieve and log them here too.
         }
 
 
@@ -90,11 +116,6 @@ public class ClassficationActivity extends AppCompatActivity {
             }
         });
         animator.start(); // start the animator
-
-
-
-
-
         TextViewFallos = (TextView)findViewById(R.id.TextViewFallos);
         textviewgrandtotal = (TextView) findViewById(R.id.textviewgrandtotal);
 
@@ -130,54 +151,88 @@ public class ClassficationActivity extends AppCompatActivity {
             textviewpuntuacion2 = (TextView) findViewById(R.id.textviewpuntuacion2);
             textviewhola = (TextView) findViewById(R.id.textviewhola);
             profilepicture = (ImageView) findViewById(R.id.profilepicture);
-            preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-            profilePictureUri = getIntent().getStringExtra("profilePictureUri");
+         SharedPreferences sharedPreferences = getSharedPreferences("GameStats", Context.MODE_PRIVATE);
+        profilePictureUri = getIntent().getStringExtra("profilePictureUri");
 
 
             buttonranking2 = (Button) findViewById(R.id.buttonranking2);
             buttonranking2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    playSwoosh();
                     Intent intent = new Intent(ClassficationActivity.this, RankingActivity.class);
                     startActivity(intent);
 
                 }
             });
 
-            buttonmenuprincipal = (Button) findViewById(R.id.buttonmenuprincipal);
-            buttonmenuprincipal.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(ClassficationActivity.this, Modocompeticion.class);
-                    startActivity(intent);
-
-                }
-            });
-
-             String code = generateRandomAlphanumericCode(12);
-
-
-            buttoncodigocobro = (Button) findViewById(R.id.buttoncodigocobro);
-            buttoncodigocobro.setOnClickListener(new View.OnClickListener() {
+        buttonmenuprincipal = (Button) findViewById(R.id.buttonmenuprincipal);
+        buttonmenuprincipal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (System.currentTimeMillis() - lastClickTime < 2000) {
-// Double click detected.
+                // If puntuacion is greater than or equal to 2500
+                if (puntuacion >= 2500) {
+                    new AlertDialog.Builder(ClassficationActivity.this)
+                            .setTitle("Confirmar Salida")
+                            .setMessage("¿Seguro que quieres salir sin generar cobro?")
+                            .setPositiveButton("SI", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // User clicked SI
+                                    playSwoosh();
+                                    Intent intent = new Intent(ClassficationActivity.this, Modocompeticion.class);
+                                    startActivity(intent);
+                                }
+                            })
+                            .setNegativeButton("NO", null) // User clicked NO, just dismiss the alert
+                            .show();
+                } else {
+                    // If puntuacion is less than 2500, proceed with the current logic
+                    playSwoosh();
+                    Intent intent = new Intent(ClassficationActivity.this, Modocompeticion.class);
+                    startActivity(intent);
+                }
+            }
+        });
+
+        String code = generateRandomAlphanumericCode(12);
+
+
+        buttoncodigocobro = (Button) findViewById(R.id.buttoncodigocobro);
+        buttoncodigocobro = (Button) findViewById(R.id.buttoncodigocobro);
+        buttoncodigocobro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Check if the user is within the cooldown period
+                if (isWithinCoolDownPeriod()) {
+                    Toast.makeText(ClassficationActivity.this, "Debes esperar 3 minutos antes de poder generar otro código QR.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Check if puntuacion is less than 2500
+                if (puntuacion < 2500) {
+                    new AlertDialog.Builder(ClassficationActivity.this)
+                            .setTitle("Cobro Mínimo")
+                            .setMessage("Debes ganar al menos 2500 FCFA para poder generar un cobro.")
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show();
+                } else {
+                    // If puntuacion is 2500 or more, proceed with the current logic
+
                     Intent intent = new Intent(ClassficationActivity.this, QRcodeActivity.class);
                     intent.putExtra("aciertos", aciertos);
                     intent.putExtra("puntuacion", puntuacion);
                     intent.putExtra("name", name);
                     intent.putExtra("code", code);
+                    saveLastSavedTimestamp();
                     startActivity(intent);
-                } else {
-// Single click detected.
-                    Toast.makeText(ClassficationActivity.this, "pulsa otra ver para generar tu código de cobro", Toast.LENGTH_SHORT).show();
-                    lastClickTime = System.currentTimeMillis();
                 }
             }
         });
 
-            Glide.with(this)
+
+
+        Glide.with(this)
                     .load(profilePictureUri)
                     .placeholder(R.drawable.baseline_account_circle_24)
                     .into(new CustomTarget<Drawable>() {
@@ -201,9 +256,17 @@ public class ClassficationActivity extends AppCompatActivity {
             textviewpuntuacion2.setText("TU PUNTUACION ES DE  " + puntuacion + " PUNTOS");
             textiviewganancias.setText("TUS GANANCIAS SON DE  " + puntuacion + " FCFA");
             TextViewFallos.setText("ACUMULASTE " + errores + " ERRORES");
+        // After you set values to the TextViews, log the values you're setting
+        Log.d("DEBUG_TAG", "Setting aciertos to TextView: " + aciertos);
+        Log.d("DEBUG_TAG", "Setting puntuacion to TextView: " + puntuacion);
+        Log.d("DEBUG_TAG", "Setting ganancias to TextView: " + ganancias);
+        Log.d("DEBUG_TAG", "Setting fallos to TextView: " + errores);
+        Log.d("DEBUG_TAG", "Setting record to TextView: " + highestScore);
+        Log.d("DEBUG_TAG", "Setting gananciascumuladas to TextView: " + grandtotal);
 
 
-            if (user != null) {
+
+        if (user != null) {
                 String userId = user.getUid();
                 DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(userId);
 
@@ -238,13 +301,62 @@ public class ClassficationActivity extends AppCompatActivity {
                 updateHighestScore(puntuacion);
             }
         }
-        private String generateRandomAlphanumericCode(int length) {
-        SecureRandom random = new SecureRandom();
-        return new BigInteger(60, random).toString(32).toUpperCase().substring(0, length);
 
+    private boolean isWithinCoolDownPeriod() {
+        long currentTimeMillis = System.currentTimeMillis();
+        long lastSavedTimestamp = getLastSavedTimestamp();
+        long threeMinutesInMillis = 3 * 60 * 1000;
+
+        return (currentTimeMillis - lastSavedTimestamp) < threeMinutesInMillis;
     }
 
-        private void updateHighestScore(int newScore) {
+
+    private void saveLastSavedTimestamp() {
+        SharedPreferences sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong("last_saved_timestamp", System.currentTimeMillis());
+        editor.apply();
+    }
+
+    private long getLastSavedTimestamp() {
+        SharedPreferences sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        return sharedPreferences.getLong("last_saved_timestamp", 0);
+    }
+
+
+
+
+    private void playSwoosh() {
+        if (swooshPlayer != null) {
+            swooshPlayer.seekTo(0);
+            swooshPlayer.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (swooshPlayer != null) {
+            swooshPlayer.release();
+            swooshPlayer = null;
+        }
+        super.onDestroy();
+    }
+
+    private String generateRandomAlphanumericCode(int length) {
+        SecureRandom random = new SecureRandom();
+        String generatedString = new BigInteger(60, random).toString(32).toUpperCase();
+
+        // If the generated string is shorter than the desired length,
+        // return the entire string. Otherwise, return the substring.
+        if (generatedString.length() < length) {
+            return generatedString;
+        } else {
+            return generatedString.substring(0, length);
+        }
+    }
+
+
+    private void updateHighestScore(int newScore) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user != null) {
@@ -268,9 +380,36 @@ public class ClassficationActivity extends AppCompatActivity {
                 }
             });
         }
+
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Initialize SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("GameStats", Context.MODE_PRIVATE);
+
+        // Fetch values from SharedPreferences
+        int aciertos = sharedPreferences.getInt("aciertos", 0);
+        int puntuacion = sharedPreferences.getInt("puntuacion", 0);
+        int errores = sharedPreferences.getInt("errores", 0);
+        // ... fetch other values ...
+
+        // Now, update your UI elements with these values
+
+        TextView textviewaciertos2 = findViewById(R.id.textviewaciertos2);
+        TextView textviewpuntuacion2 = findViewById(R.id.textviewpuntuacion2);
+        TextView textiviewganancias = findViewById(R.id.textviewganancias);
+        TextViewFallos = (TextView)findViewById(R.id.TextViewFallos);
+        textviewaciertos2.setText("HAS OBTENIDO " + aciertos + " ACIERTOS");
+        textviewpuntuacion2.setText("TU PUNTUACION ES DE  " + puntuacion + " PUNTOS");
+        textiviewganancias.setText("TUS GANANCIAS SON DE  " + puntuacion + " FCFA");
+        TextViewFallos.setText("ACUMULASTE " + errores + " ERRORES");
     }
 
-         @Override
+
+
+    @Override
         public void onBackPressed() {
         // Do nothing
           }}

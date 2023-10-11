@@ -63,115 +63,126 @@
         android:textStyle="bold"
         />
 
+
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/radio_normal3"
+        android:gravity="center_horizontal"
         android:layout_marginTop="20dp"
-        android:orientation="vertical">
+        android:layout_marginLeft="50dp">
 
         <TableLayout
-            android:layout_width="300dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="1dp"
-            android:background="@drawable/rectangulo"
+            android:background="@drawable/table_border"
             android:stretchColumns="*">
 
             <TableRow
                 android:layout_width="300dp"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
                 <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
                     android:id="@+id/textviewaciertos2"
-                    android:layout_width="300dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="ACIERTOS:"
                     android:textColor="@color/black"
                     android:textSize="15dp"
                     android:textStyle="bold"
-                    android:background="@drawable/radio_normal3"
+                    android:background="@drawable/table_border"
                     android:padding="10dp"/>
             </TableRow>
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
                 <TextView
                     android:id="@+id/TextViewFallos"
-                    android:layout_width="300dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="ERRORES:"
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:background="@drawable/radio_normal3"
+                    android:background="@drawable/table_border"
                     android:padding="10dp"/>
             </TableRow>
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
                 <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
                     android:id="@+id/textviewpuntuacion2"
-                    android:layout_width="300dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="PUNTUACION:"
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:background="@drawable/radio_normal3"
+                    android:background="@drawable/table_border"
                     android:padding="10dp"/>
             </TableRow>
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
                 <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
                     android:id="@+id/textviewganancias"
-                    android:layout_width="300dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="GANANCIAS:"
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:background="@drawable/radio_normal3"
+                    android:background="@drawable/table_border"
                     android:padding="10dp"/>
             </TableRow>
 
-
-
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
                 <TextView
                     android:id="@+id/textviewrecord"
-                    android:layout_width="300dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="RECORD:"
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:background="@drawable/radio_normal3"
+                    android:background="@drawable/table_border"
                     android:padding="10dp"/>
             </TableRow>
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
                 <TextView
                     android:id="@+id/textviewgrandtotal"
-                    android:layout_width="300dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="TOTAL ACUMULADO:"
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:background="@drawable/radio_normal3"
+                    android:background="@drawable/table_border"
                     android:padding="10dp"/>
             </TableRow>
 
         </TableLayout>
-
-
     </LinearLayout>
 
     <LinearLayout
@@ -214,7 +225,7 @@
             android:layout_height="75dp"
             android:background="@drawable/radio_normal2"
             android:freezesText="true"
-            android:text="MENU PRINCIPAL"
+            android:text="MENU"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:strokeWidth="3dp"/>

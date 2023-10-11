@@ -4,6 +4,7 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -31,13 +32,15 @@ public class LeadersProfileActivity extends AppCompatActivity {
     private TextView textviewNoRanking, nameTitle, textViewBarrio, textViewCiudad, textViewPais, textViewPuntuacionAcumulada,textViewAciertosAcumulados, textViewFallosAcumulados, textViewPastaAcumulada, textViewRecord;
     Button buttonatras;
     private ValueAnimator animator;
+    MediaPlayer swooshPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaders_profile);
 
-         profilePic = (CircleImageView) findViewById(R.id.profilepic);
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
+        profilePic = (CircleImageView) findViewById(R.id.profilepic);
         String userId = getIntent().getStringExtra("user_id");
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(userId);
         userRef.addValueEventListener(new ValueEventListener() {
@@ -57,10 +60,6 @@ public class LeadersProfileActivity extends AppCompatActivity {
                 // Handle error
             }
         });
-
-
-
-
 
         profilePic = findViewById(R.id.profilepic);
         nameTitle = findViewById(R.id.nameTitle);
@@ -93,6 +92,7 @@ public class LeadersProfileActivity extends AppCompatActivity {
         buttonatras.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                playSwoosh();
                 Intent intent = new Intent(LeadersProfileActivity.this, RankingActivity.class);
                 finish();
             }
@@ -101,6 +101,22 @@ public class LeadersProfileActivity extends AppCompatActivity {
 
 
         loadUserData(userId);
+    }
+
+    private void playSwoosh() {
+        if (swooshPlayer != null) {
+            swooshPlayer.seekTo(0);
+            swooshPlayer.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (swooshPlayer != null) {
+            swooshPlayer.release();
+            swooshPlayer = null;
+        }
+        super.onDestroy();
     }
 
     private void loadUserData(String userId) {

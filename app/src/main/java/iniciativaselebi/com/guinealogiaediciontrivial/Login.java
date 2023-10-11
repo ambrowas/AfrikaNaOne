@@ -1,6 +1,7 @@
 package iniciativaselebi.com.guinealogiaediciontrivial;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -29,11 +30,12 @@ import com.google.firebase.auth.FirebaseUser;
 public class Login extends AppCompatActivity {
 
     TextInputEditText editTextEmail, editTextPassword;
-
-    Button buttonLogIn, buttonLogout, btn_crear;
+    Button buttonLogIn, btn_crear;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
-    TextView textView;
+    MediaPlayer swooshPlayer;
+
+    TextView TextViewVolver3;
 
     @Override
     public void onStart() {
@@ -52,17 +54,30 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
         mAuth = FirebaseAuth.getInstance();
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
         buttonLogIn = findViewById(R.id.btn_login);
         btn_crear = findViewById(R.id.btn_crear);
         progressBar = findViewById(R.id.progressBar);
+        TextViewVolver3 = findViewById(R.id.TextViewVolver3);
+
+
+        TextViewVolver3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playSwoosh();
+                Intent intent = new Intent(getApplicationContext(), Modocompeticion.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         btn_crear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                playSwoosh();
                 Intent intent = new Intent(Login.this, Register.class);
                 startActivity(intent);
                 finish();
@@ -110,11 +125,13 @@ public class Login extends AppCompatActivity {
                                     String profilePicUrl = String.valueOf(user.getPhotoUrl());
                                     if (profilePicUrl != null) {
                                         Toast.makeText(Login.this, "Conectado", Toast.LENGTH_SHORT).show();
+                                        playSwoosh();
                                         Intent intent = new Intent(Login.this, Modocompeticion.class);
                                         startActivity(intent);
                                         finish();
                                     } else {
                                         Toast.makeText(Login.this, "Sube una imagen de perfil", Toast.LENGTH_SHORT).show();
+                                        playSwoosh();
                                         Intent intent = new Intent(Login.this, ProfileActivity.class);
                                         startActivity(intent);
                                         finish();
@@ -139,4 +156,23 @@ public class Login extends AppCompatActivity {
 
             }
         });
-        }}
+
+
+        }
+
+    private void playSwoosh() {
+        if (swooshPlayer != null) {
+            swooshPlayer.seekTo(0);
+            swooshPlayer.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (swooshPlayer != null) {
+            swooshPlayer.release();
+            swooshPlayer = null;
+        }
+        super.onDestroy();
+    }
+}

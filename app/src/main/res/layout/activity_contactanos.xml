@@ -9,13 +9,18 @@
     tools:context=".ContactanosActivity">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:layout_marginTop="200dp"
-        android:paddingLeft="20dp"
-        android:text="Para ruegos, sugerencias, correciones, quejas, insultos y amenazas,
-contáctenos por Whatsapp e intentaremos arreglarlo.Gracias por apoyarnos, saludos."
-        android:textAlignment="viewStart"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@drawable/table_border"
+        android:text="Para ruegos, propuestas, sugerencias, correcciones, quejas, insultos, amenazas,
+etc...contáctenos por Whatsapp e intentaremos arreglarlo.
+Gracias por apoyarnos, saludos."
+        android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="16sp" />
 
@@ -27,23 +32,21 @@ contáctenos por Whatsapp e intentaremos arreglarlo.Gracias por apoyarnos, salud
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
         android:src="@drawable/whatsapp"
-        android:background="@drawable/rectangulo"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <Button
-        android:id="@+id/buttonregresar"
+        android:id="@+id/buttonvolver3"
         android:layout_width="300dp"
         android:layout_height="75dp"
         android:text="VOLVER"
-        android:gravity="center"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/radio_selector_blue"
-        android:layout_gravity="center_horizontal"
-        app:strokeWidth="3dp"
         android:textColor="@color/white"
-        android:shadowDx="4"
-        android:shadowDy="4"
-        android:shadowRadius="6"/>
+        android:textStyle="bold"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/radio_normal2"
+        app:strokeWidth="3dp"/>
+
 
 
 

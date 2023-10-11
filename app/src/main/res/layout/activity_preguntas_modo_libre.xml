@@ -15,10 +15,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ACIERTOS : 0 "
-            android:textColor="@color/blue"
+            android:textColor="@color/black"
             android:layout_marginTop="60dp"
             android:layout_marginLeft="30dp"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
@@ -27,9 +27,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/textviewaciertos"
             android:layout_marginLeft="30dp"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:text="PUNTUACION : 0 "
-            android:textColor="@color/blue"
+            android:textColor="@color/black"
             android:textStyle="bold" />
 
 
@@ -40,8 +40,8 @@
             android:layout_below="@+id/textviewpuntuacion"
             android:layout_marginLeft="30dp"
             android:text="PREGUNTA : 1/X"
-            android:textSize="20sp"
-            android:textColor="@color/blue"
+            android:textSize="18sp"
+            android:textColor="@color/black"
             android:textStyle="bold" />
 
 
@@ -51,7 +51,7 @@
         android:layout_height="70dp"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="60dp"
-        android:layout_marginEnd="40dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginRight="10dp"
         android:fontFamily="?android:attr/fontFamily"
         android:paddingRight="10dp"
@@ -71,6 +71,7 @@
         android:layout_marginTop="80dp"
         android:layout_marginBottom="50dp"
         android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:text="¿Quien descubrió America el 12 de Octubre de 1492?"
         android:textAlignment="center"
         android:textColor="@color/black"

@@ -55,7 +55,7 @@
             android:layout_marginLeft="55dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="30dp"
-            android:background="@drawable/radio_selector_blue"
+            android:background="@drawable/radio_selector"
             android:shadowDx="4"
             android:shadowDy="4"
             android:shadowRadius="6"
@@ -71,7 +71,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="-20dp"
-        android:background="@drawable/rectangulo"
+        android:background="@drawable/table_border"
         android:stretchColumns="*">
 
         <TableRow
@@ -92,7 +92,7 @@
                 android:textStyle="bold"
                 android:textColor="@color/black"
                 android:button="@android:color/transparent"
-                android:background="@drawable/radio_normal3"/>
+                android:background="@drawable/table_border"/>
         </TableRow>
 
         <TableRow
@@ -110,7 +110,7 @@
                 android:text="Correo Electronico"
                 android:textColor="@color/black"
                 android:button="@android:color/transparent"
-                android:background="@drawable/radio_normal3"/>
+                android:background="@drawable/table_border"/>
         </TableRow>
 
         <TableRow
@@ -128,7 +128,7 @@
                 android:text="Telefono"
                 android:textColor="@color/black"
                 android:button="@android:color/transparent"
-                android:background="@drawable/radio_normal3"/>
+                android:background="@drawable/table_border"/>
         </TableRow>
 
         <TableRow
@@ -147,7 +147,7 @@
                 android:text="Barrio"
                 android:textColor="@color/black"
                 android:button="@android:color/transparent"
-                android:background="@drawable/radio_normal3"/>
+                android:background="@drawable/table_border"/>
         </TableRow>
 
         <TableRow
@@ -165,7 +165,7 @@
                 android:padding="10dp"
                 android:textColor="@color/black"
                 android:button="@android:color/transparent"
-                android:background="@drawable/radio_normal3"/>
+                android:background="@drawable/table_border"/>
         </TableRow>
 
         <TableRow
@@ -183,7 +183,7 @@
                 android:textColor="@color/black"
                 android:padding="10dp"
                 android:button="@android:color/transparent"
-                android:background="@drawable/radio_normal3"/>
+                android:background="@drawable/table_border"/>
         </TableRow>
 
         <TableRow
@@ -201,51 +201,40 @@
                 android:hint="Record"
                 android:padding="10dp"
                 android:button="@android:color/transparent"
-                android:background="@drawable/radio_normal3"/>
+                android:background="@drawable/table_border"/>
         </TableRow>
 
     </TableLayout>
 
 
-    <Button
-        android:id="@+id/btn_jugar"
-        android:layout_width="300dp"
-        android:layout_height="60dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/radio_selector"
-        android:shadowDx="4"
-        android:shadowDy="4"
-        android:shadowRadius="6"
-        android:text="JUGAR"
-        android:textColor="@color/white"
-        app:strokeWidth="3dp" />
 
-    <Button
-        android:id="@+id/btn_logout"
-        android:layout_width="300dp"
-        android:layout_height="60dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/radio_selector_blue"
-        android:shadowDx="4"
-        android:shadowDy="4"
-        android:shadowRadius="6"
-        android:text="DESCONECTAR"
-        android:textColor="@color/white"
-        app:strokeWidth="3dp" />
 
     <Button
         android:id="@+id/buttonatras"
         android:layout_width="300dp"
         android:layout_height="55dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/radio_normal2"
+        android:background="@drawable/radio_selector_blue"
         android:text="VOLVER"
+        android:layout_marginTop="40dp"
         android:textColor="@color/white"
         android:textStyle="bold"
         app:strokeWidth="3dp" />
+
+    <Button
+        android:id="@+id/btn_borrarusuario"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/radio_normal2"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:text="BORRAR USUARIO"
+        android:textColor="@color/white"
+        android:layout_marginTop="10dp"
+        app:strokeWidth="3dp" />
+
 
 
 </LinearLayout>

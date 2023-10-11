@@ -4,6 +4,7 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -33,30 +34,21 @@ public class Modocompeticion extends AppCompatActivity {
 
         FirebaseAuth auth;
         Button button_jugar2, button_perfil, button_login, button_register, button_clasificacion, buttoncodigo;
-        ImageButton button_back;
-        TextView TextViewSaludo2, TextViewRecord;
+
+        TextView TextViewSaludo2, TextViewRecord, TextViewVolver;
         FirebaseUser user;
         private FirebaseAuth.AuthStateListener authStateListener;
         private int newScore;
         private ValueAnimator animator;
+        MediaPlayer swooshPlayer;
 
         @Override
         protected void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_modo_competicion);
 
-            button_back = (ImageButton) findViewById(R.id.button_back);
-            button_back.setOnClickListener(new View.OnClickListener() {
-                private long lastClickTime = 0;
 
-                @Override
-                public void onClick(View v) {
-                        Intent intent = new Intent(Modocompeticion.this, Menuprincipal.class);
-                        startActivity(intent);
-                        finish();
-
-                }
-            });
+            swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
 
 
             auth = FirebaseAuth.getInstance();
@@ -66,12 +58,11 @@ public class Modocompeticion extends AppCompatActivity {
                 public void onClick(View v) {
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     if (user != null) {
-                        // User is signed in, can proceed to the ranking
+                        playSwoosh();
                         Intent intent = new Intent(Modocompeticion.this, RankingActivity.class);
                         startActivity(intent);
                         finish();
                     } else {
-                        // No user is signed in, show a Toast message
                         Toast.makeText(Modocompeticion.this, "Debe iniciar sesión para poder acceder al ranking.", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -81,27 +72,28 @@ public class Modocompeticion extends AppCompatActivity {
 
             button_perfil = findViewById(R.id.button_perfil);
             button_jugar2 = findViewById(R.id.button_jugar2);
-            button_jugar2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    FirebaseUser user = auth.getCurrentUser();
-                    if (user == null) {
-                        Toast.makeText(getApplicationContext(), "Debe iniciar sesión para poder jugar", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), Preguntas.class);
-                        startActivity(intent);
-                        finish();
 
-            }
-                }
-            });
             TextViewSaludo2 = findViewById(R.id.TextViewSaludo2);
             TextViewRecord = findViewById(R.id.TextViewRecord);
+            TextViewVolver = findViewById(R.id.TextViewVolver);
+
+
+            TextViewVolver.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    playSwoosh();
+                    Intent intent = new Intent(getApplicationContext(), Menuprincipal.class);
+                    startActivity(intent);
+                    finish();
+
+                }
+            });
 
             buttoncodigo = (Button)findViewById(R.id.buttoncodigo);
             buttoncodigo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    playSwoosh();
                     Intent intent = new Intent(getApplicationContext(), CheckCodigoActivity.class);
                     startActivity(intent);
                     finish();
@@ -133,6 +125,7 @@ public class Modocompeticion extends AppCompatActivity {
                     if (auth.getCurrentUser() != null) {
                         if (System.currentTimeMillis() - lastClickTime < 2000) { // 2000 ms = 2 s
                             auth.signOut();
+                            playSwoosh();
                             Toast.makeText(getApplicationContext(), "Usuario Desconectado", Toast.LENGTH_SHORT).show();
                             TextViewSaludo2.setText("INICIA SESION O REGISTRATE");
                             TextViewRecord.setVisibility(View.GONE);
@@ -141,6 +134,7 @@ public class Modocompeticion extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Presione de nuevo para cerrar sesión", Toast.LENGTH_SHORT).show();
                         }
                     } else {
+                        playSwoosh();
                         Intent intent = new Intent(getApplicationContext(), Login.class);
                         startActivity(intent);
                         finish();
@@ -156,6 +150,7 @@ public class Modocompeticion extends AppCompatActivity {
                     if (user != null) {
                         Toast.makeText(getApplicationContext(), "Ya estás registrado. Presiona JUGAR para comenzar la partida", Toast.LENGTH_SHORT).show();
                     } else {
+                        playSwoosh();
                         Intent intent = new Intent(getApplicationContext(), Register.class);
                         startActivity(intent);
                         finish();
@@ -170,6 +165,7 @@ public class Modocompeticion extends AppCompatActivity {
                     if (auth.getCurrentUser() == null) {
                         Toast.makeText(getApplicationContext(), "Debe iniciar sesión para acceder a su perfil", Toast.LENGTH_SHORT).show();
                     } else {
+                        playSwoosh();
                         Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
                         startActivity(intent);
                         finish();
@@ -184,6 +180,7 @@ public class Modocompeticion extends AppCompatActivity {
                     if (user == null) {
                         Toast.makeText(getApplicationContext(), "Debe iniciar sesión para poder jugar", Toast.LENGTH_SHORT).show();
                     } else {
+                        playSwoosh();
                         Intent intent = new Intent(getApplicationContext(), Preguntas.class);
                         startActivity(intent);
                         finish();
@@ -212,7 +209,23 @@ public class Modocompeticion extends AppCompatActivity {
             }
         }
 
-        private void checkGameFallos() {
+    private void playSwoosh() {
+        if (swooshPlayer != null) {
+            swooshPlayer.seekTo(0);
+            swooshPlayer.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (swooshPlayer != null) {
+            swooshPlayer.release();
+            swooshPlayer = null;
+        }
+        super.onDestroy();
+    }
+
+    private void checkGameFallos() {
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
             // Retrieve the user's currentgameFallos from the Realtime Database
@@ -222,31 +235,15 @@ public class Modocompeticion extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists() && snapshot.hasChild("currentGameFallos")) {
                         int currentgameFallos = snapshot.child("currentGameFallos").getValue(Integer.class);
-                        // If the user has reached 5 failures, show the buttoncodigo
-                        if (currentgameFallos >= 5) {
+
+                        // If the user has reached 5 failures, hide the button_jugar2 and show the buttoncodigo
+                        if (currentgameFallos == 5) {
+                            button_jugar2.setVisibility(View.GONE);
                             buttoncodigo.setVisibility(View.VISIBLE);
-                            button_jugar2.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Toast toast = new Toast(getApplicationContext());
-                                    LayoutInflater inflater = getLayoutInflater();
-                                    View toastLayout = inflater.inflate(R.layout.toast_custom, findViewById(R.id.toast_layout));
-
-                                    ImageView toastImage = toastLayout.findViewById(R.id.toast_image);
-                                    TextView toastText = toastLayout.findViewById(R.id.toast_text);
-
-                                    toastImage.setImageResource(R.drawable.logotrivial);
-                                    toastText.setText("INTRODUCE UN NUEVO \nCODIGO DE JUEGO.");
-                                    toastText.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL); // Justify the text to the center
-
-                                    toast.setDuration(Toast.LENGTH_SHORT);
-                                    toast.setView(toastLayout);
-                                    toast.show();
-
-                                    toast.show();
-
-                                }
-                            });
+                        } else {
+                            // Ensure button_jugar2 is visible and buttoncodigo is hidden if currentgameFallos is not 5
+                            button_jugar2.setVisibility(View.VISIBLE);
+                            buttoncodigo.setVisibility(View.GONE);
                         }
                     }
                 }
@@ -260,21 +257,21 @@ public class Modocompeticion extends AppCompatActivity {
     }
 
 
-        @Override
-        protected void onStart() {
+    @Override
+     protected void onStart() {
             super.onStart();
             auth.addAuthStateListener(authStateListener);
         }
 
         @Override
-        protected void onStop() {
+     protected void onStop() {
             super.onStop();
             if (authStateListener != null) {
                 auth.removeAuthStateListener(authStateListener);
             }
         }
 
-        private void loadUserHighestScore() {
+     private void loadUserHighestScore() {
         DatabaseReference leaderboardRef = FirebaseDatabase.getInstance().getReference("user");
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 

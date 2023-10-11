@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/trivialbackground"
+    android:background="@drawable/coolbackground"
     android:padding="16dp">
 
     <TextView
@@ -19,8 +19,23 @@
         android:textStyle="bold"
         android:textColor="@color/black"
         android:textSize="16sp"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="60dp"
         android:layout_marginBottom="20dp"/>
+
+    <Button
+
+        android:id="@+id/buttonatras"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="VOLVER"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/radio_normal2"
+        app:strokeWidth="3dp"/>
+
 
     <ScrollView
         android:layout_width="match_parent"
@@ -29,21 +44,34 @@
         <TableLayout
             android:id="@+id/tableLayout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="4dp"
             android:stretchColumns="*"
             android:paddingLeft="10dp">
 
             <!-- Table header -->
             <TableRow
                 android:background="@color/default_radio_button_background"
-                android:padding="8dp">
+                android:padding="8dp"
+                android:layout_height="160dp">
+
+                <TextView
+
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Pos"
+                    android:textColor="@color/black"
+                    android:gravity="left"
+                    android:textStyle="bold" />
+
 
                 <TextView
                         android:id="@+id/tvName"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="      Nombre"
+                    android:text="Nombre"
+                    android:textColor="@color/black"
                     android:gravity="start"
                     android:textStyle="bold" />
 
@@ -52,9 +80,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="        Ciudad"
+                    android:text="    Ciudad"
                     android:textColor="@color/black"
-                    android:gravity="center"
+                    android:gravity="left"
                     android:textStyle="bold" />
 
                 <TextView
@@ -62,8 +90,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="                  Fcfa"
-                    android:gravity="center"
+                    android:text="        Fcfa"
+                    android:gravity="left"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
 
@@ -72,6 +100,14 @@
 
             <!-- Table row example -->
             <TableRow>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:text="1"
+                    />
 
 
                 <TextView
@@ -86,14 +122,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="start"
+                    android:gravity="left"
                     android:text="New York" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
+                    android:gravity="left"
                     android:text="1200" />
 
             </TableRow>
@@ -104,19 +140,6 @@
 
 
 
-    <Button
-
-        android:id="@+id/buttonatras"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:text="VOLVER"
-        android:textColor="@color/white"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/radio_normal2"
-        app:strokeWidth="3dp"/>
 
 
 </LinearLayout>

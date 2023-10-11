@@ -3,26 +3,32 @@ package iniciativaselebi.com.guinealogiaediciontrivial;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import iniciativaselebi.com.guinealogiaediciontrivial.R;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -37,6 +43,12 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -51,7 +63,7 @@ public class ProfileActivity extends AppCompatActivity {
     private CircleImageView profilepic;
 
 
-    Button btn_jugar, buttonLogout, btn_upload, buttonatras;
+    Button btn_jugar, buttonatras, btn_upload, btn_borrarusuario;
     FirebaseAuth mAuth;
 
     private FirebaseUser user;
@@ -68,6 +80,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     TextView textViewRecord, emailAddressTitle, nameTitle, textViewTelefono, textViewBarrio, textViewCiudad, textViewPais, textviewNoRanking;
     private ValueAnimator animator;
+    MediaPlayer swooshPlayer;
 
 
     @Override
@@ -79,6 +92,10 @@ public class ProfileActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(user.getUid());
         getPositionInLeaderboard();
+
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
+
+
 
         textviewNoRanking = (TextView) findViewById(R.id.textviewNoRanking);
         final int[] colors = {Color.RED, Color.GREEN, Color.BLUE}; // array of colors to cycle through
@@ -120,8 +137,6 @@ public class ProfileActivity extends AppCompatActivity {
                         textViewPais = findViewById(R.id.textViewPais);
                         textViewPais.setText(user.getPais());
 
-
-
                         profilepic = findViewById(R.id.profilepic);
                         FirebaseDatabase.getInstance().getReference("user/"+FirebaseAuth.getInstance().getCurrentUser().getUid()+"/profilePicture").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -156,28 +171,22 @@ public class ProfileActivity extends AppCompatActivity {
 
         textViewRecord = (TextView)findViewById(R.id.textViewRecord);
         profilepic = (CircleImageView) findViewById(R.id.profilepic);
-        buttonLogout = (Button)findViewById(R.id.btn_logout);
+        btn_borrarusuario = (Button)findViewById(R.id.btn_borrarusuario);
 
         buttonatras = (Button)findViewById(R.id.buttonatras);
         buttonatras.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                playSwoosh();
                 Intent intent = new Intent(ProfileActivity.this, Modocompeticion.class);
                 startActivity(intent);
                 finish();
             };
         });
 
-        btn_jugar = (Button)findViewById(R.id.btn_jugar);
-        btn_jugar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), Preguntas.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+       
         btn_upload = (Button)findViewById(R.id.btn_upload);
+        btn_upload.setVisibility(View.INVISIBLE);
         btn_upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -186,15 +195,14 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         mAuth = FirebaseAuth.getInstance();
-        buttonLogout.setOnClickListener(new View.OnClickListener() {
+     
+        btn_borrarusuario = (Button)findViewById(R.id.btn_borrarusuario);
+        btn_borrarusuario.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                Toast.makeText(getApplicationContext(), "desconectado", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(), Modocompeticion.class);
-                startActivity(intent);
-                finish();
-            }});
+                borraUsuario();
+            }
+        });
 
 
         profilepic.setOnClickListener(new View.OnClickListener() {
@@ -203,8 +211,142 @@ public class ProfileActivity extends AppCompatActivity {
                 Intent photoIntent = new Intent(Intent.ACTION_PICK);
                 photoIntent.setType("image/*");
                 startActivityForResult(photoIntent, 1);
+                btn_upload.setVisibility(View.VISIBLE);
 
             }
+        });
+    }
+
+    private void playSwoosh() {
+        if (swooshPlayer != null) {
+            swooshPlayer.seekTo(0);
+            swooshPlayer.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (swooshPlayer != null) {
+            swooshPlayer.release();
+            swooshPlayer = null;
+        }
+        super.onDestroy();
+    }
+
+    private void borraUsuario() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
+        builder.setTitle("Confirmar acción");
+        builder.setMessage("¿Seguro que quieres borrar este usuario? Esta acción es irreversible.");
+
+        builder.setPositiveButton("SÍ", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                reauthenticateAndDelete();  // call re-authentication process
+            }
+        });
+
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
+    private void deleteUserProcess() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            String userID = user.getUid();
+            user.delete().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    // Delete user data from Realtime Database
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user").child(userID);
+                    ref.removeValue((error, ref1) -> {
+                        if (error != null) {
+                            Toast.makeText(ProfileActivity.this, "Error deleting user from Realtime Database: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Log deleted user
+                        logDeletedUser(user.getDisplayName(), user.getEmail());
+                        Toast.makeText(ProfileActivity.this, "Usuario y datos asociados borrados con exito.Bye Bye", Toast.LENGTH_SHORT).show();
+
+                        // Navigate back to MenuPrincipal
+                        playSwoosh();
+                        Intent intent = new Intent(ProfileActivity.this, Menuprincipal.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    });
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Error deleting user from Firebase Authentication: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(ProfileActivity.this, "Usuario no autenticado.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void reauthenticateAndDelete() {
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        if (user != null) {
+            // Prompt the user to re-enter their password
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Reintroduce tu contraseña");
+
+            final EditText passwordField = new EditText(this);
+            builder.setView(passwordField);
+
+            builder.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String password = passwordField.getText().toString();
+
+                    // Re-authenticate using email and password
+                    AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
+                    user.reauthenticate(credential).addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            deleteUserProcess();
+                        } else {
+                            Toast.makeText(ProfileActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+            builder.setNegativeButton("Cancelar", null);
+
+            builder.show();
+        }
+    }
+
+    private void logDeletedUser(String userFullName, String email) {
+        DatabaseReference deletedUsersRef = FirebaseDatabase.getInstance().getReference().child("deleted_users");
+        DatabaseReference userRef = deletedUsersRef.push();
+
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("ddMMyy HHmmss", Locale.getDefault());
+        String currentTimestamp = dateFormatter.format(new Date());
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR, 48);
+        String finalDeletionTimestamp = dateFormatter.format(calendar.getTime());
+
+        Map<String, String> userData = new HashMap<>();
+        userData.put("fullName", userFullName);
+        userData.put("email", email);
+        userData.put("currentTimestamp", currentTimestamp);
+        userData.put("Final Deletion", finalDeletionTimestamp);
+
+        userRef.setValue(userData, (error, ref) -> {
+            if (error != null) {
+                Toast.makeText(ProfileActivity.this, "Failed to save user to database: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+           // Toast.makeText(ProfileActivity.this, "Successfully saved user to the database.", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -226,7 +368,9 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     });
                     progressDialog.dismiss();
+                    playSwoosh();
                     Toast.makeText(ProfileActivity.this, "Foto Subida", Toast.LENGTH_SHORT).show();
+                    btn_upload.setVisibility(View.INVISIBLE);
                 }else {
                     Toast.makeText(ProfileActivity.this, task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -277,8 +421,6 @@ public class ProfileActivity extends AppCompatActivity {
             });
         }
     }
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -287,7 +429,6 @@ public class ProfileActivity extends AppCompatActivity {
             getImageInImageView();
         }
     }
-
     private void getImageInImageView() {
         Bitmap bitmap;
         try {
@@ -309,7 +450,7 @@ public class ProfileActivity extends AppCompatActivity {
                     if (dataSnapshot.exists()) {
                         Long positionInLeaderboard = dataSnapshot.getValue(Long.class);
                         if(positionInLeaderboard == 0){
-                            textviewNoRanking.setText("X");
+                            textviewNoRanking.setText("?");
                         } else {
                             textviewNoRanking.setText(String.valueOf(positionInLeaderboard));
                         }
@@ -328,9 +469,4 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-
-
-
-
-
-}
+    }

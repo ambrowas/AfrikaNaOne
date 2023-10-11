@@ -1,9 +1,12 @@
 package iniciativaselebi.com.guinealogiaediciontrivial;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -16,21 +19,21 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R;
 public class Menuprincipal extends AppCompatActivity {
 
         Button button_modolibre, button_modocompeticion, button_contactanos;
-        EditText editTextNombre;
         ImageView logo;
+        MediaPlayer swooshPlayer;
+        private Animation pulseAnimation;
 
-        String nombre;
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_menuprincipal);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_menuprincipal);
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
 
-            logo = (ImageView) findViewById(R.id.logo);
-            Rotate3dAnimation animation = new Rotate3dAnimation(0, 360, logo.getWidth()/2, logo.getHeight()/2, 0, true);
-            animation.setDuration(1000);
-            animation.setInterpolator(new AccelerateDecelerateInterpolator());
-            logo.startAnimation(animation);
+        logo = (ImageView) findViewById(R.id.logo);
+        pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);
+        logo.startAnimation(pulseAnimation);
+
 
             
             button_modolibre = findViewById(R.id.button_modolibre);
@@ -39,6 +42,7 @@ public class Menuprincipal extends AppCompatActivity {
             button_contactanos.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    playSwoosh();
                     Intent intent = new Intent(Menuprincipal.this, ContactanosActivity.class);
                     startActivity(intent);
                 }
@@ -47,6 +51,7 @@ public class Menuprincipal extends AppCompatActivity {
             button_modocompeticion.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    playSwoosh();
                     Intent intent = new Intent(Menuprincipal.this, Modocompeticion.class);
                     startActivity(intent);
                 }
@@ -57,9 +62,38 @@ public class Menuprincipal extends AppCompatActivity {
 
                 @Override
                 public void onClick(View view) {
+                    playSwoosh();
                     Intent intent = new Intent(Menuprincipal.this, ModoLibre.class);
                     startActivity(intent);
                 }
             });
         }
+
+    private void playSwoosh() {
+        if (swooshPlayer != null) {
+            swooshPlayer.seekTo(0);
+            swooshPlayer.start();
+        }
     }
+
+    @Override
+    protected void onDestroy() {
+        if (swooshPlayer != null) {
+            swooshPlayer.release();
+            swooshPlayer = null;
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (logo != null && pulseAnimation != null) {
+            logo.clearAnimation();
+        }
+    }
+
+
+
+}

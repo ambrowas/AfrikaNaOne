@@ -6,6 +6,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,19 +42,20 @@ import Model.User;
 public class RankingActivity extends AppCompatActivity {
     TableLayout tableLayout;
     Button buttonatras;
-    Animation flashAnimation;
     ValueAnimator animator;
-    private Activity toastLayout;
+    MediaPlayer swooshPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranking);
 
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
         buttonatras = (Button) findViewById(R.id.buttonatras);
         buttonatras.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                playSwoosh();
                 Intent intent = new Intent(RankingActivity.this, Modocompeticion.class);
                 startActivity(intent);
                 finish();
@@ -62,6 +64,22 @@ public class RankingActivity extends AppCompatActivity {
 
 
         loadTopUsers();
+    }
+
+    private void playSwoosh() {
+        if (swooshPlayer != null) {
+            swooshPlayer.seekTo(0);
+            swooshPlayer.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (swooshPlayer != null) {
+            swooshPlayer.release();
+            swooshPlayer = null;
+        }
+        super.onDestroy();
     }
 
     private void loadTopUsers() {
@@ -216,8 +234,7 @@ public class RankingActivity extends AppCompatActivity {
         }
     }
 
-    // Intent becomingNumberOneIntent = new Intent(RankingActivity.this, BecomingNumberOneActivity.class);
-    //startActivity(becomingNumberOneIntent);
+
 }
 
 

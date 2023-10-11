@@ -66,7 +66,6 @@ public class Preguntas extends AppCompatActivity {
     private boolean isSolutionDisplayed;
     private CountDownTimer timer;
     private MediaPlayer mediaPlayer;
-    private long remainingTimeInMillis;
     private boolean doubleClick = false;
     private static final int DOUBLE_CLICK_DELAY = 2000; // Delay in milliseconds
 
@@ -76,15 +75,7 @@ public class Preguntas extends AppCompatActivity {
     int currentGameFallos;
     int currentGamePuntuacion;
     private FirebaseAuth mAuth;
-    private FirebaseDatabase firebaseDatabase;
-
-    TableLayout leaderboardTable;
-    int rowScore;
-    TextView tvScore;
     String userId;
-    int newAciertos;
-    int newFallos;
-    int newPuntuacion;
     private DatabaseReference gameStatsRef;
     private boolean isProcessing = false;
     boolean hasShownToast = false;
@@ -277,8 +268,10 @@ public class Preguntas extends AppCompatActivity {
 
 
         if (incorrectAnswers >= 5) {
+        Toast.makeText(getApplicationContext(), "ACUMULASTE CINCO FALLOS.\n     " +
+                    "        FIN DE PARTIDA", Toast.LENGTH_LONG).show();
 
-            finishGame();
+            finishGameTerminar();
 
         }
     }
@@ -328,8 +321,6 @@ public class Preguntas extends AppCompatActivity {
         resultImage.animate().cancel();
         resultImage.setVisibility(View.INVISIBLE);
     }
-
-
 
     private void adjustButtonVisibility() {
         if (isSolutionDisplayed) {
@@ -554,48 +545,29 @@ public class Preguntas extends AppCompatActivity {
         });
     }
 
-    private void finishGame() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("aciertos", correctAnswers);
-        editor.putInt("puntuacion", score);
-        editor.putInt("errores", incorrectAnswers);
-        editor.apply();
-
-        updateAccumulatedValues(userId, correctAnswers, incorrectAnswers, score);
-        updateCurrentGameValues(correctAnswers, incorrectAnswers, score);
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                showGameOverScreen();
-            }
-        }, 500); // 500ms = 0.5 seconds
-    }
     private void finishGameTerminar() {
-
         updateAccumulatedValues(userId, correctAnswers, incorrectAnswers, score);
         updateCurrentGameValues(correctAnswers, incorrectAnswers, score);
 
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        Intent intent = new Intent(getApplicationContext(), ClassficationActivity.class);
+
+        Intent intent = new Intent(getApplicationContext(), GameOverActivity.class);
         intent.putExtra("aciertos", correctAnswers);
         intent.putExtra("puntuacion", score);
         intent.putExtra("errores", incorrectAnswers);
         startActivity(intent);
         finish();
-
-
-
     }
 
-    private void showGameOverScreen() {
-        Intent intent = new Intent(getApplicationContext(), GameOverActivity.class);
-        startActivity(intent);
-        Toast.makeText(getApplicationContext(), "ACUMULASTE CINCO FALLOS.\n             FIN DE PARTIDA", Toast.LENGTH_LONG).show();
-        finish();
-    }
+
+//    private void showGameOverScreen() {
+//        Intent intent = new Intent(getApplicationContext(), GameOverActivity.class);
+//        startActivity(intent);
+//        Toast.makeText(getApplicationContext(), "ACUMULASTE CINCO FALLOS.\n     " +
+//                "        FIN DE PARTIDA", Toast.LENGTH_LONG).show();
+//        finish();
+//    }
 
     @Override
     public void onBackPressed() {

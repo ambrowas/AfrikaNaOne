@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -36,18 +37,13 @@ public class ResultActivity extends AppCompatActivity {
     private TextView DisplayErrores;
 
     private TextView TextViewRecord;
-
     int score;
     int marcador;
-
     int highscore;
-
     private String puntaje;
     private String errores;
     private String fallos;
     private  String scoretotal;
-
-
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String KEY_HIGHSCORE = "keyHighscore";
     public static final String KEY_PUNTUACION = "keyPuntuacion";
@@ -63,12 +59,18 @@ public class ResultActivity extends AppCompatActivity {
 
     Button jugarotravez;
     Button salir;
+    MediaPlayer swooshPlayer;
+
+
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
+
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
 
         sp = getSharedPreferences("MyUserPrefs", Context.MODE_PRIVATE);
         highscore = sp.getInt("score", 0);
@@ -93,16 +95,10 @@ public class ResultActivity extends AppCompatActivity {
 
         if (C <=50) {
             DisplayNivel.setText("POR GENTE COMO TU GUINEA NO AVANZA");
-            Animation growAndShrink = new ScaleAnimation(
-                    1f, 1.5f, // fromX, toX
-                    1f, 1.5f, // fromY, toY
-                    Animation.RELATIVE_TO_SELF, 0.5f, // pivotXType, pivotXValue
-                    Animation.RELATIVE_TO_SELF, 0.5f // pivotYType, pivotYValue
-            );
-            growAndShrink.setDuration(500); // set the duration of the animation
-            growAndShrink.setRepeatCount(Animation.INFINITE); // set the number of times the animation will repeat
-            growAndShrink.setRepeatMode(Animation.REVERSE); // set the repeat mode to reverse
-            DisplayNivel.startAnimation(growAndShrink);
+            Animation pulse = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);
+
+// Start the pulse animation on the DisplayNivel view
+            DisplayNivel.startAnimation(pulse);
             MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.noluck);
             try {
                 Thread.sleep(1000);
@@ -112,23 +108,16 @@ public class ResultActivity extends AppCompatActivity {
             mediaPlayer.start();
             Drawable drawable = ContextCompat.getDrawable(this, R.drawable.guinealogo_mediocre);
             trofeo.setImageDrawable(drawable);
-            AlphaAnimation fadeInAnimation = new AlphaAnimation(0.0f, 1.0f);
-            fadeInAnimation.setDuration(4000);
-            trofeo.startAnimation(fadeInAnimation);
+            trofeo.startAnimation(pulse);
+
 
         }
         if (C >= 51 && C < 89) {
             DisplayNivel.setText("NO ESTA MAL PERO PODRIAS  HACERLO MEJOR");
-            Animation growAndShrink = new ScaleAnimation(
-                    1f, 1.5f, // fromX, toX
-                    1f, 1.5f, // fromY, toY
-                    Animation.RELATIVE_TO_SELF, 0.5f, // pivotXType, pivotXValue
-                    Animation.RELATIVE_TO_SELF, 0.5f // pivotYType, pivotYValue
-            );
-            growAndShrink.setDuration(500); // set the duration of the animation
-            growAndShrink.setRepeatCount(Animation.INFINITE); // set the number of times the animation will repeat
-            growAndShrink.setRepeatMode(Animation.REVERSE); // set the repeat mode to reverse
-            DisplayNivel.startAnimation(growAndShrink);
+            Animation pulse = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);
+
+// Start the pulse animation on the DisplayNivel view
+            DisplayNivel.startAnimation(pulse);
             MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.mixkit);
             try {
                 Thread.sleep(1000);
@@ -138,23 +127,15 @@ public class ResultActivity extends AppCompatActivity {
             mediaPlayer.start();
             Drawable drawable = ContextCompat.getDrawable(this, R.drawable.guinealogo_intermedio);
             trofeo.setImageDrawable(drawable);
-            AlphaAnimation fadeInAnimation = new AlphaAnimation(0.0f, 1.0f);
-            fadeInAnimation.setDuration(4000);
-            trofeo.startAnimation(fadeInAnimation);
+            trofeo.startAnimation(pulse);
 
         }
         if (C >= 90) {
             DisplayNivel.setText("NECESITAMOS MAS GUINEAN@S COMO TU");
-            Animation growAndShrink = new ScaleAnimation(
-                    1f, 1.5f, // fromX, toX
-                    1f, 1.5f, // fromY, toY
-                    Animation.RELATIVE_TO_SELF, 0.5f, // pivotXType, pivotXValue
-                    Animation.RELATIVE_TO_SELF, 0.5f // pivotYType, pivotYValue
-            );
-            growAndShrink.setDuration(500); // set the duration of the animation
-            growAndShrink.setRepeatCount(Animation.INFINITE); // set the number of times the animation will repeat
-            growAndShrink.setRepeatMode(Animation.REVERSE); // set the repeat mode to reverse
-            DisplayNivel.startAnimation(growAndShrink);
+            Animation pulse = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);
+
+// Start the pulse animation on the DisplayNivel view
+            DisplayNivel.startAnimation(pulse);
             MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.hallelujah);
             try {
                 Thread.sleep(1000);
@@ -164,10 +145,7 @@ public class ResultActivity extends AppCompatActivity {
             mediaPlayer.start();
             Drawable drawable = ContextCompat.getDrawable(this, R.drawable.guinealogoexperto);
             trofeo.setImageDrawable(drawable);
-            trofeo.setImageDrawable(drawable);
-            AlphaAnimation fadeInAnimation = new AlphaAnimation(0.0f, 1.0f);
-            fadeInAnimation.setDuration(4000);
-            trofeo.startAnimation(fadeInAnimation);
+            trofeo.startAnimation(pulse);
 
         }
 
@@ -187,6 +165,7 @@ public class ResultActivity extends AppCompatActivity {
 
         jugarotravez = (Button) findViewById(R.id.jugarotravez);
         jugarotravez.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 reiniciar();
@@ -201,9 +180,26 @@ public class ResultActivity extends AppCompatActivity {
     }
 
     private void reiniciar() {
+        playSwoosh();
         Intent intent = new Intent(ResultActivity.this, PreguntasModoLibre.class);
         startActivity(intent);
         finish();
+    }
+
+    private void playSwoosh() {
+        if (swooshPlayer != null) {
+            swooshPlayer.seekTo(0);
+            swooshPlayer.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (swooshPlayer != null) {
+            swooshPlayer.release();
+            swooshPlayer = null;
+        }
+        super.onDestroy();
     }
 
     private void salir() {
@@ -211,6 +207,7 @@ public class ResultActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt("marcador", marcador);
         editor.apply();
+        playSwoosh();
         Intent intent1 = new Intent(ResultActivity.this, ModoLibre.class);
         intent1.putExtra("score", score);
 

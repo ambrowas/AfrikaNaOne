@@ -1,6 +1,7 @@
 package iniciativaselebi.com.guinealogiaediciontrivial;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -27,35 +28,36 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.checkerframework.common.reflection.qual.NewInstance;
+
 import Model.User;
 
 public class Register extends AppCompatActivity {
-    @Nullable
-    private RecaptchaTasksClient recaptchaTasksClient = null;
-
-        TextInputEditText editTextEmail, editTextPassword, editTextNombre, editTextFoto, editTextTelefono,
-        editTextBarrio, editTextCiudad,editTextpais;
-        TextView textView;
-        Button btn_register;
-
+    Button btn_register;
         private FirebaseAuth mAuth;
-        FirebaseUser user;
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        ProgressBar progressBar;
-        String password, email, nombre,foto, ciudad, telefono, barrio, pais;
-         private Uri imagePath;
+        String password, email, nombre, ciudad, telefono, barrio, pais;
+        MediaPlayer swooshPlayer;
 
-
-
+        TextView TextViewVolver2;
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_register);
 
-
+            TextViewVolver2 = (TextView) findViewById(R.id.TextViewVolver2);
             mAuth = FirebaseAuth.getInstance();
             btn_register = (Button) findViewById(R.id.btn_register);
+            swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
 
+            TextViewVolver2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    playSwoosh();
+                    Intent intent = new Intent(getApplicationContext(), Modocompeticion.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
 
             btn_register.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -89,6 +91,7 @@ public class Register extends AppCompatActivity {
                                 FirebaseDatabase.getInstance().getReference("user/"+ FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(new User(editTextNombre.getText().toString(), editTextEmail.getText().toString(),editTextTelefono.getText().toString(),editTextBarrio.getText().toString(),editTextCiudad.getText().toString(),editTextPais.getText().toString(), ""));
                                 Toast.makeText(Register.this, "Usuario Registrado", Toast.LENGTH_SHORT).show();
                                 FirebaseUser user = mAuth.getCurrentUser();
+                                playSwoosh();
                                 Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
                                 startActivity(intent);
                                 finish();
@@ -100,6 +103,7 @@ public class Register extends AppCompatActivity {
                                     Toast.makeText(Register.this, "La cuenta ya existe, ¿quieres conectarte?", Toast.LENGTH_SHORT).show();
                                 }
                                 Intent intent = new Intent(getApplicationContext(), Login.class);
+                                playSwoosh();
                                 startActivity(intent);
                                 finish();
                             }
@@ -110,8 +114,23 @@ public class Register extends AppCompatActivity {
 
                         }
                     });
-                    };
+                    }
 
+    private void playSwoosh() {
+        if (swooshPlayer != null) {
+            swooshPlayer.seekTo(0);
+            swooshPlayer.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (swooshPlayer != null) {
+            swooshPlayer.release();
+            swooshPlayer = null;
+        }
+        super.onDestroy();
+    }
 
     }
 
