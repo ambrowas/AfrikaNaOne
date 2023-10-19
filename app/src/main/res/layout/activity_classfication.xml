@@ -207,17 +207,6 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"/>
 
-        <Button
-            android:id="@+id/buttonranking2"
-            android:layout_width="300dp"
-            android:layout_height="75dp"
-            android:background="@drawable/radio_selector"
-            android:freezesText="true"
-            android:text="RANKING"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            app:strokeWidth="3dp"
-            android:layout_marginBottom="10dp"/>
 
         <Button
             android:id="@+id/buttonmenuprincipal"
@@ -225,7 +214,7 @@
             android:layout_height="75dp"
             android:background="@drawable/radio_normal2"
             android:freezesText="true"
-            android:text="MENU"
+            android:text="FINALIZAR"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:strokeWidth="3dp"/>

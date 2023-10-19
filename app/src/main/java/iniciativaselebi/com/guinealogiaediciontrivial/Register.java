@@ -53,7 +53,7 @@ public class Register extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     playSwoosh();
-                    Intent intent = new Intent(getApplicationContext(), Modocompeticion.class);
+                    Intent intent = new Intent(getApplicationContext(), Login.class);
                     startActivity(intent);
                     finish();
                 }

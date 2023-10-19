@@ -41,7 +41,7 @@ import Model.User;
 
 public class RankingActivity extends AppCompatActivity {
     TableLayout tableLayout;
-    Button buttonatras;
+    Button button_retorno;
     ValueAnimator animator;
     MediaPlayer swooshPlayer;
 
@@ -51,14 +51,17 @@ public class RankingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ranking);
 
         swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
-        buttonatras = (Button) findViewById(R.id.buttonatras);
-        buttonatras.setOnClickListener(new View.OnClickListener() {
+        button_retorno = (Button)findViewById(R.id.button_retorno);
+        button_retorno.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 playSwoosh();
-                Intent intent = new Intent(RankingActivity.this, Modocompeticion.class);
+                Intent intent;
+                intent = new Intent(RankingActivity.this, Modocompeticion.class);
                 startActivity(intent);
-                finish();
+               finish();
+
+
             }
         });
 
@@ -163,6 +166,7 @@ public class RankingActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             Intent intent = new Intent(RankingActivity.this, LeadersProfileActivity.class);
                             intent.putExtra("user_id", user.getUid());
+                            playSwoosh();
                             startActivity(intent);
                         }
                     });

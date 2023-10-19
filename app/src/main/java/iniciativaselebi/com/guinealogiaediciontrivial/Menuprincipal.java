@@ -12,6 +12,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
+import java.util.concurrent.TimeUnit;
 
 import iniciativaselebi.com.guinealogiaediciontrivial.R;
 
@@ -29,6 +34,10 @@ public class Menuprincipal extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menuprincipal);
         swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
+
+
+
+
 
         logo = (ImageView) findViewById(R.id.logo);
         pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);
@@ -93,6 +102,7 @@ public class Menuprincipal extends AppCompatActivity {
             logo.clearAnimation();
         }
     }
+
 
 
 

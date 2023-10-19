@@ -30,8 +30,7 @@ import java.util.Map;
 
 public class CheckCodigoActivity extends AppCompatActivity {
     private Button button_validar, button_regresar;
-    private DatabaseReference databaseRef, userRef;
-    private String userID, fullname;
+
     MediaPlayer swooshPlayer;
 
         @Override
@@ -113,17 +112,18 @@ public class CheckCodigoActivity extends AppCompatActivity {
         }
 
     private void handleCodeValidation(DataSnapshot snapshot, String userId, String fullName) {
-        String staticCodeValue = snapshot.child("StaticCode").getValue(String.class);
-        Boolean isUsed = snapshot.child("used").getValue(Boolean.class);
-
-        if ("true".equalsIgnoreCase(staticCodeValue)) {
+        if (snapshot.hasChild("StaticCode")) {  // Check if the StaticCode node exists
             resetGameData(userId);
             Toast.makeText(getApplicationContext(), "CODIGO PROMOCIONAL VALIDO!", Toast.LENGTH_SHORT).show();
+            navigateToModocompeticion(); // Navigate after the Toast
             return;
         }
 
+        Boolean isUsed = snapshot.child("used").getValue(Boolean.class);
+
         if (isUsed != null && isUsed) {
             Toast.makeText(getApplicationContext(), "ESTE CODIGO YA HA SIDO USADO. INTRODUZCA UNO NUEVO", Toast.LENGTH_SHORT).show();
+            navigateToModocompeticion(); // Navigate after the Toast
             return;
         }
 
@@ -146,13 +146,15 @@ public class CheckCodigoActivity extends AppCompatActivity {
         snapshot.getRef().child("usedTimestamp").setValue(usedTimestamp);
 
         Toast.makeText(getApplicationContext(), "CODIGO VALIDADO: BUENA SUERTE", Toast.LENGTH_SHORT).show();
+        navigateToModocompeticion(); // Navigate after the Toast
+    }
 
+    private void navigateToModocompeticion() {
         playSwoosh();
         Intent intent = new Intent(getApplicationContext(), Modocompeticion.class);
         startActivity(intent);
         finish();
     }
-
 
     private void resetGameData(String userId) {
         DatabaseReference userGameRef = FirebaseDatabase.getInstance().getReference("user").child(userId);
@@ -172,7 +174,6 @@ public class CheckCodigoActivity extends AppCompatActivity {
             }
         });
     }
-
 
     private void playSwoosh() {
         if (swooshPlayer != null) {

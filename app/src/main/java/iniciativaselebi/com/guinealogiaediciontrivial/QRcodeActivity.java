@@ -68,7 +68,7 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
     public class QRcodeActivity extends AppCompatActivity {
 
         private ImageView qrCodeImageView;
-        Button buttonguardar, buttonvolver, buttonmenuprincipal;
+        Button buttonguardar, buttonvolver;
         Bitmap qrCodeBitmap;
 
         TextView textviewiuu;
@@ -148,16 +148,7 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                     startActivity(intent);
                 }
             });
-            buttonmenuprincipal = (Button) findViewById(R.id.buttonmenuprincipal);
-            buttonmenuprincipal.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    playSwoosh();
-                    Intent intent = new Intent(QRcodeActivity.this, Modocompeticion.class);
-                    startActivity(intent);
 
-                }
-            });
 
 
             buttonguardar = findViewById(R.id.buttonguardar);
@@ -184,41 +175,6 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
             });
 
         }
-        private String generateQRCodeKey() {
-            String allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            int length = 18;
-            StringBuilder randomKey = new StringBuilder();
-
-            Random random = new Random();
-            for (int i = 0; i < length; i++) {
-                int randomIndex = random.nextInt(allowedCharacters.length());
-                char character = allowedCharacters.charAt(randomIndex);
-                randomKey.append(character);
-            }
-
-            return randomKey.toString();
-        }
-
-        private String generateQRCodeData(String userId, String userName, String userEmail, int lastGameScore, int lastGamePuntuacion) {
-            String timestamp = getCurrentDateTime();
-            JSONObject qrCodeData = new JSONObject();
-
-            try {
-                qrCodeData.put("base64QRCode", "iVBORw0KGgoAAAANSUhEUgAA");
-                qrCodeData.put("lastGamePuntuacion", lastGamePuntuacion);
-                qrCodeData.put("lastGameScore", lastGameScore);
-                qrCodeData.put("qrCodeKey", qrCodeKey);
-                qrCodeData.put("timestamp", timestamp);
-                qrCodeData.put("userId", userId);
-                qrCodeData.put("fullname", userName);
-                qrCodeData.put("email", userEmail);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return qrCodeKey + "," + qrCodeData.toString();
-        }
-
 
 
         private Bitmap generateQRCode(String key) {

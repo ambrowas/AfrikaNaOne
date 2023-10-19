@@ -93,7 +93,7 @@ public class LeadersProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 playSwoosh();
-                Intent intent = new Intent(LeadersProfileActivity.this, RankingActivity.class);
+//                Intent intent = new Intent(LeadersProfileActivity.this, RankingActivity.class);
                 finish();
             }
         });

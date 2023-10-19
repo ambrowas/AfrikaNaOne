@@ -70,19 +70,6 @@
         app:strokeWidth="3dp" />
 
 
-    <Button
-        android:id="@+id/buttonmenuprincipal"
-        android:layout_width="300dp"
-        android:layout_height="75dp"
-        android:background="@drawable/radio_normal2"
-        android:freezesText="true"
-        android:layout_gravity="center_horizontal"
-        android:text="MENU PRINCIPAL"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        app:strokeWidth="3dp" />
-
-
 
 
 

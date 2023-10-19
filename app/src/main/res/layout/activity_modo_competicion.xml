@@ -157,4 +157,13 @@
         android:textSize="10pt"
         android:textStyle="bold" />
 
+    <Button
+        android:id="@+id/updateFirestoreButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/TextViewVolver"
+        android:text="Update Firestore"
+        android:layout_marginTop="10dp"
+        android:layout_centerInParent="true"/>
+
 </RelativeLayout>

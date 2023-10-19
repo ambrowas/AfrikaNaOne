@@ -47,7 +47,7 @@ public class ClassficationActivity extends AppCompatActivity {
         TextView textviewrecord, textiviewganancias, textviewaciertos2, textviewpuntuacion2, textviewhola, textviewclasificacion, TextViewFallos,
         textviewgrandtotal;
         ImageView profilepicture;
-        Button buttonranking2, buttonmenuprincipal, buttoncodigocobro;
+        Button  buttonmenuprincipal, buttoncodigocobro;
 
         String profilePictureUri;
         int aciertos, puntuacion, ganancias, redColor, blueColor, errores, highestScore;
@@ -154,43 +154,24 @@ public class ClassficationActivity extends AppCompatActivity {
          SharedPreferences sharedPreferences = getSharedPreferences("GameStats", Context.MODE_PRIVATE);
         profilePictureUri = getIntent().getStringExtra("profilePictureUri");
 
-
-            buttonranking2 = (Button) findViewById(R.id.buttonranking2);
-            buttonranking2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    playSwoosh();
-                    Intent intent = new Intent(ClassficationActivity.this, RankingActivity.class);
-                    startActivity(intent);
-
-                }
-            });
-
         buttonmenuprincipal = (Button) findViewById(R.id.buttonmenuprincipal);
         buttonmenuprincipal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // If puntuacion is greater than or equal to 2500
-                if (puntuacion >= 2500) {
-                    new AlertDialog.Builder(ClassficationActivity.this)
-                            .setTitle("Confirmar Salida")
-                            .setMessage("¿Seguro que quieres salir sin generar cobro?")
-                            .setPositiveButton("SI", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // User clicked SI
-                                    playSwoosh();
-                                    Intent intent = new Intent(ClassficationActivity.this, Modocompeticion.class);
-                                    startActivity(intent);
-                                }
-                            })
-                            .setNegativeButton("NO", null) // User clicked NO, just dismiss the alert
-                            .show();
-                } else {
-                    // If puntuacion is less than 2500, proceed with the current logic
-                    playSwoosh();
-                    Intent intent = new Intent(ClassficationActivity.this, Modocompeticion.class);
-                    startActivity(intent);
-                }
+                new AlertDialog.Builder(ClassficationActivity.this)
+                        .setTitle("TERMINAR")
+                        .setMessage("¿Seguro que quieres concluir la partida?")
+                        .setPositiveButton("SI", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // User clicked SI
+                                playSwoosh();
+                                Intent intent = new Intent(ClassficationActivity.this, Modocompeticion.class);
+                                startActivity(intent);
+                                finish();  // Close the current activity
+                            }
+                        })
+                        .setNegativeButton("NO", null) // User clicked NO, just dismiss the alert
+                        .show();
             }
         });
 
@@ -256,13 +237,6 @@ public class ClassficationActivity extends AppCompatActivity {
             textviewpuntuacion2.setText("TU PUNTUACION ES DE  " + puntuacion + " PUNTOS");
             textiviewganancias.setText("TUS GANANCIAS SON DE  " + puntuacion + " FCFA");
             TextViewFallos.setText("ACUMULASTE " + errores + " ERRORES");
-        // After you set values to the TextViews, log the values you're setting
-        Log.d("DEBUG_TAG", "Setting aciertos to TextView: " + aciertos);
-        Log.d("DEBUG_TAG", "Setting puntuacion to TextView: " + puntuacion);
-        Log.d("DEBUG_TAG", "Setting ganancias to TextView: " + ganancias);
-        Log.d("DEBUG_TAG", "Setting fallos to TextView: " + errores);
-        Log.d("DEBUG_TAG", "Setting record to TextView: " + highestScore);
-        Log.d("DEBUG_TAG", "Setting gananciascumuladas to TextView: " + grandtotal);
 
 
 

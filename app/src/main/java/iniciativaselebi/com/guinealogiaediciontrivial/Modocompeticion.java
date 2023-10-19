@@ -21,6 +21,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,12 +30,25 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Modocompeticion extends AppCompatActivity {
         private static final String TAG = "Modocompeticion";
 
         FirebaseAuth auth;
-        Button button_jugar2, button_perfil, button_login, button_register, button_clasificacion, buttoncodigo;
+        Button button_jugar2, button_perfil, button_login, button_register, button_clasificacion, buttoncodigo, updateupdateFirestoreButton;
 
         TextView TextViewSaludo2, TextViewRecord, TextViewVolver;
         FirebaseUser user;
@@ -52,6 +67,15 @@ public class Modocompeticion extends AppCompatActivity {
 
 
             auth = FirebaseAuth.getInstance();
+
+            Button updateupdateFirestoreButton = (Button) findViewById(R.id.updateFirestoreButton);
+            updateupdateFirestoreButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    updateFirestoreData();
+                }
+            });
+
             button_clasificacion = findViewById(R.id.button_clasificacion);
             button_clasificacion.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -82,7 +106,7 @@ public class Modocompeticion extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     playSwoosh();
-                    Intent intent = new Intent(getApplicationContext(), Menuprincipal.class);
+                   Intent intent = new Intent(getApplicationContext(), Menuprincipal.class);
                     startActivity(intent);
                     finish();
 
@@ -208,6 +232,46 @@ public class Modocompeticion extends AppCompatActivity {
                 });
             }
         }
+
+    private void updateFirestoreData() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Fetch all documents
+        db.collection("PREGUNTAS")
+                .orderBy("NUMBER", Query.Direction.ASCENDING)  // order by the current NUMBER field
+                .get()
+                .addOnSuccessListener(allDocs -> {
+                    WriteBatch batch = db.batch();  // use a batch to group updates for efficiency
+
+                    for (DocumentSnapshot document : allDocs.getDocuments()) {
+                        // Get the document number
+                        String documentNumber = document.getId();
+
+                        // Generate a random number between 0 and 1
+                        double randomValue = new Random().nextDouble();
+
+                        // Update the "NUMBER" field to match the document number and add the "random" field
+                        DocumentReference docRef = db.collection("PREGUNTAS").document(document.getId());
+                        batch.update(docRef, "NUMBER", documentNumber);
+                        batch.update(docRef, "random", randomValue);
+
+                        // Remove the "lastAccessed" field
+                        batch.update(docRef, "lastAccessed", FieldValue.delete());
+                    }
+
+                    // Commit the batch
+                    batch.commit().addOnSuccessListener(aVoid -> {
+                        Log.d("FirestoreUpdate", "Successfully updated documents with random field and removed lastAccessed.");
+                    }).addOnFailureListener(e -> {
+                        Log.e("FirestoreUpdate", "Error updating documents", e);
+                    });
+
+                })
+                .addOnFailureListener(e -> Log.e("FirestoreUpdate", "Error fetching all documents", e));
+    }
+
+
+
 
     private void playSwoosh() {
         if (swooshPlayer != null) {

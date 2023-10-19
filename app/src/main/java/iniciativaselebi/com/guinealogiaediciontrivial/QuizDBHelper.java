@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.FileOutputStream;
@@ -14,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import iniciativaselebi.com.guinealogiaediciontrivial.QuizContract.QuestionsTable;
 
@@ -94,7 +97,26 @@ public class QuizDBHelper extends SQLiteOpenHelper {
     public ArrayList<Question> getRandomQuestions(int count) {
         ArrayList<Question> questionList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM " + QuestionsTable.TABLE_NAME + " ORDER BY RANDOM() LIMIT " + count, null);
+
+        // 1. Fetch All Question IDs
+        Cursor c = db.rawQuery("SELECT " + QuestionsTable._ID + " FROM " + QuestionsTable.TABLE_NAME, null);
+        ArrayList<Integer> ids = new ArrayList<>();
+
+        if (c.moveToFirst()) {
+            do {
+                ids.add(c.getInt(c.getColumnIndex(QuestionsTable._ID)));
+            } while (c.moveToNext());
+        }
+        c.close();
+
+        // 2. Shuffle the IDs
+        Collections.shuffle(ids);
+
+        // 3. Pick the Desired Number of Questions
+        List<Integer> selectedIds = ids.subList(0, Math.min(count, ids.size()));
+        String selectedIdsString = TextUtils.join(",", selectedIds);
+
+        c = db.rawQuery("SELECT * FROM " + QuestionsTable.TABLE_NAME + " WHERE " + QuestionsTable._ID + " IN (" + selectedIdsString + ")", null);
 
         if (c.moveToFirst()) {
             do {
@@ -109,8 +131,9 @@ public class QuizDBHelper extends SQLiteOpenHelper {
                 questionList.add(question);
             } while (c.moveToNext());
         }
-
         c.close();
+
         return questionList;
     }
+
 }

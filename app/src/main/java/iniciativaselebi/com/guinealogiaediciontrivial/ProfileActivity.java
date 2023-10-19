@@ -173,31 +173,31 @@ public class ProfileActivity extends AppCompatActivity {
         profilepic = (CircleImageView) findViewById(R.id.profilepic);
         btn_borrarusuario = (Button)findViewById(R.id.btn_borrarusuario);
 
-        buttonatras = (Button)findViewById(R.id.buttonatras);
-        buttonatras.setOnClickListener(new View.OnClickListener() {
+    buttonatras = (Button)findViewById(R.id.buttonatras);
+    buttonatras.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 playSwoosh();
-                Intent intent = new Intent(ProfileActivity.this, Modocompeticion.class);
+                Intent intent = new Intent(getApplicationContext(), Modocompeticion.class);
                 startActivity(intent);
                 finish();
             };
         });
 
        
-        btn_upload = (Button)findViewById(R.id.btn_upload);
-        btn_upload.setVisibility(View.INVISIBLE);
-        btn_upload.setOnClickListener(new View.OnClickListener() {
+    btn_upload = (Button)findViewById(R.id.btn_upload);
+    btn_upload.setVisibility(View.INVISIBLE);
+    btn_upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 uploadImage();
             }
         });
 
-        mAuth = FirebaseAuth.getInstance();
+    mAuth = FirebaseAuth.getInstance();
      
-        btn_borrarusuario = (Button)findViewById(R.id.btn_borrarusuario);
-        btn_borrarusuario.setOnClickListener(new View.OnClickListener() {
+    btn_borrarusuario = (Button)findViewById(R.id.btn_borrarusuario);
+    btn_borrarusuario.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 borraUsuario();
@@ -205,7 +205,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
 
-        profilepic.setOnClickListener(new View.OnClickListener() {
+    profilepic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent photoIntent = new Intent(Intent.ACTION_PICK);
