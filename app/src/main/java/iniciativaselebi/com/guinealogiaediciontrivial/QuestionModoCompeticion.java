@@ -2,59 +2,84 @@ package iniciativaselebi.com.guinealogiaediciontrivial;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.database.PropertyName;
+
+import java.util.Objects;
+import com.google.firebase.database.core.utilities.encoding.CustomClassMapper;
+
 public class QuestionModoCompeticion implements Parcelable {
 
-    private String question;
-    private String optionA;
-    private String optionB;
-    private String optionC;
-    private String answer;
-    private String category;
-    private String imageUrl;
-    private String number;
-    private boolean used;
+    private String QUESTION;
+    @PropertyName("OPTION A")
+    private String OPTION_A;
+    @PropertyName("OPTION B")
+    private String OPTION_B;
 
+    @PropertyName("OPTION C")
+    private String OPTION_C;
+
+    private String ANSWER;
+    private String CATEGORY;
+    private String IMAGE;
+    private String NUMBER;
+    private boolean used;
     private long lastAccessed;
 
-    // Constructor
-    public QuestionModoCompeticion(String question, String optionA, String optionB, String optionC, String answer, String category, String image, String number, boolean used) {
-        this.question = question;
-        this.optionA = optionA;
-        this.optionB = optionB;
-        this.optionC = optionC;
-        this.answer = answer;
-        this.category = category;
-        this.imageUrl = image;
-        this.number = number;
-        this.used = false; // Initialize used to false
-        this.lastAccessed = 0L; // Initialize lastAccessed to 0
+    // Default constructor
+    public QuestionModoCompeticion() {
     }
 
-    // Other getters and setters
+
+
+
+    // Parameterized constructor
+    public QuestionModoCompeticion(String QUESTION, String OPTION_A, String OPTION_B, String OPTION_C, String ANSWER, String CATEGORY, String IMAGE, String NUMBER) {
+        this.QUESTION = QUESTION;
+        this.OPTION_A = OPTION_A;
+        this.OPTION_B = OPTION_B;
+        this.OPTION_C = OPTION_C;
+        this.ANSWER = ANSWER;
+        this.CATEGORY = CATEGORY;
+        this.IMAGE = IMAGE;
+        this.NUMBER = NUMBER;
+        this.used = false;  // Default value
+    }
+
+
+    @Override
+    public String toString() {
+        return "QUESTION: " + QUESTION +
+                ", OPTION A: " + OPTION_A +
+                ", OPTION B: " + OPTION_B +
+                ", OPTION C: " + OPTION_C +
+                ", ANSWER: " + ANSWER +
+                ", CATEGORY: " + CATEGORY +
+                ", IMAGE: " + IMAGE +
+                ", NUMBER: " + NUMBER;
+
+    }
 
     protected QuestionModoCompeticion(Parcel in) {
-        question = in.readString();
-        optionA = in.readString();
-        optionB = in.readString();
-        optionC = in.readString();
-        answer = in.readString();
-        category = in.readString();
-        imageUrl = in.readString();
-        number = in.readString();
-        used = in.readByte() != 0;
+        QUESTION = in.readString();
+        OPTION_A = in.readString();
+        OPTION_B = in.readString();
+        OPTION_C = in.readString();
+        ANSWER = in.readString();
+        CATEGORY = in.readString();
+        IMAGE = in.readString();
+        NUMBER = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(question);
-        dest.writeString(optionA);
-        dest.writeString(optionB);
-        dest.writeString(optionC);
-        dest.writeString(answer);
-        dest.writeString(category);
-        dest.writeString(imageUrl);
-        dest.writeString(number);
-        dest.writeByte((byte) (used ? 1 : 0));
+        dest.writeString(QUESTION);
+        dest.writeString(OPTION_A);
+        dest.writeString(OPTION_B);
+        dest.writeString(OPTION_C);
+        dest.writeString(ANSWER);
+        dest.writeString(CATEGORY);
+        dest.writeString(IMAGE);
+        dest.writeString(NUMBER);
     }
 
     @Override
@@ -74,38 +99,88 @@ public class QuestionModoCompeticion implements Parcelable {
         }
     };
 
-    public String getQuestion() {
-        return question;
+    @PropertyName("QUESTION")
+    public String getQUESTION() {
+        return QUESTION;
     }
 
-    public String getOptionA() {
-        return optionA;
+    @PropertyName("QUESTION")
+    public void setQUESTION(String QUESTION) {
+        this.QUESTION = QUESTION;
     }
 
-    public String getOptionB() {
-        return optionB;
+    @PropertyName("OPTION A")
+    public String getOPTION_A() {
+        return OPTION_A;
     }
 
-    public String getOptionC() {
-        return optionC;
+    @PropertyName("OPTION A")
+    public void setOPTION_A(String OPTION_A) {
+        this.OPTION_A = OPTION_A;
     }
 
-    public String getAnswer() {
-        return answer;
+    @PropertyName("OPTION B")
+    public String getOPTION_B() {
+        return OPTION_B;
     }
 
-    public String getCategory() {
-        return category;
+    @PropertyName("OPTION B")
+    public void setOPTION_B(String OPTION_B) {
+        this.OPTION_B = OPTION_B;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    @PropertyName("OPTION C")
+    public String getOPTION_C() {
+        return OPTION_C;
     }
 
-    public String getNumber() {
-        return number;
+    @PropertyName("OPTION C")
+    public void setOPTION_C(String OPTION_C) {
+        this.OPTION_C = OPTION_C;
     }
 
+
+    @PropertyName("ANSWER")
+    public String getANSWER() {
+        return ANSWER;
+    }
+
+    @PropertyName("ANSWER")
+    public void setANSWER(String ANSWER) {
+        this.ANSWER = ANSWER;
+    }
+
+    @PropertyName("CATEGORY")
+    public String getCATEGORY() {
+        return CATEGORY;
+    }
+
+    @PropertyName("CATEGORY")
+    public void setCATEGORY(String CATEGORY) {
+        this.CATEGORY = CATEGORY;
+    }
+
+    @PropertyName("IMAGE")
+    public String getIMAGE() {
+        return IMAGE;
+    }
+
+    @PropertyName("IMAGE")
+    public void setIMAGE(String IMAGE) {
+        this.IMAGE = IMAGE;
+    }
+
+    @PropertyName("NUMBER")
+    public String getNUMBER() {
+        return NUMBER;
+    }
+
+    @PropertyName("NUMBER")
+    public void setNUMBER(String NUMBER) {
+        this.NUMBER = NUMBER;
+    }
+
+    // Local property getters and setters
     public boolean isUsed() {
         return used;
     }

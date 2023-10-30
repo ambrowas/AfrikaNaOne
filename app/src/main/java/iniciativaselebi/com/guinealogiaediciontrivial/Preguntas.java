@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class Preguntas extends AppCompatActivity {
@@ -83,15 +84,11 @@ public class Preguntas extends AppCompatActivity {
         private List<QuestionModoCompeticion> unusedQuestions;
 
         private FirestoreQuestionManager firestoreQuestionManager;
-    private static final String SHARED_PREF_NAME = "UsedQuestionsSharedPreferences";
-    private static final String USED_QUESTIONS_KEY = "usedQuestions";
-    private SharedPreferences sharedPreferences;
+        private static final String SHARED_PREF_NAME = "UsedQuestionsSharedPreferences";
+        private static final String USED_QUESTIONS_KEY = "usedQuestions";
+        private SharedPreferences sharedPreferences;
 
-
-
-
-
-
+        private boolean isFetching = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,9 +97,7 @@ public class Preguntas extends AppCompatActivity {
 
         initializeUIElements();
 
-
-
-        sharedPreferences = getSharedPreferences("UsedQuestionsSharedPreferences", MODE_PRIVATE);
+        //sharedPreferences = getSharedPreferences("UsedQuestionsSharedPreferences", MODE_PRIVATE);
 
         FirebaseApp.initializeApp(this);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -120,15 +115,13 @@ public class Preguntas extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         preguntasList = new ArrayList<>();
-
-
-
         questionDataSource = new QuestionDataSource(this);
         questionDataSource.open();
-        unusedQuestions = questionDataSource.fetchRandomUnusedQuestions(10);
+        unusedQuestions = questionDataSource.fetchRandomUnusedQuestions(25);
 
-        // Call moveToNextQuestion directly, as it will handle fetching if needed
+        //fetchUnusedQuestionsFromDatabase();
         moveToNextQuestion();
+
 
         buttonconfirmar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -174,153 +167,147 @@ public class Preguntas extends AppCompatActivity {
                 }
                 isSolutionDisplayed = false;
                 adjustButtonVisibility();
+
             }
         });
     }
 
-     private void moveToNextQuestion() {
-        Log.d("DebugFlow", "Entering moveToNextQuestion() with unusedQuestions size: " + unusedQuestions.size());
-        stopImageAnimation();
-        if (!unusedQuestions.isEmpty()) {
-           currentQuestion = unusedQuestions.remove(0);
-            Log.d("DebugFlow", "Removed a question. New size of unusedQuestions: " + unusedQuestions.size());
-            displayQuestion();
-        } else {
+    private void moveToNextQuestion() {
+        Log.d("RecursiveCheck", "Entered <moveToNextQuestion>");
+
+        questionDataSource.open();
+
+        // Check the size of the unusedQuestions list before fetching a new question
+        if (unusedQuestions.size() == 5) {
             fetchUnusedQuestionsFromDatabase();
         }
-      //  resetTextView();
+
+        List<QuestionModoCompeticion> questions = questionDataSource.fetchRandomUnusedQuestions(1);
+        Log.d("NextQuestion", "Number of unused questions fetched from SQL database: " + questions.size());
+
+        if (!questions.isEmpty()) {
+            Log.d("NextQuestionDetail", "Question content: " + questions.get(0).toString());  // Similarly, replace with appropriate logging if there's no toString() method
+            displayQuestion();
+
+            // Mark it as used
+            questionDataSource.markQuestionAsUsed(questions.get(0).getNUMBER());
+        }
+
+        questionDataSource.close();
         resetImageAndAnimation();
     }
 
+    public void fetchUnusedQuestionsFromDatabase() {
+        if (isFetching) return; // Exit if already fetching
+        isFetching = true;
 
-    private void fetchUnusedQuestionsFromDatabase() {
-        // Log the size of the unusedQuestions list before fetching
-        Log.d("UnusedQuestions", "Current unusedQuestions list size before fetch: " + unusedQuestions.size());
+        FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
 
-        // Check if there are enough unused questions in the list
-        if (unusedQuestions.size() < 2) {
-            // Log a message indicating that new questions are being fetched
-            Log.d("FetchQuestions", "Fetching new questions because there are less than two unused questions.");
-
-            // Create an instance of FirestoreQuestionManager
-            FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
-
-            // Fetch a new batch of questions from Firestore
-            manager.fetchQuestionsBatch(new FirestoreQuestionManager.QuestionsFetchCallback() {
-                @Override
-                public void onQuestionsFetched(List<QuestionModoCompeticion> newQuestions) {
-                    clearUsedQuestionsSharedPreferences();
-                    // Add the newly fetched questions to the unusedQuestions list
-                    unusedQuestions.addAll(newQuestions);
-                    Log.d("FetchQuestions", "Added " + newQuestions.size() + " new questions to the unusedQuestions list.");
-
-                    // Optionally, move to the next question or update your UI here
-                    moveToNextQuestion();
+        manager.fetchShuffledBatchQuestions(new FirestoreQuestionManager.QuestionsFetchCallback() {
+            @Override
+            public void onQuestionsFetched(List<QuestionModoCompeticion> newQuestions) {
+                Log.d("FetchQuestions", "Total questions fetched from Firestore: " + newQuestions.size());
+                for (QuestionModoCompeticion question : newQuestions) {
+                    Log.d("FetchQuestionsDetail", "Question content: " + question.toString());
                 }
+                isFetching = false;
 
-                @Override
-                public void onError(Exception e) {
-                    // Handle the error, e.g., show an error message to the user
-                    Log.e("FetchQuestions", "Error fetching questions: " + e.getMessage());
-                    Toast.makeText(Preguntas.this, "Error fetching new questions. Please try again.", Toast.LENGTH_SHORT).show();
+                if (!newQuestions.isEmpty()) {
+                    // Update the local SQL database with new questions
+                    manager.updateLocalAndDatabaseWithNewQuestions(newQuestions, this);
+
+
+
+                    // Delay for 0.5 seconds (500 milliseconds) then proceed to the next question
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            moveToNextQuestion();
+                        }
+                    }, 500);
+                } else {
+                    Log.d("FetchQuestions", "No new questions fetched from Firestore.");
                 }
-            });
-        } else {
-            // Log the content of the unusedQuestions list
-            for (QuestionModoCompeticion question : unusedQuestions) {
-                Log.d("UnusedQuestions", "Question: " + question.getQuestion());
             }
-        }
-    }
 
-    private void clearUsedQuestionsSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("UsedQuestionsSharedPreferences", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
-        Log.d("UsedQuestionsSharedPreferences", "All used question IDs cleared from SharedPreferences.");
+            @Override
+            public void onError(Exception e) {
+                Log.e("FetchQuestions", "Error fetching questions: " + e.getMessage());
+                isFetching = false;
+            }
+        });
     }
 
     @SuppressLint("SuspiciousIndentation")
-    private void displayQuestion() {
-            Log.d("DebugFlow", "Entering displayQuestion() with unusedQuestions size: " + unusedQuestions.size());
+    private void displayQuestion()  {
+        Log.d("DebugFlow", "Entering displayQuestion() with unusedQuestions size: " + unusedQuestions.size());
 
-            if (unusedQuestions.isEmpty()) {
-                fetchUnusedQuestionsFromDatabase();
-                return;
-            }
+//        if  (unusedQuestions.size() == 3) {
+//            fetchUnusedQuestionsFromDatabase();
+//            return; // Exit as we need to wait for the questions to be fetched
+//        }
 
-             currentQuestion = unusedQuestions.get(0); // Peek, don't remove yet.
+        currentQuestion = unusedQuestions.remove(0); // Get and remove the first unused question from the list
 
-            if (isQuestionUsed(currentQuestion.getNumber())) {
-                Log.d("DebugFlow", "Question already marked as used. Skipping and calling displayQuestion again.");
-                unusedQuestions.remove(0); // Remove the question from the list.
-                unusedQuestions.add(currentQuestion); // Add it to the end.
-                displayQuestion(); // Recursive call.
-                return;
-            }
+        // UI Setup
+        Log.d("UnusedQuestions", "Displaying question: " + currentQuestion.getQUESTION());
+        textviewpregunta.setText(currentQuestion.getQUESTION());
+        radio_button1.setText(currentQuestion.getOPTION_A());
+        radio_button2.setText(currentQuestion.getOPTION_B());
+        radio_button3.setText(currentQuestion.getOPTION_C());
+        textviewcategoria.setText(currentQuestion.getCATEGORY());
 
-            // If we've reached here, we have an unused question. Remove it from the list.
-            unusedQuestions.remove(0);
+        String imageUrl = currentQuestion.getIMAGE();
+        Glide.with(this)
+                .load(imageUrl)
+                .error(R.drawable.logotrivial)
+                .into(quizImage);
 
-            // UI Setup
-            Log.d("UnusedQuestions", "Displaying question: " + currentQuestion.getQuestion());
+        radio_group.clearCheck();
+        resetRadioButtonColors();
 
-            textviewpregunta.setText(currentQuestion.getQuestion());
-            radio_button1.setText(currentQuestion.getOptionA());
-            radio_button2.setText(currentQuestion.getOptionB());
-            radio_button3.setText(currentQuestion.getOptionC());
-            textviewcategoria.setText(currentQuestion.getCategory());
-
-            String imageUrl = currentQuestion.getImageUrl();
-            Glide.with(this)
-                    .load(imageUrl)
-                    .error(R.drawable.logotrivial)
-                    .into(quizImage);
-
-            radio_group.clearCheck();
-            resetRadioButtonColors();
-
-            for (int i = 0; i < radio_group.getChildCount(); i++) {
-                radio_group.getChildAt(i).setEnabled(true);
-            }
-
-            // Timer
-            timer = new CountDownTimer(16000, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    int seconds = (int) (millisUntilFinished / 1000) % 60;
-                    String timeLeftFormatted = (seconds < 10) ? String.format(Locale.getDefault(), "0%d", seconds)
-                            : String.format(Locale.getDefault(), "%d", seconds);
-                    textviewtiempo.setText(timeLeftFormatted);
-
-                    if (seconds <= 10) {
-                        textviewtiempo.setTextColor(Color.RED);
-                    } else {
-                        textviewtiempo.setTextColor(Color.BLACK);
-                    }
-
-                    if (seconds <= 5) {
-                        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                            mediaPlayer.stop();
-                        }
-                        mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.countdown);
-                        mediaPlayer.start();
-                    }
-                }
-
-                @Override
-                public void onFinish() {
-                    processAnswer();
-                    showSolution();
-                    buttonconfirmar.setVisibility(View.GONE);
-                    buttonsiguiente.setVisibility(View.VISIBLE);
-                    buttonterminar.setVisibility(View.VISIBLE);
-                }
-            }.start();
-
-            Log.d("CurrentQuestion", "Current Question after assignment: " + currentQuestion);
+        for (int i = 0; i < radio_group.getChildCount(); i++) {
+            radio_group.getChildAt(i).setEnabled(true);
         }
+
+        // Timer
+        timer = new CountDownTimer(16000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                int seconds = (int) (millisUntilFinished / 1000) % 60;
+                String timeLeftFormatted = (seconds < 10) ? String.format(Locale.getDefault(), "0%d", seconds)
+                        : String.format(Locale.getDefault(), "%d", seconds);
+                textviewtiempo.setText(timeLeftFormatted);
+
+                if (seconds <= 10) {
+                    textviewtiempo.setTextColor(Color.RED);
+                } else {
+                    textviewtiempo.setTextColor(Color.BLACK);
+                }
+
+                if (seconds <= 5) {
+                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                        mediaPlayer.stop();
+                    }
+                    mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.countdown);
+                    mediaPlayer.start();
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                processAnswer();
+                showSolution();
+                buttonconfirmar.setVisibility(View.GONE);
+                buttonsiguiente.setVisibility(View.VISIBLE);
+                buttonterminar.setVisibility(View.VISIBLE);
+            }
+        }.start();
+
+
+        Log.d("CurrentQuestion", "Current Question after assignment: " + currentQuestion);
+    }
+
     private void processAnswer() {
             if (currentQuestion == null) {
                 Log.d("DebugFlow", "currentQuestion is null in processAnswer(). Moving to next question.");
@@ -338,7 +325,7 @@ public class Preguntas extends AppCompatActivity {
                 if (selectedRadioButton != null) {
                     String selectedOption = selectedRadioButton.getText().toString();
                     // Use the getter method to access the answer property
-                    if (selectedOption.equals(currentQuestion.getAnswer())) {
+                    if (selectedOption.equals(currentQuestion.getANSWER())) {
                         Log.d("DebugFlow", "Answer is correct.");
                         correctAnswers++;
                         currentGameAciertos++;
@@ -358,13 +345,13 @@ public class Preguntas extends AppCompatActivity {
             // Log that the question is marked as used
 
             currentQuestion.setUsed(true);
-            saveUsedQuestionToSharedPreferences(currentQuestion.getNumber());
-            Log.d("QuestionMarkedUsed", "Question marked as used: " + currentQuestion.getQuestion());
+            //saveUsedQuestionToSharedPreferences(currentQuestion.getNumber());
+            Log.d("QuestionMarkedUsed", "Question marked as used: " + currentQuestion.getQUESTION());
             Log.d("QuestionProcess", "Current unusedQuestions list size: " + unusedQuestions.size());
 
             // Log the content of unusedQuestions
             for (QuestionModoCompeticion q : unusedQuestions) {
-                Log.d("QuestionProcess", "Question in list: " + q.getQuestion()); // assuming getQuestion() gets the question text
+                Log.d("QuestionProcess", "Question in list: " + q.getQUESTION()); // assuming getQuestion() gets the question text
             }
 
 
@@ -383,27 +370,33 @@ public class Preguntas extends AppCompatActivity {
                         "        FIN DE PARTIDA", Toast.LENGTH_LONG).show();
 
                 finishGameTerminar();
-
-                if (areAllQuestionsUsed()) {
-                    firestoreQuestionManager.fetchQuestionsBatch(callback);
+//
+//                if (areAllQuestionsUsed()) {
+//                    firestoreQuestionManager.fetchQuestionsBatch(callback);
 
                 }
             }
 
+//    public void saveUsedQuestionToSharedPreferences(String questionId) {
+//        Log.d("DebugFlow", "Entering saveUsedQuestionToSharedPreferences() with questionId: " + questionId);
+//        Set<String> originalSet = sharedPreferences.getStringSet("usedQuestions", new HashSet<>());
+//        // Create a copy of the set
+//        Set<String> usedQuestionsSet = new HashSet<>(originalSet);
+//        // Add the new questionId to the copied set
+//        usedQuestionsSet.add(questionId);
+//        // Save the updated set back to SharedPreferences
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putStringSet("usedQuestions", usedQuestionsSet);
+//        editor.apply();
+//        Log.d("DebugFlow", "Exiting saveUsedQuestionToSharedPreferences(). Question saved: " + questionId);
+//    }
 
-            }
-    public void saveUsedQuestionToSharedPreferences(String questionId) {
-        Log.d("DebugFlow", "Entering saveUsedQuestionToSharedPreferences() with questionId: " + questionId);
-        Set<String> originalSet = sharedPreferences.getStringSet("usedQuestions", new HashSet<>());
-        // Create a copy of the set
-        Set<String> usedQuestionsSet = new HashSet<>(originalSet);
-        // Add the new questionId to the copied set
-        usedQuestionsSet.add(questionId);
-        // Save the updated set back to SharedPreferences
+    private void clearUsedQuestionsSharedPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UsedQuestionsSharedPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putStringSet("usedQuestions", usedQuestionsSet);
+        editor.clear();
         editor.apply();
-        Log.d("DebugFlow", "Exiting saveUsedQuestionToSharedPreferences(). Question saved: " + questionId);
+        Log.d("UsedQuestionsSharedPreferences", "All used question IDs cleared from SharedPreferences.");
     }
 
     private boolean isQuestionUsed(String questionId) {
@@ -415,7 +408,7 @@ public class Preguntas extends AppCompatActivity {
         Set<String> usedQuestionsSet = sharedPreferences.getStringSet("usedQuestions", new HashSet<>());
 
         for (QuestionModoCompeticion question : unusedQuestions) {
-            if (!usedQuestionsSet.contains(question.getNumber())) {
+            if (!usedQuestionsSet.contains(question.getNUMBER())) {
                 return false;
             }
         }
@@ -427,7 +420,7 @@ public class Preguntas extends AppCompatActivity {
             RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
             String selectedOption = selectedRadioButton != null ? selectedRadioButton.getText().toString() : null;
             // Use the getter method to access the answer property
-            String correctAnswer = currentQuestion.getAnswer();
+            String correctAnswer = currentQuestion.getANSWER();
 
             ImageView resultImage = findViewById(R.id.resultImage);
 
@@ -460,24 +453,25 @@ public class Preguntas extends AppCompatActivity {
             buttonconfirmar.setVisibility(View.GONE);
             buttonsiguiente.setVisibility(View.VISIBLE);
             buttonterminar.setVisibility(View.VISIBLE);
+            resetTextView();
         }
 
-    FirestoreQuestionManager.QuestionsFetchCallback callback = new FirestoreQuestionManager.QuestionsFetchCallback() {
-        @Override
-        public void onQuestionsFetched(List<QuestionModoCompeticion> newQuestions) {
-            // Handle the new questions here
-            // Example:
-            unusedQuestions.addAll(newQuestions);
-            moveToNextQuestion();
-        }
-
-        @Override
-        public void onError(Exception e) {
-            // Handle the error, e.g., show an error message to the user
-            Log.e("FetchQuestions", "Error fetching questions: " + e.getMessage());
-            Toast.makeText(Preguntas.this, "Error fetching new questions. Please try again.", Toast.LENGTH_SHORT).show();
-        }
-    };
+//    FirestoreQuestionManager.QuestionsFetchCallback callback = new FirestoreQuestionManager.QuestionsFetchCallback() {
+//        @Override
+//        public void onQuestionsFetched(List<QuestionModoCompeticion> newQuestions) {
+//            // Handle the new questions here
+//            // Example:
+//            unusedQuestions.addAll(newQuestions);
+//            moveToNextQuestion();
+//        }
+//
+//        @Override
+//        public void onError(Exception e) {
+//            // Handle the error, e.g., show an error message to the user
+//            Log.e("FetchQuestions", "Error fetching questions: " + e.getMessage());
+//            Toast.makeText(Preguntas.this, "Error fetching new questions. Please try again.", Toast.LENGTH_SHORT).show();
+//        }
+//    };
 
     private void stopImageAnimation() {
         ImageView resultImage = findViewById(R.id.resultImage);
@@ -583,7 +577,6 @@ public class Preguntas extends AppCompatActivity {
         });
     }
 
-
     private void resetImageAndAnimation() {
         ImageView resultImage = findViewById(R.id.resultImage);
         resultImage.setImageResource(0); // remove the previous image
@@ -591,12 +584,12 @@ public class Preguntas extends AppCompatActivity {
         resultImage.setVisibility(View.INVISIBLE);
     }
 
-//        private void resetTextView() {
-//        textviewpregunta.setText("");
-//        textviewpregunta.setTextColor(getColor(R.color.black)); // replace with your default color
-//        textviewpregunta.setTypeface(null, Typeface.NORMAL);
-//        textviewpregunta.setGravity(Gravity.START);
-//    }
+    private void resetTextView() {
+        textviewpregunta.setText("");
+        textviewpregunta.setTextColor(getColor(R.color.black)); // replace with your default color
+        textviewpregunta.setTypeface(null, Typeface.NORMAL);
+        textviewpregunta.setGravity(Gravity.START);
+    }
 
     private void adjustButtonVisibility() {
         if (isSolutionDisplayed) {
@@ -609,7 +602,6 @@ public class Preguntas extends AppCompatActivity {
             buttonterminar.setVisibility(View.GONE);
         }
     }
-
 
      private void resetRadioButtonColors() {
         radio_button1.setBackgroundResource(R.drawable.radio_selector);
@@ -728,6 +720,9 @@ public class Preguntas extends AppCompatActivity {
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
+        }
+            if (questionDataSource != null) {
+                questionDataSource.close();
 
 
         }

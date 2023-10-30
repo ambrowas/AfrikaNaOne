@@ -20,9 +20,20 @@ public class QuestionDatabaseHelperII extends SQLiteOpenHelper {
     public static final String COLUMN_NUMBER = "number";
     public static final String COLUMN_USED = "used";
 
+    // Singleton instance of the helper
+    private static QuestionDatabaseHelperII sInstance;
 
+    // Private constructor to prevent direct instantiation
     public QuestionDatabaseHelperII(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    // Public method to get the Singleton instance
+    public static synchronized QuestionDatabaseHelperII getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new QuestionDatabaseHelperII(context.getApplicationContext());
+        }
+        return sInstance;
     }
 
     @Override
@@ -38,7 +49,7 @@ public class QuestionDatabaseHelperII extends SQLiteOpenHelper {
                 COLUMN_CATEGORY + " TEXT, " +
                 COLUMN_IMAGE + " TEXT, " +
                 COLUMN_NUMBER + " TEXT, " +
-                COLUMN_USED + " INTEGER DEFAULT 0" + // Include the COLUMN_USED definition
+                COLUMN_USED + " INTEGER DEFAULT 0" +
                 ");";
         db.execSQL(createTableSQL);
     }

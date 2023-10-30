@@ -16,6 +16,8 @@ import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.concurrent.TimeUnit;
 
 import iniciativaselebi.com.guinealogiaediciontrivial.R;
@@ -34,15 +36,11 @@ public class Menuprincipal extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menuprincipal);
         swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
-
-
-
-
+        FirebaseFirestore.setLoggingEnabled(true);
 
         logo = (ImageView) findViewById(R.id.logo);
         pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);
         logo.startAnimation(pulseAnimation);
-
 
             
             button_modolibre = findViewById(R.id.button_modolibre);
