@@ -36,7 +36,7 @@ public class Menuprincipal extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menuprincipal);
         swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
-        FirebaseFirestore.setLoggingEnabled(true);
+
 
         logo = (ImageView) findViewById(R.id.logo);
         pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);

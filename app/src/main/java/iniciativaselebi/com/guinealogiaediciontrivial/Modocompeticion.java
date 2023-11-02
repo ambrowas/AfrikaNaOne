@@ -6,24 +6,16 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import iniciativaselebi.com.guinealogiaediciontrivial.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,18 +27,9 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-import com.google.firebase.database.core.utilities.encoding.CustomClassMapper;
 
 
 public class Modocompeticion extends AppCompatActivity {
@@ -64,40 +47,29 @@ public class Modocompeticion extends AppCompatActivity {
         private boolean isFetching = false;
     private List<QuestionModoCompeticion> unusedQuestions;
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+    QuestionDataSource dataSource;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_modo_competicion);
-        FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
+            FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
 
+        //    manager.assignBatchForNewUser();
 
-        checkAndFetchQuestionsIfNeeded();
-
-        if (unusedQuestions == null) {
-            Log.d("DEBUG_TAG", "unusedQuestions is null");
-        } else {
-            Log.d("DEBUG_TAG", "Size of unusedQuestions: " + unusedQuestions.size());
-        }
-
-        if (unusedQuestions == null || unusedQuestions.size() <= 5) {
-           //fetchUnusedQuestionsFromDatabase();
-            //fetchShuffledBatchQuestions(int, final );
-        }
+            checkAndFetchQuestionsIfNeeded();
 
             swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
 
+             auth = FirebaseAuth.getInstance();
 
-
-            auth = FirebaseAuth.getInstance();
-
+             dataSource = new QuestionDataSource(this);
             Button updateupdateFirestoreButton = (Button) findViewById(R.id.updateFirestoreButton);
             updateupdateFirestoreButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //fetchUnusedQuestionsFromDatabase();
-                    updateFirestoreData();
+                    dataSource.markRandomQuestionsAsUsed(40, true);
                 }
             });
 
@@ -266,17 +238,24 @@ public class Modocompeticion extends AppCompatActivity {
 
         // Initialize your QuestionDataSource
         final QuestionDataSource dataSource = new QuestionDataSource(this);
+        dataSource.open();
+        int unusedQuestionsCount = dataSource.getUnusedQuestionsCount(); // assuming you have a method like this in QuestionDataSource
+        dataSource.close();
 
-        // Check if unusedQuestions is null or its size is <= 5
-        if (unusedQuestions == null || unusedQuestions.size() <= 5) {
+        // Check if unusedQuestionsCount is < 5
+        if (unusedQuestionsCount < 5) {
             if (!isFetching) {
-                Log.d(TAG, "Starting the process to fetch questions...");
+                Log.d(TAG, "Starting the process to fetch questions because there is less than 5 unused questions left...");
 
-                // Fetch shuffled batch of questions
+                // Fetch shuffled batch of questions based on the user's current batch
                 manager.fetchShuffledBatchQuestions(new FirestoreQuestionManager.QuestionsFetchCallback() {
                     @Override
+                    public void onSuccess(List<QuestionModoCompeticion> fetchedQuestions) {
+
+                    }
+
+                    @Override
                     public void onQuestionsFetched(List<QuestionModoCompeticion> questions) {
-                        unusedQuestions = questions;
                         isFetching = false;
                         Log.d(TAG, "Fetched " + questions.size() + " questions.");
 
@@ -286,6 +265,11 @@ public class Modocompeticion extends AppCompatActivity {
                             dataSource.insertOrUpdateQuestion(question);
                         }
                         dataSource.close();
+                    }
+
+                    @Override
+                    public void onQuestionsUpdated(List<QuestionModoCompeticion> updatedQuestions) {
+
                     }
 
                     @Override
@@ -302,9 +286,10 @@ public class Modocompeticion extends AppCompatActivity {
                 Log.d(TAG, "Fetch operation already in progress...");
             }
         } else {
-            Log.d(TAG, "There are enough unused questions, no need to fetch now.");
+            Log.d(TAG, "There are enough unused questions in the database, no need to fetch now.");
         }
     }
+
 
     //public void fetchUnusedQuestionsFromDatabase() {
 //        Log.d("FetchQuestions", "fetchUnusedQuestionsFromDatabase called");
@@ -434,6 +419,7 @@ public class Modocompeticion extends AppCompatActivity {
 //        });
 //    }
 
+
     private void updateFirestoreData() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -478,7 +464,6 @@ public class Modocompeticion extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e("FirestoreUpdate", "Error fetching all documents", e));
     }
-
 
     private void playSwoosh() {
         if (swooshPlayer != null) {

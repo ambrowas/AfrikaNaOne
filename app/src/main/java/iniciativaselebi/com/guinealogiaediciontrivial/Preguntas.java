@@ -2,8 +2,6 @@ package iniciativaselebi.com.guinealogiaediciontrivial;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -39,14 +37,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 
 public class Preguntas extends AppCompatActivity {
@@ -90,6 +84,8 @@ public class Preguntas extends AppCompatActivity {
 
         private boolean isFetching = false;
 
+         private boolean isBatchPreparationStarted = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +93,7 @@ public class Preguntas extends AppCompatActivity {
 
         initializeUIElements();
 
-        //sharedPreferences = getSharedPreferences("UsedQuestionsSharedPreferences", MODE_PRIVATE);
+
 
         FirebaseApp.initializeApp(this);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -114,12 +110,9 @@ public class Preguntas extends AppCompatActivity {
         currentGamePuntuacion = 0;
 
         db = FirebaseFirestore.getInstance();
-        preguntasList = new ArrayList<>();
         questionDataSource = new QuestionDataSource(this);
         questionDataSource.open();
-        unusedQuestions = questionDataSource.fetchRandomUnusedQuestions(25);
 
-        //fetchUnusedQuestionsFromDatabase();
         moveToNextQuestion();
 
 
@@ -172,91 +165,127 @@ public class Preguntas extends AppCompatActivity {
         });
     }
 
-    private void moveToNextQuestion() {
-        Log.d("RecursiveCheck", "Entered <moveToNextQuestion>");
+    public void moveToNextQuestion() {
+        int unusedQuestionsCount = questionDataSource.getUnusedQuestionsCount();
+        Log.d("QuestionFlow", "Checking unused questions count: " + unusedQuestionsCount);
 
-        questionDataSource.open();
+        // Display the next question from the current batch
+        displayNextUnusedQuestion();
 
-        // Check the size of the unusedQuestions list before fetching a new question
-        if (unusedQuestions.size() == 5) {
-            fetchUnusedQuestionsFromDatabase();
+        // If we are at the threshold to prepare the next batch, do so
+        if (unusedQuestionsCount == 8) {
+            Log.d("QuestionFlow", "Threshold for preparing next batch reached at count: " + unusedQuestionsCount);
+            prepareNextBatch();
         }
 
-        List<QuestionModoCompeticion> questions = questionDataSource.fetchRandomUnusedQuestions(1);
-        Log.d("NextQuestion", "Number of unused questions fetched from SQL database: " + questions.size());
-
-        if (!questions.isEmpty()) {
-            Log.d("NextQuestionDetail", "Question content: " + questions.get(0).toString());  // Similarly, replace with appropriate logging if there's no toString() method
-            displayQuestion();
-
-            // Mark it as used
-            questionDataSource.markQuestionAsUsed(questions.get(0).getNUMBER());
+        // If we have reached the count where we need to fetch the new questions, do so
+        if (unusedQuestionsCount == 5) {
+            Log.d("QuestionFlow", "Low unused questions count reached, count: " + unusedQuestionsCount + ". Fetching new batch.");
+            fetchAndSaveNewQuestions();
         }
-
-        questionDataSource.close();
-        resetImageAndAnimation();
     }
 
-    public void fetchUnusedQuestionsFromDatabase() {
-        if (isFetching) return; // Exit if already fetching
-        isFetching = true;
-
-        FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
-
-        manager.fetchShuffledBatchQuestions(new FirestoreQuestionManager.QuestionsFetchCallback() {
+    private void prepareNextBatch() {
+        firestoreQuestionManager.prepareNextBatchIfRequired(userId, new FirestoreQuestionManager.BatchPreparationCallback() {
             @Override
-            public void onQuestionsFetched(List<QuestionModoCompeticion> newQuestions) {
-                Log.d("FetchQuestions", "Total questions fetched from Firestore: " + newQuestions.size());
-                for (QuestionModoCompeticion question : newQuestions) {
-                    Log.d("FetchQuestionsDetail", "Question content: " + question.toString());
-                }
-                isFetching = false;
-
-                if (!newQuestions.isEmpty()) {
-                    // Update the local SQL database with new questions
-                    manager.updateLocalAndDatabaseWithNewQuestions(newQuestions, this);
-
-
-
-                    // Delay for 0.5 seconds (500 milliseconds) then proceed to the next question
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            moveToNextQuestion();
-                        }
-                    }, 500);
-                } else {
-                    Log.d("FetchQuestions", "No new questions fetched from Firestore.");
-                }
+            public void onBatchPreparationComplete() {
+                Log.d("QuestionFlow", "Next batch preparation complete.");
+                // Logic here if needed right after preparation
             }
 
             @Override
-            public void onError(Exception e) {
-                Log.e("FetchQuestions", "Error fetching questions: " + e.getMessage());
-                isFetching = false;
+            public void onBatchPreparationFailed(Exception e) {
+                Log.e("QuestionFlow", "Failed to prepare next batch.", e);
+                // Handle batch preparation error
             }
         });
     }
 
-    @SuppressLint("SuspiciousIndentation")
+    private void fetchAndSaveNewQuestions() {
+        firestoreQuestionManager.fetchShuffledBatchQuestions(new FirestoreQuestionManager.QuestionsFetchCallback() {
+            @Override
+            public void onSuccess(List<QuestionModoCompeticion> fetchedQuestions) {
+
+            }
+
+            @Override
+            public void onQuestionsFetched(List<QuestionModoCompeticion> fetchedQuestions) {
+                // Save fetched questions to local database
+                saveFetchedQuestionsToLocalDatabase(fetchedQuestions);
+            }
+
+            @Override
+            public void onQuestionsUpdated(List<QuestionModoCompeticion> updatedQuestions) {
+                // This method might not be used here if it's intended for after the questions have been saved to the database
+                // If so, you could leave this implementation empty, or consider removing this method from the callback
+                // if it's not necessary for the interface contract in all use cases.
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("QuestionFlow", "Error fetching new batch of questions", e);
+                // Handle the fetch error
+            }
+        });
+    }
+
+
+    private void saveFetchedQuestionsToLocalDatabase(List<QuestionModoCompeticion> fetchedQuestions) {
+        firestoreQuestionManager.updateLocalDatabaseWithNewQuestions(fetchedQuestions, new FirestoreQuestionManager.QuestionsFetchCallback() {
+            @Override
+            public void onQuestionsUpdated(List<QuestionModoCompeticion> questions) {
+                Log.d("QuestionFlow", "Local database updated with new batch of questions.");
+                // You can implement additional logic here if needed
+            }
+
+            @Override
+            public void onSuccess(List<QuestionModoCompeticion> fetchedQuestions) {
+
+            }
+
+            @Override
+            public void onQuestionsFetched(List<QuestionModoCompeticion> newQuestions) {
+                // This method is not used here, but it's required by the interface. Consider if it's needed at all.
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("QuestionFlow", "Failed to update local database with new questions.", e);
+                // Handle the error
+            }
+        });
+    }
+
+
+    private void displayNextUnusedQuestion() {
+        List<QuestionModoCompeticion> questions = questionDataSource.fetchRandomUnusedQuestions(1);
+        if (!questions.isEmpty()) {
+            currentQuestion = questions.get(0);
+            Log.d("QuestionFlow", "Displaying next unused question.");
+            displayQuestion();
+            questionDataSource.markQuestionAsUsed(currentQuestion.getNUMBER());
+        } else {
+            Log.e("QuestionFlow", "No unused questions available. This should not happen if the previous checks are correct.");
+            // Handle the scenario when no unused questions are available
+        }
+    }
+
     private void displayQuestion()  {
-        Log.d("DebugFlow", "Entering displayQuestion() with unusedQuestions size: " + unusedQuestions.size());
-
-//        if  (unusedQuestions.size() == 3) {
-//            fetchUnusedQuestionsFromDatabase();
-//            return; // Exit as we need to wait for the questions to be fetched
-//        }
-
-        currentQuestion = unusedQuestions.remove(0); // Get and remove the first unused question from the list
+        resetImageAndAnimation();
+        if (currentQuestion == null) {
+            Log.e("DisplayQuestionError", "No current question to display!");
+            // Perhaps show an error message to the user or take some corrective action.
+            return;
+        }
 
         // UI Setup
-        Log.d("UnusedQuestions", "Displaying question: " + currentQuestion.getQUESTION());
         textviewpregunta.setText(currentQuestion.getQUESTION());
         radio_button1.setText(currentQuestion.getOPTION_A());
         radio_button2.setText(currentQuestion.getOPTION_B());
         radio_button3.setText(currentQuestion.getOPTION_C());
         textviewcategoria.setText(currentQuestion.getCATEGORY());
 
+        // Load Image
         String imageUrl = currentQuestion.getIMAGE();
         Glide.with(this)
                 .load(imageUrl)
@@ -270,7 +299,11 @@ public class Preguntas extends AppCompatActivity {
             radio_group.getChildAt(i).setEnabled(true);
         }
 
-        // Timer
+        // Timer Setup
+        if (timer != null) {
+            timer.cancel();
+        }
+
         timer = new CountDownTimer(16000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -303,9 +336,6 @@ public class Preguntas extends AppCompatActivity {
                 buttonterminar.setVisibility(View.VISIBLE);
             }
         }.start();
-
-
-        Log.d("CurrentQuestion", "Current Question after assignment: " + currentQuestion);
     }
 
     private void processAnswer() {
@@ -345,17 +375,10 @@ public class Preguntas extends AppCompatActivity {
             // Log that the question is marked as used
 
             currentQuestion.setUsed(true);
-            //saveUsedQuestionToSharedPreferences(currentQuestion.getNumber());
-            Log.d("QuestionMarkedUsed", "Question marked as used: " + currentQuestion.getQUESTION());
-            Log.d("QuestionProcess", "Current unusedQuestions list size: " + unusedQuestions.size());
-
-            // Log the content of unusedQuestions
-            for (QuestionModoCompeticion q : unusedQuestions) {
-                Log.d("QuestionProcess", "Question in list: " + q.getQUESTION()); // assuming getQuestion() gets the question text
-            }
+           questionDataSource.markQuestionAsUsed(currentQuestion.getNUMBER());
 
 
-            textviewaciertos.setText("ACIERTOS: " + correctAnswers);
+        textviewaciertos.setText("ACIERTOS: " + correctAnswers);
             textviewpuntuacion.setText("PUNTUACION: " + score);
             textviewfallos.setText("FALLOS: " + incorrectAnswers);
 
@@ -391,29 +414,29 @@ public class Preguntas extends AppCompatActivity {
 //        Log.d("DebugFlow", "Exiting saveUsedQuestionToSharedPreferences(). Question saved: " + questionId);
 //    }
 
-    private void clearUsedQuestionsSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("UsedQuestionsSharedPreferences", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
-        Log.d("UsedQuestionsSharedPreferences", "All used question IDs cleared from SharedPreferences.");
-    }
-
-    private boolean isQuestionUsed(String questionId) {
-        Set<String> usedQuestionsSet = sharedPreferences.getStringSet("usedQuestions", new HashSet<>());
-        return usedQuestionsSet.contains(questionId);
-    }
-
-    public boolean areAllQuestionsUsed() {
-        Set<String> usedQuestionsSet = sharedPreferences.getStringSet("usedQuestions", new HashSet<>());
-
-        for (QuestionModoCompeticion question : unusedQuestions) {
-            if (!usedQuestionsSet.contains(question.getNUMBER())) {
-                return false;
-            }
-        }
-        return true;
-    }
+//    private void clearUsedQuestionsSharedPreferences() {
+//        SharedPreferences sharedPreferences = getSharedPreferences("UsedQuestionsSharedPreferences", MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.clear();
+//        editor.apply();
+//        Log.d("UsedQuestionsSharedPreferences", "All used question IDs cleared from SharedPreferences.");
+//    }
+//
+//    private boolean isQuestionUsed(String questionId) {
+//        Set<String> usedQuestionsSet = sharedPreferences.getStringSet("usedQuestions", new HashSet<>());
+//        return usedQuestionsSet.contains(questionId);
+//    }
+//
+//    public boolean areAllQuestionsUsed() {
+//        Set<String> usedQuestionsSet = sharedPreferences.getStringSet("usedQuestions", new HashSet<>());
+//
+//        for (QuestionModoCompeticion question : unusedQuestions) {
+//            if (!usedQuestionsSet.contains(question.getNUMBER())) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
     private void showSolution() {
             int selectedRadioButtonId = radio_group.getCheckedRadioButtonId();
@@ -472,6 +495,47 @@ public class Preguntas extends AppCompatActivity {
 //            Toast.makeText(Preguntas.this, "Error fetching new questions. Please try again.", Toast.LENGTH_SHORT).show();
 //        }
 //    };
+
+//    public void fetchUnusedQuestionsFromDatabase() {
+//        if (isFetching) return; // Exit if already fetching
+//        isFetching = true;
+//
+//        FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
+//
+//        manager.fetchShuffledBatchQuestions(new FirestoreQuestionManager.QuestionsFetchCallback() {
+//            @Override
+//            public void onQuestionsFetched(List<QuestionModoCompeticion> newQuestions) {
+//                Log.d("FetchQuestions", "Total questions fetched from Firestore: " + newQuestions.size());
+//                for (QuestionModoCompeticion question : newQuestions) {
+//                    Log.d("FetchQuestionsDetail", "Question content: " + question.toString());
+//                }
+//                isFetching = false;
+//
+//                if (!newQuestions.isEmpty()) {
+//                    // Update the local SQL database with new questions
+//                    manager.updateLocalAndDatabaseWithNewQuestions(newQuestions, this);
+//
+//
+//
+//                    // Delay for 0.5 seconds (500 milliseconds) then proceed to the next question
+//                    new Handler().postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            moveToNextQuestion();
+//                        }
+//                    }, 500);
+//                } else {
+//                    Log.d("FetchQuestions", "No new questions fetched from Firestore.");
+//                }
+//            }
+//
+//            @Override
+//            public void onError(Exception e) {
+//                Log.e("FetchQuestions", "Error fetching questions: " + e.getMessage());
+//                isFetching = false;
+//            }
+//        });
+//    }
 
     private void stopImageAnimation() {
         ImageView resultImage = findViewById(R.id.resultImage);
@@ -673,7 +737,7 @@ public class Preguntas extends AppCompatActivity {
         });
     }
 
-     private void finishGameTerminar() {
+    private void finishGameTerminar() {
         updateAccumulatedValues(userId, correctAnswers, incorrectAnswers, score);
         updateCurrentGameValues(correctAnswers, incorrectAnswers, score);
 
@@ -701,7 +765,7 @@ public class Preguntas extends AppCompatActivity {
         }
     }
 
-   private Runnable backButtonRunnable = new Runnable() {
+    private Runnable backButtonRunnable = new Runnable() {
         @Override
         public void run() {
             isBackPressed = false;
@@ -709,7 +773,7 @@ public class Preguntas extends AppCompatActivity {
     };
 
       @Override
-   protected void onDestroy() {
+     protected void onDestroy() {
         super.onDestroy();
         if (backButtonHandler != null) {
             backButtonHandler.removeCallbacks(backButtonRunnable);
