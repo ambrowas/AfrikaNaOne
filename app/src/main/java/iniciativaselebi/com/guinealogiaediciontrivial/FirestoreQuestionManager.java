@@ -201,49 +201,6 @@ import java.util.concurrent.atomic.AtomicInteger;
             });
         }
 
-//        private void createShuffledOrder(DocumentReference shuffledOrderRef, QuestionsFetchCallback callback) {
-//                Log.d("QuestionFlow", "Entered <createShuffledOrder>");
-//
-//                // Step 1: Fetch all questions
-//                fetchShuffledQuestions(new ArrayList<>(), new QuestionsFetchCallback() {
-//                    @Override
-//                    public void onQuestionsFetched(List<QuestionModoCompeticion> allQuestions) {
-//
-//                        // Step 2: Shuffle the fetched questions
-//                        Collections.shuffle(allQuestions);
-//                        List<String> initialShuffledOrder = new ArrayList<>();
-//                        for (QuestionModoCompeticion q : allQuestions) {
-//                            initialShuffledOrder.add(q.getNUMBER());
-//                        }
-//
-//                        Log.d("QuestionFlow", "Initial shuffled order created with size: " + initialShuffledOrder.size());
-//
-//                        Map<String, Object> data = new HashMap<>();
-//                        data.put("shuffledOrder", initialShuffledOrder);
-//
-//                        // Step 3: Save shuffled order to Firestore
-//                        shuffledOrderRef.set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Log.d("QuestionFlow", "Shuffled order saved successfully.");
-//                                fetchShuffledBatchQuestions(callback); // Starting from batch 1
-//                            }
-//                        }).addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//                                Log.e("QuestionFlow", "Error saving shuffled order: ", e);
-//                                callback.onError(e);
-//                            }
-//                        });
-//                    }
-//
-//                    @Override
-//                    public void onError(Exception e) {
-//                        Log.e("QuestionFlow", "Error fetching all questions for shuffled order: ", e);
-//                        callback.onError(e);
-//                    }
-//                });
-//            }
 
         void setCurrentBatchForUser(String userId, int nextBatch) {
             if (userId != null) {
@@ -273,7 +230,7 @@ import java.util.concurrent.atomic.AtomicInteger;
             void onError(Exception e);
         }
 
-            public void getCurrentBatchForUser(CurrentBatchCallback callback) {
+        public void getCurrentBatchForUser(CurrentBatchCallback callback) {
                 if (currentUser != null) {
                     DatabaseReference userRef = database.getReference("Users").child(currentUser.getUid());
                     Log.d("FetchAndSaveFlow", "Fetching current batch for user: " + currentUser.getUid());
@@ -308,36 +265,7 @@ import java.util.concurrent.atomic.AtomicInteger;
                 }
             }
 
-        //        public void moveToNextBatch() {
-//            if (currentUser != null) {
-//                String userId = currentUser.getUid();
-//                DatabaseReference userRef = database.getReference("Users").child(userId);
-//
-//                userRef.child("currentBatch").addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                        int currentBatch = dataSnapshot.getValue(Integer.class);
-//                        getTotalBatches(new BatchCountCallback() {
-//                            @Override
-//                            public void onBatchCountRetrieved(int totalCount) {
-//                                int nextBatch = (currentBatch >= totalCount) ? 1 : currentBatch + 1;
-//                                setCurrentBatchForUser(userId, nextBatch);
-//                            }
-//
-//                            @Override
-//                            public void onError(Exception e) {
-//                                // Handle error
-//                            }
-//                        });
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//                        // Handle error
-//                    }
-//                });
-//            }
-//        }
+
         public void assignBatchForNewUser(BatchAssignmentCallback callback) {
             FirebaseUser currentUser = mAuth.getCurrentUser();
             if (currentUser != null) {

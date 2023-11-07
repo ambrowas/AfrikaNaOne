@@ -36,7 +36,7 @@ public class Modocompeticion extends AppCompatActivity {
         private static final String TAG = "Modocompeticion";
 
         FirebaseAuth auth;
-        Button button_jugar2, button_perfil, button_login, button_register, button_clasificacion, buttoncodigo, updateupdateFirestoreButton;
+        Button button_jugar2, button_perfil, button_login, button_register, button_clasificacion, buttoncodigo;
 
         TextView TextViewSaludo2, TextViewRecord, TextViewVolver;
         FirebaseUser user;
@@ -56,7 +56,6 @@ public class Modocompeticion extends AppCompatActivity {
             setContentView(R.layout.activity_modo_competicion);
             FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
 
-        //    manager.assignBatchForNewUser();
 
             checkAndFetchQuestionsIfNeeded();
 
@@ -65,13 +64,6 @@ public class Modocompeticion extends AppCompatActivity {
              auth = FirebaseAuth.getInstance();
 
              dataSource = new QuestionDataSource(this);
-            Button updateupdateFirestoreButton = (Button) findViewById(R.id.updateFirestoreButton);
-            updateupdateFirestoreButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dataSource.markRandomQuestionsAsUsed(40, true);
-                }
-            });
 
             button_clasificacion = findViewById(R.id.button_clasificacion);
             button_clasificacion.setOnClickListener(new View.OnClickListener() {
@@ -289,189 +281,12 @@ public class Modocompeticion extends AppCompatActivity {
             Log.d(TAG, "There are enough unused questions in the database, no need to fetch now.");
         }
     }
-
-
-    //public void fetchUnusedQuestionsFromDatabase() {
-//        Log.d("FetchQuestions", "fetchUnusedQuestionsFromDatabase called");
-//        if (isFetching) {
-//            Log.d("FetchQuestions", "Fetching already in progress, returning early");
-//            return;
-//        }// Exit if already fetching
-//        isFetching = true;
-//
-//        FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
-//
-//        manager.fetchQuestionsBatch(new FirestoreQuestionManager.QuestionsFetchCallback() {
-//            @Override
-//            public void onQuestionsFetched(List<QuestionModoCompeticion> newQuestions) {
-//                Log.d("FetchQuestions", "onQuestionsFetched callback entered");
-//                Log.d("FetchQuestions", "Total questions fetched from Firestore: " + newQuestions.size());
-//                for (QuestionModoCompeticion question : newQuestions) {
-//                    Log.d("FetchQuestionsDetail", "Question content: " + question.toString());
-//                }
-//                isFetching = false;
-//
-//                if (!newQuestions.isEmpty()) {  // Check if the newQuestions list isn't empty
-//                    // Delay for 2 seconds (2000 milliseconds)
-//                    new Handler().postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            // moveToNextQuestion();
-//                        }
-//                    }, 1000);
-//                } else {
-//                    Log.d("FetchQuestions", "No new questions fetched from Firestore.");
-//                }
-//            }
-//
-//            @Override
-//            public void onError(Exception e) {
-//                Log.e("FetchQuestions", "onError callback entered. Error fetching questions: " + e.getMessage());
-//                Log.e("FetchQuestions", "Error fetching questions: " + e.getMessage());
-//               // Toast.makeText(Modocompeticion.this, "Error fetching new questions. Please try again.", Toast.LENGTH_SHORT).show();
-//                isFetching = false;
-//            }
-//        });
-//    }
-
-//    private void fetchShuffledBatchQuestions(int currentUserId, final FirestoreQuestionManager.QuestionsFetchCallback callback) {
-//        // Fetch current batch for the user from Firebase Realtime Database
-//        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(String.valueOf(currentUserId));
-//        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.exists()) {
-//                    int currentBatch = dataSnapshot.child("currentBatch").getValue(Integer.class);
-//
-//                    // Retrieve the shuffled order from Firestore
-//                    firestore.collection("metadata").document("questionOrder")
-//                            .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                                @Override
-//                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                                    List<Integer> shuffledOrder = (List<Integer>) documentSnapshot.get("order");
-//                                    if (shuffledOrder == null || shuffledOrder.isEmpty()) {
-//                                        callback.onError(new Exception("No shuffled order found"));
-//                                        return;
-//                                    }
-//
-//                                    int batchSize = 50;
-//                                    int startIndex = (currentBatch - 1) * batchSize;
-//                                    int endIndex = startIndex + batchSize;
-//
-//                                    if (startIndex >= shuffledOrder.size()) {
-//                                        callback.onError(new Exception("All questions have been fetched."));
-//                                        return;
-//                                    }
-//
-//                                    List<Integer> batchIndices = shuffledOrder.subList(startIndex, Math.min(endIndex, shuffledOrder.size()));
-//
-//                                    // Fetch the batch of questions from Firestore based on the batchIndices
-//                                    firestore.collection("PREGUNTAS")
-//                                            .whereIn("id", batchIndices)
-//                                            .get()
-//                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                                                @Override
-//                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                                                    List<QuestionModoCompeticion> updatedQuestionsList = new ArrayList<>();
-//                                                    for (DocumentSnapshot document : queryDocumentSnapshots) {
-//                                                        updatedQuestionsList.add(document.toObject(QuestionModoCompeticion.class));
-//                                                    }
-//
-//                                                    // Save to the local database and update Firebase Realtime Database with new batch
-//                                                    int nextBatch = (endIndex >= shuffledOrder.size()) ? 1 : currentBatch + 1;
-//                                                    setCurrentBatchForUser(currentUserId, nextBatch);
-//                                                    updateLocalAndDatabaseWithNewQuestions(updatedQuestionsList, new FirestoreQuestionManager.QuestionsFetchCallback() {
-//                                                        @Override
-//                                                        public void onQuestionsFetched(List<QuestionModoCompeticion> newQuestions) {
-//                                                            callback.onQuestionsFetched(newQuestions);
-//                                                        }
-//
-//                                                        @Override
-//                                                        public void onError(Exception e) {
-//                                                            callback.onError(e);
-//                                                        }
-//                                                    });
-//                                                }
-//                                            })
-//                                            .addOnFailureListener(new OnFailureListener() {
-//                                                @Override
-//                                                public void onFailure(@NonNull Exception e) {
-//                                                    callback.onError(e);
-//                                                }
-//                                            });
-//                                }
-//                            })
-//                            .addOnFailureListener(new OnFailureListener() {
-//                                @Override
-//                                public void onFailure(@NonNull Exception e) {
-//                                    callback.onError(e);
-//                                }
-//                            });
-//                } else {
-//                    callback.onError(new Exception("User not found"));
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                callback.onError(databaseError.toException());
-//            }
-//        });
-//    }
-
-
-    private void updateFirestoreData() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // Fetch all documents from PREGUNTAS
-        db.collection("PREGUNTAS")
-                .get()
-                .addOnSuccessListener(allDocs -> {
-                    WriteBatch batch = db.batch();  // Use a batch to group updates for efficiency
-
-                    for (DocumentSnapshot document : allDocs.getDocuments()) {
-                        DocumentReference docRef = db.collection("PREGUNTAS").document(document.getId());
-
-                        // Get the current fields with spaces
-                        String optionA = document.getString("OPTION A");
-                        String optionB = document.getString("OPTION B");
-                        String optionC = document.getString("OPTION C");
-
-                        // Remove fields with spaces
-                        batch.update(docRef, "OPTION A", FieldValue.delete());
-                        batch.update(docRef, "OPTION B", FieldValue.delete());
-                        batch.update(docRef, "OPTION C", FieldValue.delete());
-
-                        // Add fields without spaces
-                        if (optionA != null) {
-                            batch.update(docRef, "OPTION_A", optionA);
-                        }
-                        if (optionB != null) {
-                            batch.update(docRef, "OPTION_B", optionB);
-                        }
-                        if (optionC != null) {
-                            batch.update(docRef, "OPTION_C", optionC);
-                        }
-                    }
-
-                    // Commit the batch
-                    batch.commit().addOnSuccessListener(aVoid -> {
-                        Log.d("FirestoreUpdate", "Successfully updated fields in all documents.");
-                    }).addOnFailureListener(e -> {
-                        Log.e("FirestoreUpdate", "Error updating fields", e);
-                    });
-
-                })
-                .addOnFailureListener(e -> Log.e("FirestoreUpdate", "Error fetching all documents", e));
-    }
-
     private void playSwoosh() {
         if (swooshPlayer != null) {
             swooshPlayer.seekTo(0);
             swooshPlayer.start();
         }
     }
-
     @Override
     protected void onDestroy() {
         if (swooshPlayer != null) {
@@ -480,7 +295,6 @@ public class Modocompeticion extends AppCompatActivity {
         }
         super.onDestroy();
     }
-
     private void checkGameFallos() {
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
@@ -513,18 +327,18 @@ public class Modocompeticion extends AppCompatActivity {
     }
 
     @Override
-     protected void onStart() {
+    protected void onStart() {
             super.onStart();
             auth.addAuthStateListener(authStateListener);
         }
-        @Override
-     protected void onStop() {
+
+    @Override
+    protected void onStop() {
             super.onStop();
             if (authStateListener != null) {
                 auth.removeAuthStateListener(authStateListener);
             }
         }
-
      private void loadUserHighestScore() {
         DatabaseReference leaderboardRef = FirebaseDatabase.getInstance().getReference("user");
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();

@@ -66,15 +66,12 @@ import Model.User;
 import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
 
     public class QRcodeActivity extends AppCompatActivity {
-
         private ImageView qrCodeImageView;
         Button buttonguardar, buttonvolver;
         Bitmap qrCodeBitmap;
-
         TextView textviewiuu;
         String  code,qrCodeKey;
         MediaPlayer swooshPlayer;
-
         private long lastSavedTimestamp = 0;
 
 
@@ -83,7 +80,6 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_qrcode);
-
 
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
@@ -101,7 +97,6 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                 qrCodeImageView.setImageBitmap(qrCodeBitmap);
             }
 
-
             if (currentUser != null) {
 
                 String userId = currentUser.getUid();
@@ -112,9 +107,6 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                 String timestamp = getCurrentDateTime();
 
                 String base64QRCode = generateQRcode(code);
-
-
-
                 saveQRCodeToDatabase(userId, base64QRCode, userName, userEmail, lastGameScore, lastGamePuntuacion, timestamp)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
@@ -138,7 +130,6 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                 Toast.makeText(getApplicationContext(), "Debes iniciar sesion", Toast.LENGTH_SHORT).show();
             }
 
-
             buttonvolver = findViewById(R.id.buttonvolver);
             buttonvolver.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -148,18 +139,22 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                     startActivity(intent);
                 }
             });
-
-
-
             buttonguardar = findViewById(R.id.buttonguardar);
             buttonguardar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (isWithinCoolDownPeriod()) {
+                        // If the user has saved a QR code within the last three minutes, show a toast message
+                        Toast.makeText(QRcodeActivity.this, "Este Codigo QR ya ha sido guardado", Toast.LENGTH_SHORT).show();
+                        return; // Exit the method early
+                    }
+
                     // Check for storage permissions to save the QR code to the gallery
                     if (ContextCompat.checkSelfPermission(QRcodeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                        // Save the image to gallery
                         saveImageToGallery(QRcodeActivity.this, qrCodeBitmap);
                     } else {
-                        // Show an explanation to the user and request the permission again
+                        // Permission is not granted, show an explanation to the user, etc.
                         if (ActivityCompat.shouldShowRequestPermissionRationale(QRcodeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                             new AlertDialog.Builder(QRcodeActivity.this)
                                     .setTitle("Se necesita permiso")
@@ -175,8 +170,6 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
             });
 
         }
-
-
         private Bitmap generateQRCode(String key) {
             try {
                 BitMatrix bitMatrix = new MultiFormatWriter().encode(key, BarcodeFormat.QR_CODE, 400, 400);
@@ -196,8 +189,6 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
             }
             return null;
         }
-
-
 
         private void saveImageToGallery(Context context, Bitmap bitmap) {
             OutputStream outputStream;
@@ -292,8 +283,7 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                     }
                 }
 
-//                qr_code_image = findViewById(R.id.qr_code_image);
-//                qr_code_image.setImageBitmap(qrCodeBitmap);
+
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -307,7 +297,6 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
             String base64QRCode = Base64.encodeToString(byteArray, Base64.DEFAULT);
             return base64QRCode.substring(0, 24);
         }
-
 
         private Task<String> saveQRCodeToDatabase(String userId, String base64QRCode, String fullname, String email, int lastGameScore, int lastGamePuntuacion, String timestamp) {
             TaskCompletionSource<String> tcs = new TaskCompletionSource<>();
@@ -385,8 +374,6 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
 
             return (currentTimeMillis - lastSavedTimestamp) < threeMinutesInMillis;
         }
-
-
 
         private void playSwoosh() {
             if (swooshPlayer != null) {
