@@ -114,7 +114,7 @@ public class CheckCodigoActivity extends AppCompatActivity {
     private void handleCodeValidation(DataSnapshot snapshot, String userId, String fullName) {
         if (snapshot.hasChild("StaticCode")) {  // Check if the StaticCode node exists
             resetGameData(userId);
-            Toast.makeText(getApplicationContext(), "CODIGO PROMOCIONAL VALIDO!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "CODIGO PROMOCIONAL VALIDADO", Toast.LENGTH_SHORT).show();
             navigateToModocompeticion(); // Navigate after the Toast
             return;
         }

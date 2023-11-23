@@ -8,8 +8,8 @@ android {
         applicationId "iniciativaselebi.com.guinealogiaediciontrivial"
         minSdk 24
         targetSdk 33
-        versionCode 6
-        versionName "6.0"
+        versionCode 8
+        versionName "8.0"
         namespace "iniciativaselebi.com.guinealogiaediciontrivial"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

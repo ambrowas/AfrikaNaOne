@@ -2,6 +2,7 @@ package iniciativaselebi.com.guinealogiaediciontrivial;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -44,7 +46,6 @@ import java.util.Map;
 
 
 public class Preguntas extends AppCompatActivity {
-
         private static final int BATCH_SIZE = 50;
         private ImageView quizImage, resultImage;
         private TextView textviewpregunta, textviewcategoria, textviewaciertos, textviewpuntuacion, textviewfallos, textviewtiempo;
@@ -81,19 +82,28 @@ public class Preguntas extends AppCompatActivity {
         private static final String SHARED_PREF_NAME = "UsedQuestionsSharedPreferences";
         private static final String USED_QUESTIONS_KEY = "usedQuestions";
         private SharedPreferences sharedPreferences;
-
         private boolean isFetching = false;
-
          private boolean isBatchPreparationStarted = false;
+    private boolean timerWasActive = false;
+    private boolean questionInProgress = false;
+    private boolean isAlertDisplayed = false;
+    private boolean isAppInBackground = false;
+
+    MediaPlayer swooshPlayer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preguntas);
 
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
+
+        timerWasActive = false;
+        questionInProgress = false;
+        incorrectAnswers = 0;
+
         initializeUIElements();
-
-
 
         FirebaseApp.initializeApp(this);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -123,6 +133,16 @@ public class Preguntas extends AppCompatActivity {
                     int selectedRadioButtonId = radio_group.getCheckedRadioButtonId();
                     if (selectedRadioButtonId == -1) {
                         Toast.makeText(Preguntas.this, "Sin miedo, escoge una opción", Toast.LENGTH_SHORT).show();
+                        isAlertDisplayed = true;
+
+                        // Reset the isAlertDisplayed flag after the duration of the Toast
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                isAlertDisplayed = false;
+                            }
+                        }, 2000); // For LENGTH_SHORT, use 2000 ms delay
+
                         return;
                     }
 
@@ -130,15 +150,21 @@ public class Preguntas extends AppCompatActivity {
                         timer.cancel();
                     }
 
-                    // Get the selected RadioButton using the selectedRadioButtonId
-                    selectedRadioButton = findViewById(selectedRadioButtonId);
-
-                    // Make sure the selectedRadioButton is not null before trying to modify it
+                    RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
                     if (selectedRadioButton != null) {
                         selectedRadioButton.setBackgroundResource(R.drawable.radio_normal3);
                     } else {
-                        // Handle the unexpected case where the RadioButton is still null
                         Toast.makeText(Preguntas.this, "Ha ocurrido un error inesperado.", Toast.LENGTH_SHORT).show();
+                        isAlertDisplayed = true;
+
+                        // Reset the isAlertDisplayed flag after the duration of the Toast
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                isAlertDisplayed = false;
+                            }
+                        }, 2000); // For LENGTH_SHORT, use 2000 ms delay
+
                         return;
                     }
 
@@ -155,13 +181,17 @@ public class Preguntas extends AppCompatActivity {
         buttonsiguiente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                playSwoosh();
                 if (isSolutionDisplayed) {
+
                     moveToNextQuestion();
                 }
                 isSolutionDisplayed = false;
                 adjustButtonVisibility();
 
             }
+
+
         });
     }
 
@@ -229,7 +259,6 @@ public class Preguntas extends AppCompatActivity {
         });
     }
 
-
     private void saveFetchedQuestionsToLocalDatabase(List<QuestionModoCompeticion> fetchedQuestions) {
         firestoreQuestionManager.updateLocalDatabaseWithNewQuestions(fetchedQuestions, new FirestoreQuestionManager.QuestionsFetchCallback() {
             @Override
@@ -256,7 +285,6 @@ public class Preguntas extends AppCompatActivity {
         });
     }
 
-
     private void displayNextUnusedQuestion() {
         List<QuestionModoCompeticion> questions = questionDataSource.fetchRandomUnusedQuestions(1);
         if (!questions.isEmpty()) {
@@ -277,7 +305,7 @@ public class Preguntas extends AppCompatActivity {
             // Perhaps show an error message to the user or take some corrective action.
             return;
         }
-
+        questionInProgress = true;
         // UI Setup
         textviewpregunta.setText(currentQuestion.getQUESTION());
         radio_button1.setText(currentQuestion.getOPTION_A());
@@ -303,7 +331,7 @@ public class Preguntas extends AppCompatActivity {
         if (timer != null) {
             timer.cancel();
         }
-
+        timerWasActive = true; // Timer is about to start
         timer = new CountDownTimer(16000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -329,6 +357,7 @@ public class Preguntas extends AppCompatActivity {
 
             @Override
             public void onFinish() {
+                timerWasActive = false;
                 processAnswer();
                 showSolution();
                 buttonconfirmar.setVisibility(View.GONE);
@@ -376,67 +405,56 @@ public class Preguntas extends AppCompatActivity {
 
             currentQuestion.setUsed(true);
            questionDataSource.markQuestionAsUsed(currentQuestion.getNUMBER());
+           questionInProgress = false;
 
 
         textviewaciertos.setText("ACIERTOS: " + correctAnswers);
             textviewpuntuacion.setText("PUNTUACION: " + score);
             textviewfallos.setText("FALLOS: " + incorrectAnswers);
 
-            if (incorrectAnswers >= 4 && !hasShownToast) {
-                textviewfallos.setTextColor(Color.RED);
-                Toast.makeText(Preguntas.this, "Atención: 4 errores, uno más y se acabará la partida", Toast.LENGTH_LONG).show();
-                hasShownToast = true;
-            }
+        if (incorrectAnswers >= 4 && !hasShownToast) {
+            textviewfallos.setTextColor(Color.RED);
 
-            if (incorrectAnswers >= 5) {
-                Toast.makeText(getApplicationContext(), "ACUMULASTE CINCO FALLOS.\n     " +
-                        "        FIN DE PARTIDA", Toast.LENGTH_LONG).show();
 
-                finishGameTerminar();
-//
-//                if (areAllQuestionsUsed()) {
-//                    firestoreQuestionManager.fetchQuestionsBatch(callback);
+            new AlertDialog.Builder(Preguntas.this)
+                    .setTitle("Atención")
+                    .setMessage("4 errores; Uno más y se acabará la partida")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // User clicked OK button. Write any code here if needed.
+                        }
+                    })
+                    .setIcon(R.drawable.logotrivial)
+                    .show();
+            hasShownToast = true;
+        }
+
+
+        if (incorrectAnswers >= 5) {
+            new AlertDialog.Builder(Preguntas.this)
+                    .setTitle("Fin de Partida")
+                    .setMessage("Acumulaste cinco fallos")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // User clicked OK button. Handle game over logic here.
+                            finishGameTerminar();
+                        }
+                    })
+                    .setIcon(R.drawable.logotrivial)
+                    .show();
+            hasShownToast = true;
+        }
+
 
                 }
-            }
 
-//    public void saveUsedQuestionToSharedPreferences(String questionId) {
-//        Log.d("DebugFlow", "Entering saveUsedQuestionToSharedPreferences() with questionId: " + questionId);
-//        Set<String> originalSet = sharedPreferences.getStringSet("usedQuestions", new HashSet<>());
-//        // Create a copy of the set
-//        Set<String> usedQuestionsSet = new HashSet<>(originalSet);
-//        // Add the new questionId to the copied set
-//        usedQuestionsSet.add(questionId);
-//        // Save the updated set back to SharedPreferences
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putStringSet("usedQuestions", usedQuestionsSet);
-//        editor.apply();
-//        Log.d("DebugFlow", "Exiting saveUsedQuestionToSharedPreferences(). Question saved: " + questionId);
-//    }
+    private void playSwoosh() {
+        if (swooshPlayer != null) {
+            swooshPlayer.seekTo(0);
+            swooshPlayer.start();
+        }
+    }
 
-//    private void clearUsedQuestionsSharedPreferences() {
-//        SharedPreferences sharedPreferences = getSharedPreferences("UsedQuestionsSharedPreferences", MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.clear();
-//        editor.apply();
-//        Log.d("UsedQuestionsSharedPreferences", "All used question IDs cleared from SharedPreferences.");
-//    }
-//
-//    private boolean isQuestionUsed(String questionId) {
-//        Set<String> usedQuestionsSet = sharedPreferences.getStringSet("usedQuestions", new HashSet<>());
-//        return usedQuestionsSet.contains(questionId);
-//    }
-//
-//    public boolean areAllQuestionsUsed() {
-//        Set<String> usedQuestionsSet = sharedPreferences.getStringSet("usedQuestions", new HashSet<>());
-//
-//        for (QuestionModoCompeticion question : unusedQuestions) {
-//            if (!usedQuestionsSet.contains(question.getNUMBER())) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
 
     private void showSolution() {
             int selectedRadioButtonId = radio_group.getCheckedRadioButtonId();
@@ -479,63 +497,6 @@ public class Preguntas extends AppCompatActivity {
             resetTextView();
         }
 
-//    FirestoreQuestionManager.QuestionsFetchCallback callback = new FirestoreQuestionManager.QuestionsFetchCallback() {
-//        @Override
-//        public void onQuestionsFetched(List<QuestionModoCompeticion> newQuestions) {
-//            // Handle the new questions here
-//            // Example:
-//            unusedQuestions.addAll(newQuestions);
-//            moveToNextQuestion();
-//        }
-//
-//        @Override
-//        public void onError(Exception e) {
-//            // Handle the error, e.g., show an error message to the user
-//            Log.e("FetchQuestions", "Error fetching questions: " + e.getMessage());
-//            Toast.makeText(Preguntas.this, "Error fetching new questions. Please try again.", Toast.LENGTH_SHORT).show();
-//        }
-//    };
-
-//    public void fetchUnusedQuestionsFromDatabase() {
-//        if (isFetching) return; // Exit if already fetching
-//        isFetching = true;
-//
-//        FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
-//
-//        manager.fetchShuffledBatchQuestions(new FirestoreQuestionManager.QuestionsFetchCallback() {
-//            @Override
-//            public void onQuestionsFetched(List<QuestionModoCompeticion> newQuestions) {
-//                Log.d("FetchQuestions", "Total questions fetched from Firestore: " + newQuestions.size());
-//                for (QuestionModoCompeticion question : newQuestions) {
-//                    Log.d("FetchQuestionsDetail", "Question content: " + question.toString());
-//                }
-//                isFetching = false;
-//
-//                if (!newQuestions.isEmpty()) {
-//                    // Update the local SQL database with new questions
-//                    manager.updateLocalAndDatabaseWithNewQuestions(newQuestions, this);
-//
-//
-//
-//                    // Delay for 0.5 seconds (500 milliseconds) then proceed to the next question
-//                    new Handler().postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            moveToNextQuestion();
-//                        }
-//                    }, 500);
-//                } else {
-//                    Log.d("FetchQuestions", "No new questions fetched from Firestore.");
-//                }
-//            }
-//
-//            @Override
-//            public void onError(Exception e) {
-//                Log.e("FetchQuestions", "Error fetching questions: " + e.getMessage());
-//                isFetching = false;
-//            }
-//        });
-//    }
 
     private void stopImageAnimation() {
         ImageView resultImage = findViewById(R.id.resultImage);
@@ -591,28 +552,24 @@ public class Preguntas extends AppCompatActivity {
                     return; // Do nothing if a click is being processed
                 }
 
-                if (doubleClick) {
-                    isProcessing = true;
-                    finishGameTerminar();
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            doubleClick = false;
-                            isProcessing = false;
-                        }
-                    }, DOUBLE_CLICK_DELAY);
-                } else {
-                    doubleClick = true;
-                    Toast.makeText(Preguntas.this, "Para terminar la partida pulsa otra vez", Toast.LENGTH_SHORT).show();
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            doubleClick = false;
-                        }
-                    }, DOUBLE_CLICK_DELAY);
-                }
+                // Show an AlertDialog when buttonterminar is pressed
+                new AlertDialog.Builder(Preguntas.this)
+                        .setTitle("Confirmar")
+                        .setMessage("¿Seguro que quieres terminar la partida?")
+                        .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // User clicked "Sí" button. Finish the game.
+                                isProcessing = true;
+                                finishGameTerminar();
+                                isProcessing = false;
+                            }
+                        })
+                        .setNegativeButton("No", null) // null listener results in dismissing the dialog without additional actions
+                        .setIcon(R.drawable.logotrivial)
+                        .show();
             }
         });
+
 
         radio_button1.setTextColor(Color.WHITE);
         radio_button2.setTextColor(Color.WHITE);
@@ -772,9 +729,11 @@ public class Preguntas extends AppCompatActivity {
         }
     };
 
-      @Override
-     protected void onDestroy() {
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
+
+        // Existing code to handle backButtonHandler, timer, and mediaPlayer
         if (backButtonHandler != null) {
             backButtonHandler.removeCallbacks(backButtonRunnable);
         }
@@ -785,12 +744,111 @@ public class Preguntas extends AppCompatActivity {
             mediaPlayer.release();
             mediaPlayer = null;
         }
-            if (questionDataSource != null) {
-                questionDataSource.close();
+        if (questionDataSource != null) {
+            questionDataSource.close();
+        }
 
-
+        // Additional code to release the swooshPlayer
+        if (swooshPlayer != null) {
+            swooshPlayer.release();
+            swooshPlayer = null;
         }
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // App is going into the background
+        isAppInBackground = true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("ActivityLifecycle", "onResume: App returning to foreground");
+        // Only call processPenaltyForLeavingApp if a question is in progress
+        if (isAppInBackground && timerWasActive && questionInProgress && incorrectAnswers < 3 && !isAlertDisplayed) {
+            Log.d("ActivityLifecycle", "onResume: Calling processPenaltyForLeavingApp");
+            processPenaltyForLeavingApp();
+        }
+        isAppInBackground = false;
+    }
+
+    private void processPenaltyForLeavingApp() {
+        Log.d("PenaltyLogic", "processPenaltyForLeavingApp: Triggered");
+
+        if (questionInProgress && incorrectAnswers < 4) {
+            // Pause the timer
+            if (timer != null) {
+                timer.cancel();
+            }
+
+            // Show an AlertDialog
+            new AlertDialog.Builder(Preguntas.this)
+                    .setTitle("Aviso")
+                    .setMessage("No abandones la aplicación mientras haya una pregunta activa.")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Restart the timer and apply the penalty when OK is clicked
+
+                            applyPenalty();
+                        }
+                    })
+                    .setCancelable(false)
+                    .setIcon(R.drawable.logotrivial)
+                    .show();
+
+
+            isAlertDisplayed = true; // Indicate that an alert is being displayed
+        }
+    }
+
+    private void applyPenalty() {
+        // Play sound effect for incorrect answer
+        MediaPlayer mediaPlayer2 = MediaPlayer.create(getApplicationContext(), R.raw.notright);
+        mediaPlayer2.start();
+
+        // Update the score and incorrect answers count
+        score -= 500;
+        incorrectAnswers++;
+
+        // Update the UI to reflect the penalty
+        textviewaciertos.setText("ACIERTOS: " + correctAnswers);
+        textviewpuntuacion.setText("PUNTUACION: " + score);
+        textviewfallos.setText("FALLOS: " + incorrectAnswers);
+
+        // Check if the game over condition is met
+        if (incorrectAnswers >= 5) {
+            Toast.makeText(getApplicationContext(), "ACUMULASTE CINCO FALLOS.\n" +
+                    "FIN DE PARTIDA", Toast.LENGTH_LONG).show();
+            finishGameTerminar();
+        } else {
+            // Mark the current question as answered incorrectly
+            if (currentQuestion != null) {
+                currentQuestion.setUsed(true);
+                questionDataSource.markQuestionAsUsed(currentQuestion.getNUMBER());
+            }
+
+            // Prepare UI for the next question (without moving to it immediately)
+            showSolution();
+            buttonconfirmar.setVisibility(View.GONE);
+            buttonsiguiente.setVisibility(View.VISIBLE);
+            buttonterminar.setVisibility(View.VISIBLE);
+        }
+
+        // Reset the questionInProgress flag
+        questionInProgress = false;
+
+        // Reset the isAlertDisplayed flag as the alert has been handled
+        isAlertDisplayed = false;
+    }
+
+
+
+
+
+
 
 }
 

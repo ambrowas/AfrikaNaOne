@@ -171,6 +171,7 @@ public class ClassficationActivity extends AppCompatActivity {
                             }
                         })
                         .setNegativeButton("NO", null) // User clicked NO, just dismiss the alert
+                        .setIcon(R.drawable.logotrivial)
                         .show();
             }
         });
@@ -196,7 +197,9 @@ public class ClassficationActivity extends AppCompatActivity {
                             .setTitle("Cobro Mínimo")
                             .setMessage("Debes ganar al menos 2500 FCFA para poder generar un cobro.")
                             .setPositiveButton(android.R.string.ok, null)
+                            .setIcon(R.drawable.logotrivial)
                             .show();
+
                 } else {
                     // If puntuacion is 2500 or more, proceed with the current logic
 

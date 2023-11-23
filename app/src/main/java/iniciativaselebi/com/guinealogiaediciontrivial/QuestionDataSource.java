@@ -206,8 +206,6 @@ public class QuestionDataSource {
         return result;
     }
 
-
-
     private long updateQuestion(QuestionModoCompeticion question) {
         ContentValues values = questionToContentValues(question);
         return database.update(QuestionDatabaseHelperII.TABLE_QUESTIONS, values, QuestionDatabaseHelperII.COLUMN_NUMBER + " = ?", new String[]{question.getNUMBER()});

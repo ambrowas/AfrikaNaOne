@@ -345,61 +345,61 @@ import java.util.concurrent.atomic.AtomicInteger;
             });
         }
 
-        public void prepareNextBatchIfRequired(String userId, BatchPreparationCallback callback)  {
-            DatabaseReference userRef = database.getReference("Users").child(userId).child("currentBatch");
+            public void prepareNextBatchIfRequired(String userId, BatchPreparationCallback callback)  {
+                DatabaseReference userRef = database.getReference("Users").child(userId).child("currentBatch");
 
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot currentBatchSnapshot) {
-                    if (currentBatchSnapshot.exists()) {
-                        int currentBatchId = currentBatchSnapshot.getValue(Integer.class);
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot currentBatchSnapshot) {
+                        if (currentBatchSnapshot.exists()) {
+                            int currentBatchId = currentBatchSnapshot.getValue(Integer.class);
 
-                        // Retrieve total batch count to determine the next batch ID
-                        getTotalBatches(new BatchCountCallback() {
-                            @Override
-                            public void onBatchCountRetrieved(int totalCount) {
-                                int nextBatchId = currentBatchId + 1;
-                                // Wrap around if the nextBatchId exceeds total batches
-                                if (nextBatchId > totalCount) {
-                                    nextBatchId = 1;
+                            // Retrieve total batch count to determine the next batch ID
+                            getTotalBatches(new BatchCountCallback() {
+                                @Override
+                                public void onBatchCountRetrieved(int totalCount) {
+                                    int nextBatchId = currentBatchId + 1;
+                                    // Wrap around if the nextBatchId exceeds total batches
+                                    if (nextBatchId > totalCount) {
+                                        nextBatchId = 1;
+                                    }
+
+                                    // final variable for use in lambda
+                                    final int newBatchId = nextBatchId;
+
+                                    // Update the user's current batch ID in the database
+                                    userRef.setValue(newBatchId).addOnCompleteListener(task -> {
+                                        if (task.isSuccessful()) {
+                                            Log.d("FetchAndSaveFlow", "Set new batch for user: " + userId + " to batch number: " + newBatchId);
+                                        } else {
+                                            Log.e("FetchAndSaveFlow", "Failed to set new batch for user: " + userId, task.getException());
+                                        }
+                                    });
                                 }
 
-                                // final variable for use in lambda
-                                final int newBatchId = nextBatchId;
+                                @Override
+                                public void onError(Exception e) {
+                                    Log.e("FetchAndSaveFlow", "Error retrieving total batch count.", e);
+                                }
+                            });
 
-                                // Update the user's current batch ID in the database
-                                userRef.setValue(newBatchId).addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        Log.d("FetchAndSaveFlow", "Set new batch for user: " + userId + " to batch number: " + newBatchId);
-                                    } else {
-                                        Log.e("FetchAndSaveFlow", "Failed to set new batch for user: " + userId, task.getException());
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                Log.e("FetchAndSaveFlow", "Error retrieving total batch count.", e);
-                            }
-                        });
-
-                    } else {
-                        Log.e("FetchAndSaveFlow", "No current batch found for user: " + userId);
-                        // Possibly initialize the user's batch here
+                        } else {
+                            Log.e("FetchAndSaveFlow", "No current batch found for user: " + userId);
+                            // Possibly initialize the user's batch here
+                        }
                     }
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.e("FetchAndSaveFlow", "Database error occurred while checking current batch.", databaseError.toException());
-                }
-            });
-        }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.e("FetchAndSaveFlow", "Database error occurred while checking current batch.", databaseError.toException());
+                    }
+                });
+            }
 
-        interface BatchPreparationCallback {
-            void onBatchPreparationComplete();
-            void onBatchPreparationFailed(Exception e);
-        }
+            interface BatchPreparationCallback {
+                void onBatchPreparationComplete();
+                void onBatchPreparationFailed(Exception e);
+            }
 
         private void fetchShuffledQuestions(List<String> questionIds, QuestionsFetchCallback callback) {
             Log.d("FetchAndSaveFlow", "Fetching shuffled questions.");
