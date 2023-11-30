@@ -12,6 +12,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -158,21 +159,7 @@ public class ClassficationActivity extends AppCompatActivity {
         buttonmenuprincipal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AlertDialog.Builder(ClassficationActivity.this)
-                        .setTitle("TERMINAR")
-                        .setMessage("¿Seguro que quieres concluir la partida?")
-                        .setPositiveButton("SI", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // User clicked SI
-                                playSwoosh();
-                                Intent intent = new Intent(ClassficationActivity.this, Modocompeticion.class);
-                                startActivity(intent);
-                                finish();  // Close the current activity
-                            }
-                        })
-                        .setNegativeButton("NO", null) // User clicked NO, just dismiss the alert
-                        .setIcon(R.drawable.logotrivial)
-                        .show();
+                showTerminationDialog();
             }
         });
 
@@ -187,18 +174,13 @@ public class ClassficationActivity extends AppCompatActivity {
 
                 // Check if the user is within the cooldown period
                 if (isWithinCoolDownPeriod()) {
-                    Toast.makeText(ClassficationActivity.this, "Debes esperar 3 minutos antes de poder generar otro código QR.", Toast.LENGTH_SHORT).show();
+                    showCooldownAlertDialog();
                     return;
                 }
 
                 // Check if puntuacion is less than 2500
                 if (puntuacion < 2500) {
-                    new AlertDialog.Builder(ClassficationActivity.this)
-                            .setTitle("Cobro Mínimo")
-                            .setMessage("Debes ganar al menos 2500 FCFA para poder generar un cobro.")
-                            .setPositiveButton(android.R.string.ok, null)
-                            .setIcon(R.drawable.logotrivial)
-                            .show();
+                    showMinimumCobroDialog();
 
                 } else {
                     // If puntuacion is 2500 or more, proceed with the current logic
@@ -287,6 +269,61 @@ public class ClassficationActivity extends AppCompatActivity {
         return (currentTimeMillis - lastSavedTimestamp) < threeMinutesInMillis;
     }
 
+    private void showTerminationDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(ClassficationActivity.this)
+                .setTitle("TERMINAR")
+                .setMessage("¿Seguro que quieres concluir la partida?")
+                .setPositiveButton("SI", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        playSwoosh();
+                        Intent intent = new Intent(ClassficationActivity.this, Modocompeticion.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .setNegativeButton("NO", null)
+                .setIcon(R.drawable.logotrivial)
+                .create();
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+
+        dialog.show();
+    }
+
+    private void showMinimumCobroDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(ClassficationActivity.this)
+                .setTitle("Cobro Mínimo")
+                .setMessage("Debes ganar al menos 2500 FCFA para poder generar un cobro.")
+                .setPositiveButton(android.R.string.ok, null)
+                .setIcon(R.drawable.logotrivial)
+                .create();
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+
+        dialog.show();
+    }
+
+    private void showCooldownAlertDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(ClassficationActivity.this)
+                .setTitle("Espera Necesaria")
+                .setMessage("Debes esperar 3 minutos antes de poder generar otro código QR.")
+                .setPositiveButton(android.R.string.ok, null)
+                .setIcon(R.drawable.logotrivial)
+                .create();
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+
+        dialog.show();
+    }
 
     private void saveLastSavedTimestamp() {
         SharedPreferences sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE);
@@ -299,9 +336,6 @@ public class ClassficationActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE);
         return sharedPreferences.getLong("last_saved_timestamp", 0);
     }
-
-
-
 
     private void playSwoosh() {
         if (swooshPlayer != null) {
@@ -331,7 +365,6 @@ public class ClassficationActivity extends AppCompatActivity {
             return generatedString.substring(0, length);
         }
     }
-
 
     private void updateHighestScore(int newScore) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -383,7 +416,6 @@ public class ClassficationActivity extends AppCompatActivity {
         textiviewganancias.setText("TUS GANANCIAS SON DE  " + puntuacion + " FCFA");
         TextViewFallos.setText("ACUMULASTE " + errores + " ERRORES");
     }
-
 
 
     @Override

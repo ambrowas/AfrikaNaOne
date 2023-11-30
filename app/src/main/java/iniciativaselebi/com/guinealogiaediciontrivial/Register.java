@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import iniciativaselebi.com.guinealogiaediciontrivial.R;
@@ -36,7 +38,7 @@ public class Register extends AppCompatActivity {
     private FirebaseAuth mAuth;
     String password, email, nombre, ciudad, telefono, barrio, pais;
     MediaPlayer swooshPlayer;
-    FirestoreQuestionManager firestoreQuestionManager; // Assume this is your manager class
+    FirestoreQuestionManager firestoreQuestionManager;
 
     TextView TextViewVolver2;
 
@@ -49,7 +51,7 @@ public class Register extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         btn_register = findViewById(R.id.btn_register);
         swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
-        firestoreQuestionManager = new FirestoreQuestionManager(this); // Initialize your FirestoreQuestionManager
+        firestoreQuestionManager = new FirestoreQuestionManager(this);
 
         TextViewVolver2.setOnClickListener(v -> {
             playSwoosh();
@@ -58,6 +60,7 @@ public class Register extends AppCompatActivity {
         });
 
         btn_register.setOnClickListener(v -> {
+            // Retrieve input data
             EditText editTextNombre = findViewById(R.id.nombre);
             EditText editTextEmail = findViewById(R.id.email);
             EditText editTextPassword = findViewById(R.id.password);
@@ -66,24 +69,34 @@ public class Register extends AppCompatActivity {
             EditText editTextCiudad = findViewById(R.id.ciudad);
             EditText editTextPais = findViewById(R.id.pais);
 
-            // Trim the strings to remove any leading or trailing white spaces
+            // Set the values
+            nombre = editTextNombre.getText().toString().trim();
             email = editTextEmail.getText().toString().trim();
             password = editTextPassword.getText().toString().trim();
-            nombre = editTextNombre.getText().toString().trim();
             telefono = editTextTelefono.getText().toString().trim();
             barrio = editTextBarrio.getText().toString().trim();
             ciudad = editTextCiudad.getText().toString().trim();
             pais = editTextPais.getText().toString().trim();
 
-            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(nombre) || TextUtils.isEmpty(telefono) || TextUtils.isEmpty(barrio) || TextUtils.isEmpty(ciudad) || TextUtils.isEmpty(pais)) {
-                Toast.makeText(Register.this, "Completa todos los datos", Toast.LENGTH_SHORT).show();
+            if (!areAllFieldsValid()) {
                 return;
             }
 
+            // Sanitize and trim input data
+            nombre = sanitizeInput(editTextNombre.getText().toString().trim());
+            telefono = sanitizeInput(editTextTelefono.getText().toString().trim());
+            barrio = sanitizeInput(editTextBarrio.getText().toString().trim());
+            ciudad = sanitizeInput(editTextCiudad.getText().toString().trim());
+            pais = sanitizeInput(editTextPais.getText().toString().trim());
+            email = editTextEmail.getText().toString().trim();
+            password = editTextPassword.getText().toString().trim();
+
+
+
+            // Proceed with Firebase authentication
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            // User registration succeeded
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
                                 User newUser = new User(nombre, email, telefono, barrio, ciudad, pais, "");
@@ -91,51 +104,135 @@ public class Register extends AppCompatActivity {
                                         .setValue(newUser)
                                         .addOnCompleteListener(task1 -> {
                                             if (task1.isSuccessful()) {
-                                                Toast.makeText(Register.this, "Usuario Registrado", Toast.LENGTH_SHORT).show();
-
-                                                // Call assignBatchForNewUser from FirestoreQuestionManager
-                                                firestoreQuestionManager.assignBatchForNewUser(new FirestoreQuestionManager.BatchAssignmentCallback() {
-                                                    @Override
-                                                    public void onBatchAssigned(int batchNumber) {
-                                                        // Batch has been assigned, proceed to ProfileActivity
-                                                        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                                                        startActivity(intent);
-                                                        finish();
-                                                    }
-
-                                                    @Override
-                                                    public void onError(Exception e) {
-                                                        // Handle the error scenario, maybe retry or prompt the user
-                                                        e.printStackTrace();
-                                                        // You might want to stay in the register screen or show an error message
-                                                    }
-                                                });
+                                                showCustomAlertDialog("Éxito", "Usuario creado correctamente. Establece una foto de perfil", this::navigateToProfileActivity);
                                             } else {
-                                                Toast.makeText(Register.this, "Error registrando usuario en la base de datos", Toast.LENGTH_SHORT).show();
+                                                showCustomAlertDialog("Error", "Error registrando usuario en la base de datos");
                                             }
                                         });
                             }
                         } else {
-                            // Handle registration failure
-                            task.getException().printStackTrace();
-                            Toast.makeText(Register.this, "Error registrando usuario", Toast.LENGTH_SHORT).show();
-
                             if (task.getException() instanceof FirebaseAuthUserCollisionException) {
-                                Toast.makeText(Register.this, "La cuenta ya existe, ¿quieres conectarte?", Toast.LENGTH_SHORT).show();
+                                showCustomAlertDialog("Atención", "La cuenta ya existe, ¿quieres conectarte?");
+                            } else {
+                                showCustomAlertDialog("Error", "Error registrando usuario");
                             }
-
-                            // Redirect to Login activity
-                            startActivity(new Intent(getApplicationContext(), Login.class));
-                            playSwoosh();
-                            finish();
                         }
                     });
         });
     }
 
-    public interface BatchAssignmentCallback {
-        void onBatchAssigned();
-        void onError(Exception e);
+
+    private boolean areAllFieldsValid() {
+        if (TextUtils.isEmpty(nombre) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(telefono) || TextUtils.isEmpty(barrio) || TextUtils.isEmpty(ciudad) || TextUtils.isEmpty(pais)) {
+            showCustomAlertDialog("Atención", "Debes completar todos los campos");
+            return false;
+        }
+        if (!isValidName(nombre)) {
+            showCustomAlertDialog("Atención", "Nombre inválido");
+            return false;
+        }
+        if (!isValidEmail(email)) {
+            showCustomAlertDialog("Atención", "Email inválido");
+            return false;
+        }
+        if (!isPasswordValid(password)) {
+            showCustomAlertDialog("Atención", "La contraseña debe tener al menos 6 caracteres");
+            return false;
+        }
+        if (!isValidPhoneNumber(telefono)) {
+            showCustomAlertDialog("Atención", "Número de teléfono inválido");
+            return false;
+        }
+        if (!isValidField(barrio)) {
+            showCustomAlertDialog("Atención", "Barrio inválido");
+            return false;
+        }
+        if (!isValidField(ciudad)) {
+            showCustomAlertDialog("Atención", "Ciudad inválida");
+            return false;
+        }
+        if (!isValidField(pais)) {
+            showCustomAlertDialog("Atención", "País inválido");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void navigateToProfileActivity() {
+        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+        return email.matches(emailPattern);
+    }
+
+    private boolean isValidName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return false;
+        }
+        String namePattern = "[a-zA-Z\\s.'-]+";
+        return name.matches(namePattern);
+    }
+
+    private boolean isValidPhoneNumber(String phone) {
+        String phonePattern = "^[+0-9]{1,}[0-9\\-\\s]{3,15}$";
+        return phone.matches(phonePattern);
+    }
+
+    private boolean isPasswordValid(String password) {
+        return password.length() >= 6;
+    }
+
+    private boolean isValidField(String field) {
+        return field != null && !field.trim().isEmpty();
+    }
+
+    private String sanitizeInput(String input) {
+        // Firebase does not allow '.', '#', '$', '[', or ']' in keys
+        return input.replaceAll("[.#$\\[\\]/]", "");
+    }
+
+    private void showCustomAlertDialog(String title, String message) {
+        AlertDialog dialog = new AlertDialog.Builder(Register.this)
+                .setTitle(title) // Set the title
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> dialogInterface.dismiss())
+                .setIcon(R.drawable.logotrivial) // Include the icon
+                .create();
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+
+        dialog.show();
+    }
+
+
+
+    private void showCustomAlertDialog(String title, String message, final Runnable onDismiss) {
+        AlertDialog dialog = new AlertDialog.Builder(Register.this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    if (onDismiss != null) {
+                        onDismiss.run();
+                    }
+                })
+                .setIcon(R.drawable.logotrivial) // Include the icon
+                .create();
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+
+        dialog.show();
     }
 
     private void playSwoosh() {
@@ -154,5 +251,3 @@ public class Register extends AppCompatActivity {
         super.onDestroy();
     }
 }
-
-

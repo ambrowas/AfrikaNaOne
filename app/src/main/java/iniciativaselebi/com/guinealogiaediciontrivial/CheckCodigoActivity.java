@@ -1,14 +1,18 @@
 package iniciativaselebi.com.guinealogiaediciontrivial;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import iniciativaselebi.com.guinealogiaediciontrivial.R;
@@ -34,7 +38,7 @@ public class CheckCodigoActivity extends AppCompatActivity {
     MediaPlayer swooshPlayer;
 
         @Override
-        protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_check_codigo);
 
@@ -81,49 +85,61 @@ public class CheckCodigoActivity extends AppCompatActivity {
                 }
             });
         }
+    private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener onPositiveClickListener) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(title) // Set the title here
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, onPositiveClickListener)
+                .setIcon(R.drawable.logotrivial) // Set the icon here
+                .create();
 
-        private void validateCode(String userId, String fullName, String enteredCode) {
-            DatabaseReference gameCodesRef = FirebaseDatabase.getInstance().getReference("gamecodes");
-            gameCodesRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    boolean codeFound = false;
-
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        String code = String.valueOf(snapshot.child("code").getValue(Long.class));
-
-                        if (enteredCode.equals(code)) {
-                            codeFound = true;
-                            handleCodeValidation(snapshot, userId, fullName);
-                            break;
-                        }
-                    }
-
-                    if (!codeFound) {
-                        Toast.makeText(getApplicationContext(), "ESTE CODIGO NO EXISTE", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Toast.makeText(getApplicationContext(), "Error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background); // Set the background here
         }
 
+        dialog.show();
+    }
+
+    private void validateCode(String userId, String fullName, String enteredCode) {
+        DatabaseReference gameCodesRef = FirebaseDatabase.getInstance().getReference("gamecodes");
+        gameCodesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean codeFound = false;
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String code = String.valueOf(snapshot.child("code").getValue(Long.class));
+
+                    if (enteredCode.equals(code)) {
+                        codeFound = true;
+                        handleCodeValidation(snapshot, userId, fullName);
+                        break;
+                    }
+                }
+
+                if (!codeFound) {
+                    showCustomAlertDialog("Atención", "ESTE CODIGO NO EXISTE", null);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                showCustomAlertDialog("Error", "Error: " + databaseError.getMessage(), null);
+            }
+        });
+    }
     private void handleCodeValidation(DataSnapshot snapshot, String userId, String fullName) {
-        if (snapshot.hasChild("StaticCode")) {  // Check if the StaticCode node exists
+        if (snapshot.hasChild("StaticCode")) {
             resetGameData(userId);
-            Toast.makeText(getApplicationContext(), "CODIGO PROMOCIONAL VALIDADO", Toast.LENGTH_SHORT).show();
-            navigateToModocompeticion(); // Navigate after the Toast
+            showCustomAlertDialog("Atención", "CODIGO PROMOCIONAL VALIDADO", (dialogInterface, i) -> navigateToModocompeticion());
             return;
         }
 
         Boolean isUsed = snapshot.child("used").getValue(Boolean.class);
-
         if (isUsed != null && isUsed) {
-            Toast.makeText(getApplicationContext(), "ESTE CODIGO YA HA SIDO USADO. INTRODUZCA UNO NUEVO", Toast.LENGTH_SHORT).show();
-            navigateToModocompeticion(); // Navigate after the Toast
+            showCustomAlertDialog("Atención", "ESTE CODIGO YA HA SIDO USADO. INTRODUZCA UNO NUEVO", (dialogInterface, i) -> {});
+            navigateToModocompeticionWithDelay();
             return;
         }
 
@@ -145,8 +161,7 @@ public class CheckCodigoActivity extends AppCompatActivity {
         String usedTimestamp = df.format(new Date());
         snapshot.getRef().child("usedTimestamp").setValue(usedTimestamp);
 
-        Toast.makeText(getApplicationContext(), "CODIGO VALIDADO: BUENA SUERTE", Toast.LENGTH_SHORT).show();
-        navigateToModocompeticion(); // Navigate after the Toast
+        showCustomAlertDialog("Atención", "CODIGO VALIDADO: BUENA SUERTE", (dialogInterface, i) -> navigateToModocompeticion());
     }
 
     private void navigateToModocompeticion() {
@@ -190,6 +205,15 @@ public class CheckCodigoActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
+
+    private void navigateToModocompeticionWithDelay() {
+        new Handler().postDelayed(() -> {
+            Intent intent = new Intent(getApplicationContext(), Modocompeticion.class);
+            startActivity(intent);
+            finish();
+        }, 2000); // delay for 2 seconds
+    }
+
 }
 
 

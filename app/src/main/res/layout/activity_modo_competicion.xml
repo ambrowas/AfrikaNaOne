@@ -65,7 +65,7 @@
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_normal"
         android:layout_below="@+id/button_jugar2"
-        android:text="CODIGO"
+        android:text="INTRUDUCIR CODIGO"
         android:textColor="@color/white"
         android:gravity="center"
         android:shadowDx="4"

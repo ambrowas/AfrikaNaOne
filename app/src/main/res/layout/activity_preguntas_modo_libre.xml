@@ -98,6 +98,10 @@
             android:textColor="@color/white"
             android:elevation="4dp"
             android:gravity="center"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="12sp"
+            android:autoSizeMaxTextSize="18sp"
+            android:autoSizeStepGranularity="2sp"
 
               />
 
@@ -113,7 +117,11 @@
                 android:textColor="@color/white"
                 android:elevation="4dp"
                 android:gravity="center"
-              />
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="12sp"
+                android:autoSizeMaxTextSize="18sp"
+                android:autoSizeStepGranularity="2sp"
+                />
 
             <RadioButton
                 android:id="@+id/radio_button3"
@@ -127,7 +135,11 @@
                 android:gravity="center"
                 android:text="Option 3"
                 android:textColor="@color/white"
-               />
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="12sp"
+                android:autoSizeMaxTextSize="18sp"
+                android:autoSizeStepGranularity="2sp"
+                />
         </RadioGroup>
 
             />

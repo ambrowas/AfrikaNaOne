@@ -1,20 +1,27 @@
 package iniciativaselebi.com.guinealogiaediciontrivial;
 
+import static android.app.ProgressDialog.show;
+
 import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -65,23 +72,24 @@ public class Modocompeticion extends AppCompatActivity {
 
              dataSource = new QuestionDataSource(this);
 
-            button_clasificacion = findViewById(R.id.button_clasificacion);
-            button_clasificacion.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    if (user != null) {
-                        playSwoosh();
-                        Intent intent = new Intent(Modocompeticion.this, RankingActivity.class);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Toast.makeText(Modocompeticion.this, "Debe iniciar sesión para poder acceder al ranking.", Toast.LENGTH_SHORT).show();
-                    }
+        button_clasificacion = findViewById(R.id.button_clasificacion);
+        button_clasificacion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    playSwoosh();
+                    Intent intent = new Intent(Modocompeticion.this, RankingActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    showAlert("Debes iniciar sesión para poder acceder al ranking.");
                 }
-            });
+            }
+        });
 
-            button_login = findViewById(R.id.button_login);
+
+        button_login = findViewById(R.id.button_login);
 
             button_perfil = findViewById(R.id.button_perfil);
             button_jugar2 = findViewById(R.id.button_jugar2);
@@ -102,16 +110,16 @@ public class Modocompeticion extends AppCompatActivity {
                 }
             });
 
-            buttoncodigo = (Button)findViewById(R.id.buttoncodigo);
-            buttoncodigo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    playSwoosh();
-                    Intent intent = new Intent(getApplicationContext(), CheckCodigoActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            });
+                buttoncodigo = (Button)findViewById(R.id.buttoncodigo);
+                buttoncodigo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        playSwoosh();
+                        Intent intent = new Intent(getApplicationContext(), CheckCodigoActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
             button_register = (Button)findViewById(R.id.button_register);
 
             loadUserHighestScore();
@@ -130,79 +138,65 @@ public class Modocompeticion extends AppCompatActivity {
                 }
             };
 
-            button_login.setOnClickListener(new View.OnClickListener() {
-                private long lastClickTime = 0;
-
-                @Override
-                public void onClick(View v) {
-                    if (auth.getCurrentUser() != null) {
-                        if (System.currentTimeMillis() - lastClickTime < 2000) { // 2000 ms = 2 s
-                            auth.signOut();
-                            playSwoosh();
-                            Toast.makeText(getApplicationContext(), "Usuario Desconectado", Toast.LENGTH_SHORT).show();
-                            TextViewSaludo2.setText("INICIA SESION O REGISTRATE");
-                            TextViewRecord.setVisibility(View.GONE);
-                        } else {
-                            lastClickTime = System.currentTimeMillis();
-                            Toast.makeText(getApplicationContext(), "Presione de nuevo para cerrar sesión", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        playSwoosh();
-                        Intent intent = new Intent(getApplicationContext(), Login.class);
-                        startActivity(intent);
-                        finish();
-                    }
+        button_login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (auth.getCurrentUser() != null) {
+                    confirmLogout();
+                } else {
+                    playSwoosh();
+                    Intent intent = new Intent(getApplicationContext(), Login.class);
+                    startActivity(intent);
+                    finish();
                 }
-            });
+            }
+        });
 
-
-            button_register.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    if (user != null) {
-                        Toast.makeText(getApplicationContext(), "Ya estás registrado. Presiona JUGAR para comenzar la partida", Toast.LENGTH_SHORT).show();
-                    } else {
-                        playSwoosh();
-                        Intent intent = new Intent(getApplicationContext(), Register.class);
-                        startActivity(intent);
-                        finish();
-                    }
-
+        button_register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    showAlert("Ya estás registrado. Presiona JUGAR para comenzar la partida");
+                } else {
+                    playSwoosh();
+                    Intent intent = new Intent(getApplicationContext(), Register.class);
+                    startActivity(intent);
+                    finish();
                 }
-            });
+            }
+        });
 
-            button_perfil.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (auth.getCurrentUser() == null) {
-                        Toast.makeText(getApplicationContext(), "Debe iniciar sesión para acceder a su perfil", Toast.LENGTH_SHORT).show();
-                    } else {
-                        playSwoosh();
-                        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
+        button_perfil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (auth.getCurrentUser() == null) {
+                    showAlert("Debes iniciar sesión para acceder a tu perfil");
+                } else {
+                    playSwoosh();
+                    Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
-            });
+            }
+        });
 
-            button_jugar2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    FirebaseUser user = auth.getCurrentUser();
-                    if (user == null) {
-                        Toast.makeText(getApplicationContext(), "Debe iniciar sesión para poder jugar", Toast.LENGTH_SHORT).show();
-                    } else {
-                        playSwoosh();
-
-                        Intent intent = new Intent(getApplicationContext(), Preguntas.class);
-                        startActivity(intent);
-                        finish();
-                    }
+        button_jugar2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseUser user = auth.getCurrentUser();
+                if (user == null) {
+                    showAlert("Debes iniciar sesión para poder jugar");
+                } else {
+                    playSwoosh();
+                    Intent intent = new Intent(getApplicationContext(), Preguntas.class);
+                    startActivity(intent);
+                    finish();
                 }
-            });
+            }
+        });
 
-            if (auth.getCurrentUser() != null) {
+        if (auth.getCurrentUser() != null) {
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user").child(auth.getCurrentUser().getUid());
                 ref.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -222,6 +216,55 @@ public class Modocompeticion extends AppCompatActivity {
                 });
             }
         }
+
+
+    private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener onPositiveClickListener) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(title) // Set the title
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, onPositiveClickListener)
+                .setIcon(R.drawable.logotrivial) // Include the icon
+                .create();
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+
+        dialog.show();
+    }
+
+    private void showAlert(String message) {
+        showCustomAlertDialog("Atención", message, null);
+    }
+
+    private void confirmLogout() {
+        DialogInterface.OnClickListener positiveClickListener = (dialog, which) -> {
+            auth.signOut();
+            playSwoosh();
+            TextViewSaludo2.setText("INICIA SESION O REGISTRATE");
+            TextViewRecord.setVisibility(View.GONE);
+            showAlert("Usuario Desconectado");
+        };
+
+        DialogInterface.OnClickListener negativeClickListener = (dialog, which) -> dialog.dismiss();
+
+        AlertDialog dialog = new AlertDialog.Builder(Modocompeticion.this)
+                .setTitle("Atención")
+                .setMessage("¿Seguro de que quieres cerrar la sesión?")
+                .setPositiveButton("Sí", positiveClickListener)
+                .setNegativeButton("No", negativeClickListener)
+                .setIcon(R.drawable.logotrivial)
+                .create();
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+
+        dialog.show();
+    }
+
 
 
     private void checkAndFetchQuestionsIfNeeded() {
@@ -325,13 +368,11 @@ public class Modocompeticion extends AppCompatActivity {
             });
         }
     }
-
     @Override
     protected void onStart() {
             super.onStart();
             auth.addAuthStateListener(authStateListener);
         }
-
     @Override
     protected void onStop() {
             super.onStop();

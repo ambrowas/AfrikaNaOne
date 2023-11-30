@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -368,85 +369,82 @@ public class Preguntas extends AppCompatActivity {
     }
 
     private void processAnswer() {
-            if (currentQuestion == null) {
-                Log.d("DebugFlow", "currentQuestion is null in processAnswer(). Moving to next question.");
-                moveToNextQuestion();
-                return;
-            }
-            int selectedRadioButtonId = radio_group.getCheckedRadioButtonId();
-            if (selectedRadioButtonId == -1) {
-                MediaPlayer mediaPlayer2 = MediaPlayer.create(getApplicationContext(), R.raw.notright);
-                mediaPlayer2.start();
-                score -= 500;
-                incorrectAnswers++;
-            } else {
-                RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
-                if (selectedRadioButton != null) {
-                    String selectedOption = selectedRadioButton.getText().toString();
-                    // Use the getter method to access the answer property
-                    if (selectedOption.equals(currentQuestion.getANSWER())) {
-                        Log.d("DebugFlow", "Answer is correct.");
-                        correctAnswers++;
-                        currentGameAciertos++;
-                        MediaPlayer mediaPlayer1 = MediaPlayer.create(getApplicationContext(), R.raw.right);
-                        mediaPlayer1.start();
-                        score += 500;
-                    } else {
-                        Log.d("DebugFlow", "Answer is incorrect.");
-                        incorrectAnswers++;
-                        currentGameFallos++;
-                        MediaPlayer mediaPlayer2 = MediaPlayer.create(getApplicationContext(), R.raw.notright);
-                        mediaPlayer2.start();
-                        score -= 500;
-                    }
+        if (currentQuestion == null) {
+            Log.d("DebugFlow", "currentQuestion is null in processAnswer(). Moving to next question.");
+            moveToNextQuestion();
+            return;
+        }
+
+        int selectedRadioButtonId = radio_group.getCheckedRadioButtonId();
+        if (selectedRadioButtonId == -1) {
+            MediaPlayer mediaPlayer2 = MediaPlayer.create(getApplicationContext(), R.raw.notright);
+            mediaPlayer2.start();
+            score -= 500;
+            incorrectAnswers++;
+        } else {
+            RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
+            if (selectedRadioButton != null) {
+                String selectedOption = selectedRadioButton.getText().toString();
+                if (selectedOption.equals(currentQuestion.getANSWER())) {
+                    correctAnswers++;
+                    currentGameAciertos++;
+                    MediaPlayer mediaPlayer1 = MediaPlayer.create(getApplicationContext(), R.raw.right);
+                    mediaPlayer1.start();
+                    score += 500;
+                } else {
+                    incorrectAnswers++;
+                    currentGameFallos++;
+                    MediaPlayer mediaPlayer2 = MediaPlayer.create(getApplicationContext(), R.raw.notright);
+                    mediaPlayer2.start();
+                    score -= 500;
                 }
             }
-            // Log that the question is marked as used
+        }
 
-            currentQuestion.setUsed(true);
-           questionDataSource.markQuestionAsUsed(currentQuestion.getNUMBER());
-           questionInProgress = false;
-
+        currentQuestion.setUsed(true);
+        questionDataSource.markQuestionAsUsed(currentQuestion.getNUMBER());
+        questionInProgress = false;
 
         textviewaciertos.setText("ACIERTOS: " + correctAnswers);
-            textviewpuntuacion.setText("PUNTUACION: " + score);
-            textviewfallos.setText("FALLOS: " + incorrectAnswers);
+        textviewpuntuacion.setText("PUNTUACION: " + score);
+        textviewfallos.setText("FALLOS: " + incorrectAnswers);
 
         if (incorrectAnswers >= 4 && !hasShownToast) {
             textviewfallos.setTextColor(Color.RED);
-
-
-            new AlertDialog.Builder(Preguntas.this)
-                    .setTitle("Atención")
-                    .setMessage("4 errores; Uno más y se acabará la partida")
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // User clicked OK button. Write any code here if needed.
-                        }
-                    })
-                    .setIcon(R.drawable.logotrivial)
-                    .show();
+            showCustomDialog("Atención", "4 errores; Uno más y se acabará la partida");
             hasShownToast = true;
         }
-
 
         if (incorrectAnswers >= 5) {
-            new AlertDialog.Builder(Preguntas.this)
-                    .setTitle("Fin de Partida")
-                    .setMessage("Acumulaste cinco fallos")
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // User clicked OK button. Handle game over logic here.
-                            finishGameTerminar();
-                        }
-                    })
-                    .setIcon(R.drawable.logotrivial)
-                    .show();
+            showCustomDialog("Fin de Partida", "Acumulaste cinco fallos", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    finishGameTerminar();
+                }
+            });
             hasShownToast = true;
         }
+    }
 
+    private void showCustomDialog(String title, String message, DialogInterface.OnClickListener positiveClickListener) {
+        AlertDialog dialog = new AlertDialog.Builder(Preguntas.this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", positiveClickListener)
+                .setIcon(R.drawable.logotrivial)
+                .create();
 
-                }
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+
+        dialog.show();
+    }
+
+    private void showCustomDialog(String title, String message) {
+        showCustomDialog(title, message, null);
+    }
+
 
     private void playSwoosh() {
         if (swooshPlayer != null) {
@@ -708,18 +706,21 @@ public class Preguntas extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-       @Override
-    public void onBackPressed() {
-        if (isBackPressed) {
-            backButtonHandler.removeCallbacks(backButtonRunnable);
-            finish();
-        } else {
 
-            isBackPressed = true;
-            Toast.makeText(this, "Pulsa otra vez para salir", Toast.LENGTH_SHORT).show();
-            backButtonHandler = new Handler();
-            backButtonHandler.postDelayed(backButtonRunnable, 2000);
-        }
+    @Override
+    public void onBackPressed() {
+        showExitConfirmation();
+    }
+
+    private void showExitConfirmation() {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmar salida")
+                .setMessage("¿Estás seguro de que quieres salir?")
+                .setPositiveButton("Sí", (dialog, which) -> finish())
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .setIcon(R.drawable.logotrivial) // Set the icon here
+                .create()
+                .show();
     }
 
     private Runnable backButtonRunnable = new Runnable() {

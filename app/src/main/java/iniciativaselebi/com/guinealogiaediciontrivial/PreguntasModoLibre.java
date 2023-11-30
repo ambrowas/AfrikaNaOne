@@ -18,6 +18,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -224,13 +225,8 @@ public class PreguntasModoLibre extends AppCompatActivity {
                 mediaPlayerNotRight.start();
                 errores = errores + 1;
 
-                // Add a listener to know when the sound has finished playing
-//                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//                    @Override
-//                    public void onCompletion(MediaPlayer mp) {
-//
-//                    }
-   //             });
+
+
 
                 textviewpregunta.setText("RESPUESTA INCORRECTA");
                 textviewpregunta.setTextColor(getColor(R.color.red));
@@ -274,14 +270,19 @@ public class PreguntasModoLibre extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (backPressedTime + 2000 > System.currentTimeMillis()) {
-            finishQuiz();
-        } else {
-            Toast.makeText(this, "Pulsa otra vez para finalizar", Toast.LENGTH_SHORT).show();
-        }
-        backPressedTime = System.currentTimeMillis();
-
+        showExitConfirmation();
     }
+
+        private void showExitConfirmation() {
+            new AlertDialog.Builder(this)
+                    .setTitle("Confirmar salida")
+                    .setMessage("¿Estás seguro de que quieres finalizar?")
+                    .setPositiveButton("Sí", (dialog, which) -> finishQuiz())
+                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                    .setIcon(R.drawable.logotrivial) // Set the icon here
+                    .create()
+                    .show();
+        }
 
     @Override
     protected void onPause() {

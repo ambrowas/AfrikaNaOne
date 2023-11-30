@@ -1,10 +1,12 @@
 package iniciativaselebi.com.guinealogiaediciontrivial;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import iniciativaselebi.com.guinealogiaediciontrivial.R;
 
@@ -94,23 +97,20 @@ public class Login extends AppCompatActivity {
         blinkAnimation.setRepeatCount(Animation.INFINITE);
         blinkAnimation.setRepeatMode(Animation.REVERSE);
 
-
-
         buttonLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
-                String email, password;
-                email = String.valueOf(editTextEmail.getText());
-                password = String.valueOf(editTextPassword.getText());
+                String email = editTextEmail.getText().toString().trim();
+                String password = editTextPassword.getText().toString().trim();
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(Login.this, "Introduce tu email", Toast.LENGTH_SHORT).show();
+                    showAlert("Atención", "Introduce tu email");
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
                 if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(Login.this, "Introduce tu contraseña", Toast.LENGTH_SHORT).show();
+                    showAlert("Atención", "Introduce tu contraseña");
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
@@ -121,22 +121,10 @@ public class Login extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 progressBar.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    String profilePicUrl = String.valueOf(user.getPhotoUrl());
-                                    if (profilePicUrl != null) {
-                                        Toast.makeText(Login.this, "Conectado", Toast.LENGTH_SHORT).show();
-                                        playSwoosh();
-                                        Intent intent = new Intent(Login.this, Modocompeticion.class);
-                                        startActivity(intent);
-                                        finish();
-                                    } else {
-                                        Toast.makeText(Login.this, "Sube una imagen de perfil", Toast.LENGTH_SHORT).show();
-                                        playSwoosh();
-                                        Intent intent = new Intent(Login.this, ProfileActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                    }
-
+                                    playSwoosh();
+                                    Intent intent = new Intent(Login.this, Modocompeticion.class);
+                                    startActivity(intent);
+                                    finish();
                                 }
                             }
                         })
@@ -145,20 +133,108 @@ public class Login extends AppCompatActivity {
                             public void onFailure(@NonNull Exception e) {
                                 progressBar.setVisibility(View.GONE);
                                 if (e instanceof FirebaseAuthInvalidUserException) {
-                                    Toast.makeText(Login.this, "No hay ninguna cuenta asociada con ese email. Quieres registrarte?", Toast.LENGTH_LONG).show();
+                                    showRegistrationPrompt();
                                 } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                                    Toast.makeText(Login.this, "Contraseña incorrecta. Intentalo de nuevo", Toast.LENGTH_LONG).show();
+                                    showAlert("Atención", "Contraseña incorrecta. Inténtalo de nuevo");
                                 } else {
-                                    Toast.makeText(Login.this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                                    showAlert("Atención", e.getLocalizedMessage());
                                 }
                             }
                         });
-
             }
         });
 
 
+    }
+
+    private void showAlert(String title, String message, DialogInterface.OnClickListener positiveClickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(Login.this);
+        builder.setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", positiveClickListener != null ? positiveClickListener : new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(R.drawable.logotrivial);
+
+        AlertDialog dialog = builder.create();
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
         }
+
+        dialog.show();
+    }
+
+    private void showAlert(String title, String message) {
+        showAlert(title, message, null);
+    }
+//    private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener onPositiveClickListener) {
+//        AlertDialog dialog = new AlertDialog.Builder(this)
+//                .setTitle(title) // Set the title
+//                .setMessage(message)
+//                .setPositiveButton(android.R.string.ok, onPositiveClickListener)
+//                .setIcon(R.drawable.logotrivial) // Include the icon
+//                .create();
+//
+//        Window window = dialog.getWindow();
+//        if (window != null) {
+//            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+//        }
+//
+//        dialog.show();
+//    }
+//
+//
+//    private void showAlert(String message, Runnable onPositiveAction) {
+//        AlertDialog dialog = new AlertDialog.Builder(Login.this)
+//                .setTitle("Atención") // Include a title
+//                .setMessage(message)
+//                .setPositiveButton("OK", (dialogInterface, i) -> {
+//                    if (onPositiveAction != null) {
+//                        onPositiveAction.run(); // Run the specified action when OK is clicked
+//                    }
+//                    dialogInterface.dismiss();
+//                })
+//                .setIcon(R.drawable.logotrivial)
+//                .create();
+//
+//        Window window = dialog.getWindow();
+//        if (window != null) {
+//            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+//        }
+//
+//        dialog.show();
+//    }
+
+    private void showRegistrationPrompt() {
+        new AlertDialog.Builder(Login.this)
+                .setTitle("Atención")
+                .setMessage("No hay ninguna cuenta asociada con ese email. ¿Quieres registrarte?")
+                .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        navigateToRegister();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(R.drawable.logotrivial)
+                .show();
+    }
+
+
+    private void navigateToRegister() {
+        Intent intent = new Intent(Login.this, Register.class);
+        startActivity(intent);
+        finish();
+    }
 
     private void playSwoosh() {
         if (swooshPlayer != null) {

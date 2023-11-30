@@ -20,6 +20,7 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -127,7 +128,7 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
 
 
             } else {
-                Toast.makeText(getApplicationContext(), "Debes iniciar sesion", Toast.LENGTH_SHORT).show();
+                showCustomAlertDialog("Atención", "Debes iniciar sesión", null);
             }
 
             buttonvolver = findViewById(R.id.buttonvolver);
@@ -145,7 +146,7 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                 public void onClick(View v) {
                     if (isWithinCoolDownPeriod()) {
                         // If the user has saved a QR code within the last three minutes, show a toast message
-                        Toast.makeText(QRcodeActivity.this, "Este Codigo QR ya ha sido guardado", Toast.LENGTH_SHORT).show();
+                        showCustomAlertDialog("Atención", "Este Código QR ya ha sido guardado", null);
                         return; // Exit the method early
                     }
 
@@ -156,12 +157,7 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                     } else {
                         // Permission is not granted, show an explanation to the user, etc.
                         if (ActivityCompat.shouldShowRequestPermissionRationale(QRcodeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                            new AlertDialog.Builder(QRcodeActivity.this)
-                                    .setTitle("Se necesita permiso")
-                                    .setMessage("Se necesita permiso para guardar la imagen")
-                                    .setPositiveButton("OK", (dialog, which) -> ActivityCompat.requestPermissions(QRcodeActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1))
-                                    .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
-                                    .create().show();
+                            showPermissionRationaleDialog();
                         } else {
                             ActivityCompat.requestPermissions(QRcodeActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                         }
@@ -170,6 +166,40 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
             });
 
         }
+
+        private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener positiveClickListener) {
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok, positiveClickListener != null ? positiveClickListener : (dialogInterface, i) -> dialogInterface.dismiss())
+                    .setIcon(R.drawable.logotrivial)
+                    .create();
+
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.setBackgroundDrawableResource(R.drawable.dialog_background);
+            }
+
+            dialog.show();
+        }
+
+        private void showPermissionRationaleDialog() {
+            AlertDialog dialog = new AlertDialog.Builder(QRcodeActivity.this)
+                    .setTitle("Se necesita permiso")
+                    .setMessage("Se necesita permiso para guardar la imagen")
+                    .setPositiveButton("OK", (dialogInterface, i) -> ActivityCompat.requestPermissions(QRcodeActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1))
+                    .setNegativeButton("Cancelar", (dialogInterface, i) -> dialogInterface.dismiss())
+                    .setIcon(R.drawable.logotrivial)
+                    .create();
+
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.setBackgroundDrawableResource(R.drawable.dialog_background);
+            }
+
+            dialog.show();
+        }
+
         private Bitmap generateQRCode(String key) {
             try {
                 BitMatrix bitMatrix = new MultiFormatWriter().encode(key, BarcodeFormat.QR_CODE, 400, 400);
@@ -205,35 +235,35 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                     outputStream = resolver.openOutputStream(Objects.requireNonNull(imageUri));
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
                     Objects.requireNonNull(outputStream).close();
-                    playSwoosh();
-                    Toast.makeText(getApplicationContext(), "Código QR guardado en la galería", Toast.LENGTH_LONG).show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "Error al guardar el código", Toast.LENGTH_LONG).show();
-                }
-            } else {
-                File imagesDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "YourAppName");
+                        playSwoosh();
+                    showCustomAlertDialog("Guardado", "Código QR guardado en la galería", null);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    showCustomAlertDialog("Error", "Error al guardar el código", null);
+                    }
+                } else {
+                    File imagesDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "YourAppName");
 
-                if (!imagesDir.exists()) {
-                    if (!imagesDir.mkdirs()) {
-                        Toast.makeText(getApplicationContext(), "Error al crear el directorio", Toast.LENGTH_LONG).show();
-                        return;
+                    if (!imagesDir.exists()) {
+                        if (!imagesDir.mkdirs()) {
+                            showCustomAlertDialog("Error", "Error al crear el directorio", null);
+                            return;
+                        }
+                    }
+
+                    String fileName = "QRCode_" + System.currentTimeMillis() + ".jpg";
+                    File imageFile = new File(imagesDir, fileName);
+                    try {
+                        outputStream = new FileOutputStream(imageFile);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                        outputStream.close();
+                        showCustomAlertDialog("Guardado", "Código QR guardado en la galería", null);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        showCustomAlertDialog("Error", "Error al guardar el código", null);
                     }
                 }
-
-                String fileName = "QRCode_" + System.currentTimeMillis() + ".jpg";
-                File imageFile = new File(imagesDir, fileName);
-                try {
-                    outputStream = new FileOutputStream(imageFile);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-                    outputStream.close();
-                    Toast.makeText(getApplicationContext(), "Código QR guardado en la galería", Toast.LENGTH_LONG).show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "Error al guardar el código", Toast.LENGTH_LONG).show();
-                }
             }
-        }
 
         @Override
         public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -244,23 +274,21 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                 } else {
                     if (ActivityCompat.shouldShowRequestPermissionRationale(QRcodeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                         // Show an explanation to the user and request the permission again
-                        new AlertDialog.Builder(this)
-                                .setTitle("Se necesita permiso")
-                                .setMessage("Se necesita permiso para guardar la imagen en la galería.")
-                                .setPositiveButton("OK",
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                ActivityCompat.requestPermissions(QRcodeActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                                            }
-                                        })
-                                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                        showCustomAlertDialog(
+                                "Se necesita permiso",
+                                "Se necesita permiso para guardar la imagen en la galería.",
+                                new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
+                                        ActivityCompat.requestPermissions(QRcodeActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                                     }
-                                })
-                                .create().show();
+                                });
+                    } else {
+                        // User has denied permission and selected "Don't ask again"
+                        showCustomAlertDialog(
+                                "Permiso denegado",
+                                "No se ha otorgado permiso para guardar imágenes en la galería. Puede cambiar esto en la configuración de la aplicación.",
+                                null);
                     }
                 }
             }
@@ -302,7 +330,7 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
             TaskCompletionSource<String> tcs = new TaskCompletionSource<>();
 
             if (isWithinCoolDownPeriod()) {
-                Toast.makeText(QRcodeActivity.this, "Debes esperar 3 minutos antes de poder guardar otro código QR.", Toast.LENGTH_SHORT).show();
+                showCustomAlertDialog("Atención", "Debes esperar 3 minutos antes de poder guardar otro código QR.");
                 tcs.setException(new RuntimeException("Cooldown period active"));
                 return tcs.getTask();
             }
@@ -317,19 +345,15 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                         for (DataSnapshot qrCodeSnapshot : dataSnapshot.getChildren()) {
                             QRCodeData qrCodeData = new QRCodeData(qrCodeSnapshot.getKey(), userId, base64QRCode, fullname, email, lastGameScore, lastGamePuntuacion, timestamp);
 
-                            qrCodesRef.child(qrCodeSnapshot.getKey()).setValue(qrCodeData).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        playSwoosh();
-                                        Toast.makeText(QRcodeActivity.this, "Código QR actualizado", Toast.LENGTH_SHORT).show();
-                                        tcs.setResult(qrCodeSnapshot.getKey());
-                                        lastSavedTimestamp = System.currentTimeMillis();  // Update the timestamp here.
-                                    } else {
-                                        Toast.makeText(QRcodeActivity.this, "Error al actualizar Código QR", Toast.LENGTH_SHORT).show();
-                                        tcs.setException(task.getException());
-                                    }
-
+                            qrCodesRef.child(qrCodeSnapshot.getKey()).setValue(qrCodeData).addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    playSwoosh();
+                                    showCustomAlertDialog("Éxito", "Código QR actualizado");
+                                    tcs.setResult(qrCodeSnapshot.getKey());
+                                    lastSavedTimestamp = System.currentTimeMillis();
+                                } else {
+                                    showCustomAlertDialog("Error", "Error al actualizar Código QR");
+                                    tcs.setException(task.getException());
                                 }
                             });
                         }
@@ -338,23 +362,19 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                         if (qrCodeKey != null) {
                             QRCodeData qrCodeData = new QRCodeData(qrCodeKey, userId, base64QRCode, fullname, email, lastGameScore, lastGamePuntuacion, timestamp);
 
-                            qrCodesRef.child(qrCodeKey).setValue(qrCodeData).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        playSwoosh();
-                                        Toast.makeText(QRcodeActivity.this, "Código QR creado", Toast.LENGTH_SHORT).show();
-                                        tcs.setResult(qrCodeKey);
-                                        lastSavedTimestamp = System.currentTimeMillis();  // Update the timestamp here.
-                                    } else {
-                                        Toast.makeText(QRcodeActivity.this, "Error al crear Código QR", Toast.LENGTH_SHORT).show();
-                                        tcs.setException(task.getException());
-                                    }
-
+                            qrCodesRef.child(qrCodeKey).setValue(qrCodeData).addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    playSwoosh();
+                                    showCustomAlertDialog("Éxito", "Código QR creado");
+                                    tcs.setResult(qrCodeKey);
+                                    lastSavedTimestamp = System.currentTimeMillis();
+                                } else {
+                                    showCustomAlertDialog("Error", "Error al crear Código QR");
+                                    tcs.setException(task.getException());
                                 }
                             });
                         } else {
-                            Toast.makeText(QRcodeActivity.this, "Error al generar código QR", Toast.LENGTH_SHORT).show();
+                            showCustomAlertDialog("Error", "Error al generar código QR");
                             tcs.setException(new RuntimeException("Error generating QR code key"));
                         }
                     }
@@ -362,12 +382,29 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
+                    showCustomAlertDialog("Error", error.getMessage());
                     tcs.setException(error.toException());
                 }
             });
             return tcs.getTask();
-
         }
+
+        private void showCustomAlertDialog(String title, String message) {
+            AlertDialog dialog = new AlertDialog.Builder(QRcodeActivity.this)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> dialogInterface.dismiss())
+                    .setIcon(R.drawable.logotrivial)
+                    .create();
+
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.setBackgroundDrawableResource(R.drawable.dialog_background);
+            }
+
+            dialog.show();
+        }
+
         private boolean isWithinCoolDownPeriod() {
             long currentTimeMillis = System.currentTimeMillis();
             long threeMinutesInMillis = 3 * 60 * 1000;
