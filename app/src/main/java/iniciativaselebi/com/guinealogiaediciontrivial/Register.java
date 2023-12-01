@@ -121,6 +121,10 @@ public class Register extends AppCompatActivity {
         });
     }
 
+    private String sanitizeInput(String input) {
+        // Firebase Realtime Database keys cannot contain '.', '#', '$', '[', or ']'
+        return input.replaceAll("[.#$\\[\\]]", "");
+    }
 
     private boolean areAllFieldsValid() {
         if (TextUtils.isEmpty(nombre) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(telefono) || TextUtils.isEmpty(barrio) || TextUtils.isEmpty(ciudad) || TextUtils.isEmpty(pais)) {
@@ -159,12 +163,6 @@ public class Register extends AppCompatActivity {
         return true;
     }
 
-    private void navigateToProfileActivity() {
-        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
     private boolean isValidEmail(String email) {
         String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
         return email.matches(emailPattern);
@@ -174,7 +172,8 @@ public class Register extends AppCompatActivity {
         if (name == null || name.trim().isEmpty()) {
             return false;
         }
-        String namePattern = "[a-zA-Z\\s.'-]+";
+        // Allow Unicode letters, apostrophes, hyphens, and spaces
+        String namePattern = "[\\p{L}\\s.'-]+";
         return name.matches(namePattern);
     }
 
@@ -191,10 +190,6 @@ public class Register extends AppCompatActivity {
         return field != null && !field.trim().isEmpty();
     }
 
-    private String sanitizeInput(String input) {
-        // Firebase does not allow '.', '#', '$', '[', or ']' in keys
-        return input.replaceAll("[.#$\\[\\]/]", "");
-    }
 
     private void showCustomAlertDialog(String title, String message) {
         AlertDialog dialog = new AlertDialog.Builder(Register.this)
@@ -211,7 +206,6 @@ public class Register extends AppCompatActivity {
 
         dialog.show();
     }
-
 
 
     private void showCustomAlertDialog(String title, String message, final Runnable onDismiss) {
@@ -233,6 +227,12 @@ public class Register extends AppCompatActivity {
         }
 
         dialog.show();
+    }
+
+    private void navigateToProfileActivity() {
+        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void playSwoosh() {

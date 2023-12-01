@@ -87,7 +87,7 @@ public class RankingActivity extends AppCompatActivity {
 
     private void loadTopUsers() {
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("user");
-        Query topUsersQuery = usersRef.orderByChild("accumulatedPuntuacion").limitToLast(25);
+        Query topUsersQuery = usersRef.orderByChild("accumulatedPuntuacion").limitToLast(15);
 
         topUsersQuery.addValueEventListener(new ValueEventListener() {
             @Override
