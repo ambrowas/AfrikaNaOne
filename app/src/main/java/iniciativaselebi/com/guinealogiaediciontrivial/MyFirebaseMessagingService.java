@@ -3,7 +3,9 @@ package iniciativaselebi.com.guinealogiaediciontrivial;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -39,7 +41,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void showNotification(String title, String body) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
         String NOTIFICATION_CHANNEL_ID = "my_channel_id_01";
 
         // Since Android Oreo, notification channels are required.
@@ -53,23 +54,28 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(channel);
         }
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+        // Create an intent that does nothing
+        Intent intent = new Intent();
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
         notificationBuilder.setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.mipmap.ic_launcher) // Replace with your own icon
+                .setSmallIcon(R.drawable.ic_stat_name) // Use the resource ID of your icon
                 .setContentTitle(title)
                 .setContentText(body)
-                .setContentInfo("Info");
+                .setContentInfo("Info")
+                .setContentIntent(pendingIntent); // Set the do-nothing intent
 
         notificationManager.notify(1, notificationBuilder.build());
-
     }
+
 
     @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
+        Log.d("FCM", "New token: " + token);
         sendTokenToServer(token); // Call your method here
     }
 
