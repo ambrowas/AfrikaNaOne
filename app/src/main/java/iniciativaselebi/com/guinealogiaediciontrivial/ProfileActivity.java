@@ -83,7 +83,8 @@ public class ProfileActivity extends AppCompatActivity {
 
 
 
-    TextView textViewRecord, emailAddressTitle, nameTitle, textViewTelefono, textViewBarrio, textViewCiudad, textViewPais, textviewNoRanking;
+    TextView textViewRecord, emailAddressTitle, nameTitle, textViewTelefono, textViewBarrio, textViewCiudad, textViewPais, textviewNoRanking,
+    textViewPuntuacionAcumulada,textViewAciertosAcumulados, textViewFallosAcumulados, textViewPastaAcumulada ;
     private ValueAnimator animator;
     MediaPlayer swooshPlayer;
 
@@ -127,48 +128,53 @@ public class ProfileActivity extends AppCompatActivity {
                         nameTitle = findViewById(R.id.nameTitle);
                         nameTitle.setText(user.getFullname());
 
-                        emailAddressTitle = findViewById(R.id.emailAddressTitle);
-                        emailAddressTitle.setText(user.getEmail());
+
 
                         textViewTelefono = findViewById(R.id.textViewTelefono);
-                        textViewTelefono.setText(user.getTelefono());
+                        textViewTelefono.setText("TELÉFONO: " + user.getTelefono());
 
                         textViewBarrio = findViewById(R.id.textViewBarrio);
-                        textViewBarrio.setText(user.getBarrio());
+                        textViewBarrio.setText("BARRIO: " + user.getBarrio());
 
                         textViewCiudad = findViewById(R.id.textViewCiudad);
-                        textViewCiudad.setText(user.getCiudad());
+                        textViewCiudad.setText("CIUDAD: " + user.getCiudad());
 
                         textViewPais = findViewById(R.id.textViewPais);
-                        textViewPais.setText(user.getPais());
+                        textViewPais.setText("PAÍS: " + user.getPais());
+
+                        textViewPuntuacionAcumulada = findViewById(R.id.textViewPuntuacionAcumulada);
+                        textViewPuntuacionAcumulada.setText("PUNT. ACUMULADA: " + String.valueOf(user.getAccumulatedPuntuacion() + " PUNTOS"));
+
+                        textViewAciertosAcumulados = findViewById(R.id.textViewAciertosAcumulados);
+                        textViewAciertosAcumulados.setText("ACIERTOS ACUMULADOS: " + String.valueOf(user.getAccumulatedAciertos()));
+
+                        textViewFallosAcumulados = findViewById(R.id.textViewFallosAcumulados);
+                        textViewFallosAcumulados.setText("FALLOS ACUMULADOS: " + String.valueOf(user.getAccumulatedFallos()));
+
+                        textViewPastaAcumulada = findViewById(R.id.textViewPastaAcumulada);
+                        textViewPastaAcumulada.setText("PASTA ACUMULADA: " + String.valueOf(user.getAccumulatedPuntuacion() + " FCFA."));
 
                         profilepic = findViewById(R.id.profilepic);
-                        FirebaseDatabase.getInstance().getReference("user/"+FirebaseAuth.getInstance().getCurrentUser().getUid()+"/profilePicture").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                String profilePicUrl = snapshot.getValue(String.class);
-                                if (profilePicUrl != null && !profilePicUrl.isEmpty()) {
-                                    Picasso.get().load(profilePicUrl).into(profilepic, new Callback() {
-                                        @Override
-                                        public void onSuccess() {
-                                            isImageSet = true; // Image successfully loaded
-                                        }
-
-                                        @Override
-                                        public void onError(Exception e) {
-                                            isImageSet = false; // Error loading image
-                                        }
-                                    });
-                                } else {
-                                    isImageSet = false; // No image URL, hence no image set
+                        String profilePicUrl = snapshot.child("profilePicture").getValue(String.class);
+                        if (profilePicUrl != null && !profilePicUrl.isEmpty()) {
+                            Picasso.get().load(profilePicUrl).into(profilepic, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    isImageSet = true; // Image successfully loaded
                                 }
-                            }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                Toast.makeText(ProfileActivity.this, "Error al cargar datos de usuario", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                                @Override
+                                public void onError(Exception e) {
+                                    isImageSet = false; // Error loading image
+                                }
+                            });
+                        } else {
+                            isImageSet = false; // No image URL, hence no image set
+                        }
+
+                        // Update FCM token and Installation ID if necessary
+                        updateFcmTokenIfNeeded(userRef, snapshot);
+                        updateInstallationIdIfNeeded(userRef, snapshot);
                     }
                 }
                 loadUserHighestScore();
@@ -183,12 +189,14 @@ public class ProfileActivity extends AppCompatActivity {
 
         });
 
+
+
         textViewRecord = (TextView)findViewById(R.id.textViewRecord);
         profilepic = (CircleImageView) findViewById(R.id.profilepic);
         btn_borrarusuario = (Button)findViewById(R.id.btn_borrarusuario);
 
     buttonatras = (Button)findViewById(R.id.buttonatras);
-        buttonatras.setOnClickListener(new View.OnClickListener() {
+    buttonatras.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isImageSet) {
@@ -202,7 +210,7 @@ public class ProfileActivity extends AppCompatActivity {
 
 
 
-        btn_upload = (Button)findViewById(R.id.btn_upload);
+    btn_upload = (Button)findViewById(R.id.btn_upload);
     btn_upload.setVisibility(View.INVISIBLE);
     btn_upload.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -232,6 +240,40 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
+    private String getInstallationIdFromPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("appPreferences", MODE_PRIVATE);
+        return sharedPreferences.getString("firebaseInstallationId", null);
+    }
+
+    private void updateFcmTokenIfNeeded(DatabaseReference userRef, DataSnapshot snapshot) {
+        String newFcmToken = getFcmTokenFromPreferences();
+        String currentFcmTokenInDb = snapshot.child("fcmToken").getValue(String.class);
+        if (newFcmToken != null && !newFcmToken.equals(currentFcmTokenInDb)) {
+            userRef.child("fcmToken").setValue(newFcmToken)
+                    .addOnSuccessListener(aVoid -> Log.d("ProfileActivity", "FCM Token updated successfully"))
+                    .addOnFailureListener(e -> Log.e("ProfileActivity", "Failed to update FCM Token", e));
+        }
+    }
+
+    private void updateInstallationIdIfNeeded(DatabaseReference userRef, DataSnapshot snapshot) {
+        String newInstallationId = getInstallationIdFromPreferences();
+        String currentInstallationIdInDb = snapshot.child("installationID").getValue(String.class);
+        if (newInstallationId != null && !newInstallationId.equals(currentInstallationIdInDb)) {
+            userRef.child("installationID").setValue(newInstallationId)
+                    .addOnSuccessListener(aVoid -> Log.d("ProfileActivity", "Installation ID updated successfully"))
+                    .addOnFailureListener(e -> Log.e("ProfileActivity", "Failed to update Installation ID", e));
+        }
+
+    }
+
+    private String getFcmTokenFromPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("appPreferences", MODE_PRIVATE);
+        return sharedPreferences.getString("fcmToken", null); // Returns null if "fcmToken" doesn't exist
+    }
+
     private void showExitConfirmation() {
         DialogInterface.OnClickListener positiveAction = (dialog, which) -> navigateToModoCompeticion();
         DialogInterface.OnClickListener negativeAction = (dialog, which) -> dialog.dismiss();
@@ -442,7 +484,6 @@ public class ProfileActivity extends AppCompatActivity {
         dialog.show();
     }
 
-
     private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener positiveAction, DialogInterface.OnClickListener negativeAction) {
         AlertDialog dialog = new AlertDialog.Builder(ProfileActivity.this)
                 .setTitle(title)
@@ -483,9 +524,9 @@ public class ProfileActivity extends AppCompatActivity {
                     if (highestScore == null || newScore > highestScore) {
                         dataSnapshot.getRef().child("highestScore").setValue(newScore);
                         Toast.makeText(ProfileActivity.this, "¡Nuevo récord alcanzado!", Toast.LENGTH_SHORT).show();
-                        textViewRecord.setText("Record: " + newScore + " Puntos"); // Update the textview with the new record value
+                        textViewRecord.setText("RECORD: " + newScore + " PUNTOS"); // Update the textview with the new record value
                     } else {
-                        textViewRecord.setText("Record: " + (highestScore == null ? 0 : highestScore + " Puntos"));
+                        textViewRecord.setText("RECORD: " + (highestScore == null ? 0 : highestScore + " PUNTOS"));
                     }
                 }
 

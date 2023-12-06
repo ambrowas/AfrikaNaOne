@@ -4,12 +4,14 @@ package iniciativaselebi.com.guinealogiaediciontrivial;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,7 +53,7 @@ public class RankingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ranking);
 
         swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
-        button_retorno = (Button)findViewById(R.id.button_retorno);
+        button_retorno = (Button) findViewById(R.id.button_retorno);
         button_retorno.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,7 +61,7 @@ public class RankingActivity extends AppCompatActivity {
                 Intent intent;
                 intent = new Intent(RankingActivity.this, Modocompeticion.class);
                 startActivity(intent);
-               finish();
+                finish();
 
 
             }
@@ -99,103 +101,62 @@ public class RankingActivity extends AppCompatActivity {
                     tableLayout.removeViewAt(1);
                 }
 
-
+                String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 List<DataSnapshot> dataSnapshots = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     dataSnapshots.add(snapshot);
                 }
                 Collections.reverse(dataSnapshots);
-
-                int rank = 1;
+                int rank = 1; // Start ranking from 1
                 for (DataSnapshot snapshot : dataSnapshots) {
                     User user = snapshot.getValue(User.class);
+                    if (user == null) continue;
                     user.setUid(snapshot.getKey());
-
                     updateUserPositionInDatabase(user, rank);
-                    checkAndLaunchNumberOneActivity(user, rank);
 
-
+                    // Create a new TableRow
                     TableRow row = new TableRow(RankingActivity.this);
+                    row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+                    row.setPadding(0, 18, 0, 18); // Add vertical padding for increased row height
 
-                    String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                    if (currentUserId.equals(user.getUid())) {
-                        if (user.getUid().equals(currentUserId)) {
-                            final int[] colors = {Color.RED, Color.GREEN, Color.BLUE};
-                            animator = ValueAnimator.ofInt(colors);
-                            animator.setDuration(1000);
-                            animator.setEvaluator(new ArgbEvaluator());
-                            animator.setRepeatCount(ValueAnimator.INFINITE);
-
-                            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator animator) {
-                                    int color = (int) animator.getAnimatedValue();
-                                    // Set the text color for all TextViews in the row
-                                    for (int i = 0; i < row.getChildCount(); i++) {
-                                        View child = row.getChildAt(i);
-                                        if (child instanceof TextView) {
-                                            ((TextView) child).setTextColor(color);
-                                        }
-                                    }
-                                }
-                            });
-                            animator.start();
-                        }
-
-                    }
-
-                    row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-
+                    // Create and configure the Rank TextView
                     TextView tvRank = new TextView(RankingActivity.this);
                     tvRank.setText(String.valueOf(rank));
-                    tvRank.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1));
+                    tvRank.setLayoutParams(new TableRow.LayoutParams(dpToPx(0, RankingActivity.this), TableRow.LayoutParams.WRAP_CONTENT));
                     tvRank.setGravity(Gravity.LEFT);
-                    tvRank.setEllipsize(TextUtils.TruncateAt.END);
+                    tvRank.setTextSize(16); // Set text size as needed
                     row.addView(tvRank);
 
+                    // Create and configure the Name TextView
                     TextView tvName = new TextView(RankingActivity.this);
                     tvName.setText(user.fullname);
-                    tvName.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-                    tvName.setGravity(Gravity.START);
-                    tvName.setMaxLines(1);
-                    tvName.setEllipsize(TextUtils.TruncateAt.END);
+                    TableRow.LayoutParams nameParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f); // Weighted layout parameters for Name TextView
+                    nameParams.setMargins(dpToPx(-20, RankingActivity.this), 0, 0, 0); // Adjusting left margin to bring Name closer to Rank
+                    tvName.setGravity(Gravity.LEFT);
+                    tvName.setTextSize(16); // Set text size as needed
+                    tvName.setOnClickListener(v -> {
+                        Intent intent = new Intent(RankingActivity.this, LeadersProfileActivity.class);
+                        intent.putExtra("user_id", user.getUid());
+                        startActivity(intent);
+                    });
                     row.addView(tvName);
 
-                    tvName.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(RankingActivity.this, LeadersProfileActivity.class);
-                            intent.putExtra("user_id", user.getUid());
-                            playSwoosh();
-                            startActivity(intent);
-                        }
-                    });
 
-
-                    TextView tvCity = new TextView(RankingActivity.this);
-                    tvCity.setText(user.ciudad);
-                    tvCity.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-                    tvCity.setGravity(Gravity.LEFT);
-                    tvCity.setMaxLines(1);
-                    tvCity.setEllipsize(TextUtils.TruncateAt.END);
-                    row.addView(tvCity);
-
+// Score TextView
+                    // Score TextView
                     TextView tvScore = new TextView(RankingActivity.this);
-                    try {
-                        tvScore.setText(String.valueOf(user.getAccumulatedPuntuacion()));
-                    } catch (Exception e) {
-                        Log.e("RankingActivity", "Error setting tvScore text", e);
-                        tvScore.setText("0");
-                    }
                     tvScore.setText(String.valueOf(user.getAccumulatedPuntuacion()));
-                    tvScore.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+                    TableRow.LayoutParams scoreParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
+                    scoreParams.setMargins(dpToPx(-20, RankingActivity.this), 0, 0, 0); // Adjusting left margin
+                    tvScore.setLayoutParams(scoreParams);
                     tvScore.setGravity(Gravity.LEFT);
+                    tvScore.setTextSize(16); // Set text size as needed
                     tvScore.setMaxLines(1);
                     tvScore.setEllipsize(TextUtils.TruncateAt.END);
                     row.addView(tvScore);
 
 
-                    tableLayout.addView(row);
+                    tableLayout.addView(row); // Add the TableRow to the TableLayout
                     rank++;
                 }
             }
@@ -203,9 +164,14 @@ public class RankingActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 FirebaseCrashlytics.getInstance().recordException(new Exception("Realtime Database Error: " + error.getMessage()));
-
             }
         });
+    }
+
+
+
+    public static int dpToPx(int dp, Context context) {
+        return (int) (dp * context.getResources().getDisplayMetrics().density);
     }
 
     private void updateUserPositionInDatabase(User user, int newPosition) {
@@ -216,8 +182,6 @@ public class RankingActivity extends AppCompatActivity {
         }
     }
 
-
-    // Usar este metodo cuando decidas celebrar adquirir puesto No.1
     private void checkAndLaunchNumberOneActivity(User user, int rank) {
         String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         if (rank == 1 && currentUserUid.equals(user.getUid())) {
@@ -237,10 +201,4 @@ public class RankingActivity extends AppCompatActivity {
             toast.show();
         }
     }
-
-
 }
-
-
-
-

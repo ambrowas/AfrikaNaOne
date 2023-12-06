@@ -44,7 +44,12 @@
             android:name=".ClassficationActivity"
             android:exported="false" />
         <activity
+            android:name=".PreguntasModoCompeticion"
+            android:launchMode="singleTask"
+            android:exported="false" />
+        <activity
             android:name=".Preguntas"
+            android:launchMode="singleTask"
             android:exported="false" />
         <activity
             android:name=".ProfileActivity"

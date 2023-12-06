@@ -44,14 +44,15 @@ public class LeadersProfileActivity extends AppCompatActivity {
         String userId = getIntent().getStringExtra("user_id");
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(userId);
         userRef.addValueEventListener(new ValueEventListener() {
-            @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                if (user != null && user.getProfilePicture() != null) {
-                    Glide.with(LeadersProfileActivity.this)
-                            .load(user.getProfilePicture())
-                            .placeholder(R.drawable.baseline_account_circle_24) // Add a default placeholder image if needed
-                            .into(profilePic);
+                if (!isFinishing() && !isDestroyed()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if (user != null && user.getProfilePicture() != null) {
+                        Glide.with(LeadersProfileActivity.this)
+                                .load(user.getProfilePicture())
+                                .placeholder(R.drawable.baseline_account_circle_24)
+                                .into(profilePic);
+                    }
                 }
             }
 
@@ -60,7 +61,6 @@ public class LeadersProfileActivity extends AppCompatActivity {
                 // Handle error
             }
         });
-
         profilePic = findViewById(R.id.profilepic);
         nameTitle = findViewById(R.id.nameTitle);
         textViewBarrio = findViewById(R.id.textViewBarrio);
@@ -116,6 +116,13 @@ public class LeadersProfileActivity extends AppCompatActivity {
             swooshPlayer.release();
             swooshPlayer = null;
         }
+
+        // Correct way to cancel Glide requests
+        Glide.with(getApplicationContext()).clear(profilePic);
+
+        // Unregister the ValueEventListener here if you have a reference to it
+        // e.g., userRef.removeEventListener(valueEventListener);
+
         super.onDestroy();
     }
 

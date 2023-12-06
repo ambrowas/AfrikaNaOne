@@ -67,64 +67,61 @@ import java.util.concurrent.atomic.AtomicInteger;
         public FirestoreQuestionManager(Context context) {
                 this.context = context;
                 this.dbHelper = new QuestionDatabaseHelperII(this.context);
-                dataSource = new QuestionDataSource(context);
+                dataSource = new QuestionDataSource(this.context);
                 firestore = FirebaseFirestore.getInstance();
                 mAuth = FirebaseAuth.getInstance();
                 currentUser = mAuth.getCurrentUser();
             }
 
         public void fetchShuffledBatchQuestions(final QuestionsFetchCallback callback) {
-            Log.d(TAG, "Starting the process to fetch questions...");
+            Log.d(TAG, "[MyApp] Starting the process to fetch questions...");
 
-            // Get current user's ID
             FirebaseAuth mAuth = FirebaseAuth.getInstance();
             FirebaseUser mUser = mAuth.getCurrentUser();
 
             if (mUser == null) {
-                Log.e(TAG, "User is not authenticated. Cannot fetch questions.");
+                Log.e(TAG, "[MyApp] User is not authenticated. Cannot fetch questions.");
                 callback.onError(new Exception("User is not authenticated."));
                 return;
             }
 
             String userId = mUser.getUid();
-
             FirebaseDatabase rtdb = FirebaseDatabase.getInstance();
-            DatabaseReference batchRef = rtdb.getReference("Users").child(userId).child("currentBatch");
+            DatabaseReference batchRef = rtdb.getReference("user").child(userId).child("currentBatch");
 
             batchRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         Long currentBatch = dataSnapshot.getValue(Long.class);
-                        Log.d(TAG, "Successfully fetched currentBatch: " + currentBatch + " from Realtime Database.");
+                        Log.d(TAG, "[MyApp] Successfully fetched currentBatch: " + currentBatch + " from Realtime Database.");
 
-                        // Fetch the shuffledOrder array for the current batch from Firestore
                         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
                         DocumentReference batchReference = firestore.collection("Metadata").document("Batch_" + currentBatch);
+
                         batchReference.get().addOnSuccessListener(documentSnapshot -> {
                             if (documentSnapshot.exists() && documentSnapshot.contains("shuffledOrder")) {
                                 List<String> shuffledOrder = (List<String>) documentSnapshot.get("shuffledOrder");
+                                Log.d(TAG, "[MyApp] Fetched shuffledOrder: " + shuffledOrder);
                                 fetchQuestionsFromShuffledOrder(shuffledOrder, callback);
                             } else {
-                                Log.e(TAG, "Metadata document does not exist or shuffledOrder is missing.");
+                                Log.e(TAG, "[MyApp] Metadata document does not exist or shuffledOrder is missing.");
                                 callback.onError(new Exception("Metadata document does not exist or shuffledOrder is missing."));
                             }
                         }).addOnFailureListener(e -> {
-                            Log.e(TAG, "Failed fetching shuffledOrder for currentBatch from Firestore. Error: " + e.getMessage());
+                            Log.e(TAG, "[MyApp] Failed fetching shuffledOrder for currentBatch from Firestore. Error: " + e.getMessage());
                             callback.onError(e);
                         });
                     } else {
-                        // If currentBatch does not exist, call assignBatchForNewUser
                         assignBatchForNewUser(new BatchAssignmentCallback() {
                             @Override
                             public void onBatchAssigned(int batchNumber) {
-                                // Once a batch is assigned, fetch the questions for that batch
                                 fetchShuffledBatchQuestions(callback);
                             }
 
                             @Override
                             public void onError(Exception e) {
-                                Log.e(TAG, "Failed to assign a new batch for the user. Error: " + e.getMessage());
+                                Log.e(TAG, "[MyApp] Failed to assign a new batch for the user. Error: " + e.getMessage());
                                 callback.onError(e);
                             }
                         });
@@ -133,7 +130,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.e(TAG, "Failed fetching currentBatch from Realtime Database. Error: " + databaseError.getMessage());
+                    Log.e(TAG, "[MyApp] Failed fetching currentBatch from Realtime Database. Error: " + databaseError.getMessage());
                     callback.onError(new Exception(databaseError.getMessage()));
                 }
             });
@@ -143,33 +140,30 @@ import java.util.concurrent.atomic.AtomicInteger;
             FirebaseFirestore firestore = FirebaseFirestore.getInstance();
             CollectionReference preguntasCollection = firestore.collection("PREGUNTAS");
 
-            Log.d("FetchAndSaveFlow", "Starting to fetch questions.");
+            Log.d(TAG, "[MyApp] FetchAndSaveFlow: Starting to fetch questions for shuffledOrder: " + shuffledOrder);
 
             List<QuestionModoCompeticion> fetchedQuestions = new ArrayList<>();
-            for (String questionId : shuffledOrder) {
-                preguntasCollection.document(questionId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        QuestionModoCompeticion question = documentSnapshot.toObject(QuestionModoCompeticion.class);
-                        if (question != null) {
-                            fetchedQuestions.add(question);
-                            Log.d("FetchAndSaveFlow", "Question fetched: " + questionId);
-                        }
+            AtomicInteger counter = new AtomicInteger();
 
-                        if (fetchedQuestions.size() == shuffledOrder.size()) {
-                            Log.d("FetchAndSaveFlow", "All questions fetched.");
-                            callback.onQuestionsFetched(fetchedQuestions);
-                        }
+            for (String questionId : shuffledOrder) {
+                preguntasCollection.document(questionId).get().addOnSuccessListener(documentSnapshot -> {
+                    QuestionModoCompeticion question = documentSnapshot.toObject(QuestionModoCompeticion.class);
+                    if (question != null) {
+                        fetchedQuestions.add(question);
+                        Log.d(TAG, "[MyApp] FetchAndSaveFlow: Question fetched: " + questionId);
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("FetchAndSaveFlow", "Failed to fetch question: " + questionId, e);
-                        callback.onError(e);
+
+                    if (counter.incrementAndGet() == shuffledOrder.size()) {
+                        Log.d(TAG, "[MyApp] FetchAndSaveFlow: All questions fetched. Total: " + fetchedQuestions.size());
+                        callback.onQuestionsFetched(fetchedQuestions);
                     }
+                }).addOnFailureListener(e -> {
+                    Log.e(TAG, "[MyApp] FetchAndSaveFlow: Failed to fetch question: " + questionId, e);
+                    callback.onError(e);
                 });
             }
         }
+
 
         private void fetchQuestionsByOrder(List<String> shuffledOrder, final QuestionsFetchCallback callback) {
             FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -195,7 +189,7 @@ import java.util.concurrent.atomic.AtomicInteger;
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Log.e(TAG, "Error fetching questions by order: " + e.getMessage());
+                    Log.e(TAG, "[MyApp]Error fetching questions by order: " + e.getMessage());
                     callback.onQuestionsFetched(new ArrayList<>()); // return an empty list to indicate a failure
                 }
             });
@@ -204,8 +198,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
         void setCurrentBatchForUser(String userId, int nextBatch) {
             if (userId != null) {
-                DatabaseReference userRef = database.getReference("Users").child(userId);
-                Log.d("FetchAndSaveFlow", "Attempting to set current batch for user: " + userId + " to batch number: " + nextBatch);
+                DatabaseReference userRef = database.getReference("user").child(userId);
+                Log.d("[MyApp]FetchAndSaveFlow", "Attempting to set current batch for user: " + userId + " to batch number: " + nextBatch);
 
                 // Set the value and add a completion listener to handle success or failure
                 userRef.child("currentBatch").setValue(nextBatch, new DatabaseReference.CompletionListener() {
@@ -213,15 +207,15 @@ import java.util.concurrent.atomic.AtomicInteger;
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                         if (databaseError != null) {
                             // Handle the error scenario, log the error
-                            Log.e("FetchAndSaveFlow", "Error setting current batch for user: " + userId, databaseError.toException());
+                            Log.e("[MyApp]FetchAndSaveFlow", "Error setting current batch for user: " + userId, databaseError.toException());
                         } else {
                             // The batch was set successfully, log this outcome
-                            Log.d("FetchAndSaveFlow", "Successfully set current batch for user: " + userId + " to batch number: " + nextBatch);
+                            Log.d("[MyApp]FetchAndSaveFlow", "Successfully set current batch for user: " + userId + " to batch number: " + nextBatch);
                         }
                     }
                 });
             } else {
-                Log.e("FetchAndSaveFlow", "Cannot set current batch. UserId is null.");
+                Log.e("[MyApp]FetchAndSaveFlow", "Cannot set current batch. UserId is null.");
             }
         }
 
@@ -232,7 +226,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
         public void getCurrentBatchForUser(CurrentBatchCallback callback) {
                 if (currentUser != null) {
-                    DatabaseReference userRef = database.getReference("Users").child(currentUser.getUid());
+                    DatabaseReference userRef = database.getReference("user").child(currentUser.getUid());
                     Log.d("FetchAndSaveFlow", "Fetching current batch for user: " + currentUser.getUid());
                     userRef.child("currentBatch").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -270,8 +264,8 @@ import java.util.concurrent.atomic.AtomicInteger;
             FirebaseUser currentUser = mAuth.getCurrentUser();
             if (currentUser != null) {
                 String userId = currentUser.getUid();
-                Log.d("FetchAndSaveFlow", "Assigning batch for new user: " + userId);
-                DatabaseReference userRef = database.getReference("Users").child(userId);
+                Log.d("[MyApp]FetchAndSaveFlow", "Assigning batch for new user: " + userId);
+                DatabaseReference userRef = database.getReference("user").child(userId);
 
                 userRef.child("currentBatch").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -281,7 +275,7 @@ import java.util.concurrent.atomic.AtomicInteger;
                                 @Override
                                 public void onBatchCountRetrieved(int totalCount) {
                                     int randomBatch = new Random().nextInt(totalCount) + 1;
-                                    Log.d("FetchAndSaveFlow", "New batch assigned for user: " + userId + " - Batch: " + randomBatch);
+                                    Log.d("[MyApp]FetchAndSaveFlow", "New batch assigned for user: " + userId + " - Batch: " + randomBatch);
                                     setCurrentBatchForUser(userId, randomBatch);
                                     // Notify the callback that the batch has been assigned
                                     callback.onBatchAssigned(randomBatch);
@@ -289,7 +283,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
                                 @Override
                                 public void onError(Exception e) {
-                                    Log.e("FetchAndSaveFlow", "Error retrieving total batch count.", e);
+                                    Log.e("[MyApp]FetchAndSaveFlow", "Error retrieving total batch count.", e);
                                     // Notify the callback about the error
                                     callback.onError(e);
                                 }
@@ -304,7 +298,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e("FetchAndSaveFlow", "Failed to assign batch for new user.", databaseError.toException());
+                        Log.e("[MyApp]FetchAndSaveFlow", "Failed to assign batch for new user.", databaseError.toException());
                         // Notify the callback about the cancellation/error
                         callback.onError(databaseError.toException());
                     }
@@ -328,25 +322,25 @@ import java.util.concurrent.atomic.AtomicInteger;
         public void getTotalBatches(BatchCountCallback callback) {
             // Get a reference to the Firestore Metadata collection
             CollectionReference metadataRef = FirebaseFirestore.getInstance().collection("Metadata");
-            Log.d("FetchAndSaveFlow", "Getting total batches from Metadata collection.");
+            Log.d("[MyApp]FetchAndSaveFlow", "Getting total batches from Metadata collection.");
 
             metadataRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
                         int count = task.getResult().size();
-                        Log.d("FetchAndSaveFlow", "Total batches retrieved: " + count);
+                        Log.d("[MyApp]FetchAndSaveFlow", "Total batches retrieved: " + count);
                         callback.onBatchCountRetrieved(count);
                     } else {
-                        Log.e("FetchAndSaveFlow", "Error getting total batches.", task.getException());
+                        Log.e("[MyApp]FetchAndSaveFlow", "Error getting total batches.", task.getException());
                         callback.onError(task.getException());
                     }
                 }
             });
         }
 
-            public void prepareNextBatchIfRequired(String userId, BatchPreparationCallback callback)  {
-                DatabaseReference userRef = database.getReference("Users").child(userId).child("currentBatch");
+        public void prepareNextBatchIfRequired(String userId, BatchPreparationCallback callback)  {
+                DatabaseReference userRef = database.getReference("user").child(userId).child("currentBatch");
 
                 userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -370,39 +364,39 @@ import java.util.concurrent.atomic.AtomicInteger;
                                     // Update the user's current batch ID in the database
                                     userRef.setValue(newBatchId).addOnCompleteListener(task -> {
                                         if (task.isSuccessful()) {
-                                            Log.d("FetchAndSaveFlow", "Set new batch for user: " + userId + " to batch number: " + newBatchId);
+                                            Log.d("[MyApp]FetchAndSaveFlow", "Set new batch for user: " + userId + " to batch number: " + newBatchId);
                                         } else {
-                                            Log.e("FetchAndSaveFlow", "Failed to set new batch for user: " + userId, task.getException());
+                                            Log.e("[MyApp]FetchAndSaveFlow", "Failed to set new batch for user: " + userId, task.getException());
                                         }
                                     });
                                 }
 
                                 @Override
                                 public void onError(Exception e) {
-                                    Log.e("FetchAndSaveFlow", "Error retrieving total batch count.", e);
+                                    Log.e("[MyApp]FetchAndSaveFlow", "Error retrieving total batch count.", e);
                                 }
                             });
 
                         } else {
-                            Log.e("FetchAndSaveFlow", "No current batch found for user: " + userId);
+                            Log.e("[MyApp]FetchAndSaveFlow", "No current batch found for user: " + userId);
                             // Possibly initialize the user's batch here
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e("FetchAndSaveFlow", "Database error occurred while checking current batch.", databaseError.toException());
+                        Log.e("[MyApp]FetchAndSaveFlow", "Database error occurred while checking current batch.", databaseError.toException());
                     }
                 });
             }
 
-            interface BatchPreparationCallback {
+        interface BatchPreparationCallback {
                 void onBatchPreparationComplete();
                 void onBatchPreparationFailed(Exception e);
             }
 
         private void fetchShuffledQuestions(List<String> questionIds, QuestionsFetchCallback callback) {
-            Log.d("FetchAndSaveFlow", "Fetching shuffled questions.");
+            Log.d("[MyApp]FetchAndSaveFlow", "Fetching shuffled questions.");
             List<QuestionModoCompeticion> questions = new ArrayList<>();
             List<String> questionsToFetch = new ArrayList<>(questionIds);
 
@@ -410,10 +404,10 @@ import java.util.concurrent.atomic.AtomicInteger;
         }
 
         private void fetchQuestionsInChunks(List<String> questionsToFetch, List<QuestionModoCompeticion> questions, QuestionsFetchCallback callback) {
-            Log.d("FetchAndSaveFlow", "Fetching questions in chunks.");
+            Log.d("[MyApp]FetchAndSaveFlow", "Fetching questions in chunks.");
 
             if (questionsToFetch.isEmpty()) {
-                Log.d("FetchAndSaveFlow", "All chunks have been fetched.");
+                Log.d("[MyApp]FetchAndSaveFlow", "All chunks have been fetched.");
                 callback.onQuestionsFetched(questions);
                 return;
             }
@@ -433,24 +427,24 @@ import java.util.concurrent.atomic.AtomicInteger;
                                 }
                             }
 
-                            Log.d("FetchAndSaveFlow", "Fetched chunk of questions. Remaining: " + questionsToFetch.size());
+                            Log.d("[MyApp]FetchAndSaveFlow", "Fetched chunk of questions. Remaining: " + questionsToFetch.size());
 
                             questionsToFetch.removeAll(currentChunk);
                             fetchQuestionsInChunks(questionsToFetch, questions, callback);
                         } else {
-                            Log.e("FetchAndSaveFlow", "Failed to fetch questions chunk.", task.getException());
+                            Log.e("[MyApp]FetchAndSaveFlow", "Failed to fetch questions chunk.", task.getException());
                             callback.onError(new Exception("Failed to fetch questions from Firestore."));
                         }
                     });
         }
 
         public void updateLocalDatabaseWithNewQuestions(List<QuestionModoCompeticion> newQuestions, QuestionsFetchCallback callback) {
-            Log.d("FetchAndSaveFlow", "Updating local database with new questions.");
+            Log.d("[MyApp]FetchAndSaveFlow", "[MyApp]Updating local database with new questions.");
 
             dataSource.open();
 
             try {
-                Log.d("FetchAndSaveFlow", "Local data source opened.");
+                Log.d("[MyApp]FetchAndSaveFlow", "[MyApp]Local data source opened.");
 
                 List<QuestionModoCompeticion> lastFiveQuestions = getLastFiveUnusedQuestions();
                 dataSource.deleteUsedQuestions();
@@ -467,21 +461,21 @@ import java.util.concurrent.atomic.AtomicInteger;
                     dataSource.insertOrUpdateQuestion(question);
                 }
 
-                Log.d("FetchAndSaveFlow", "Local database updated with new questions.");
+                Log.d("[MyApp]FetchAndSaveFlow", "[MyApp]Local database updated with new questions.");
                 callback.onQuestionsUpdated(newQuestions); // Notify that questions have been updated
 
             } catch (Exception e) {
-                Log.e("FetchAndSaveFlow", "Error updating local database with new questions.", e);
+                Log.e("[MyApp]FetchAndSaveFlow", "[MyApp]Error updating local database with new questions.", e);
                 callback.onError(e); // Notify about the error
             } finally {
                 dataSource.close();
-                Log.d("FetchAndSaveFlow", "Local database closed.");
+                Log.d("[MyApp]FetchAndSaveFlow", "[MyApp]Local database closed.");
             }
         }
 
 
         public List<QuestionModoCompeticion> getLastFiveUnusedQuestions() {
-            Log.d("FetchAndSaveFlow", "Fetching last five unused questions from local database.");
+            Log.d("[MyApp]FetchAndSaveFlow", "[MyApp]Fetching last five unused questions from local database.");
             List<QuestionModoCompeticion> lastFiveQuestions = new ArrayList<>();
             SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -508,14 +502,11 @@ import java.util.concurrent.atomic.AtomicInteger;
             return lastFiveQuestions;
         }
 
-
-
         public interface MoveToNextBatchCallback {
             void onShouldMove();
 
             void onShouldNotMove();
         }
-
 
         private QuestionModoCompeticion parseFirestoreDocument(QueryDocumentSnapshot document) {
             String question = document.getString("QUESTION");

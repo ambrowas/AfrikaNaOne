@@ -48,7 +48,7 @@ public class PreguntasModoLibre extends AppCompatActivity {
     private Button buttonconfirmar;
     private ColorStateList textColorDefaultRb;
     private ColorStateList textColorDefaultCd;
-    private CountDownTimer countDownTimer;
+    private CountDownTimer countDownTimerII;
     private long timeLeftInMillis;
     int errores;
     private List<Question> questionList;
@@ -172,7 +172,7 @@ public class PreguntasModoLibre extends AppCompatActivity {
     }
 
     private void startCountDown() {
-        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+        countDownTimerII = new CountDownTimer(timeLeftInMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 timeLeftInMillis = millisUntilFinished;
@@ -208,7 +208,7 @@ public class PreguntasModoLibre extends AppCompatActivity {
 
         private void checkAnswer () {
             answered = true;
-            countDownTimer.cancel();
+            countDownTimerII.cancel();
 
             RadioButton rbSelected = findViewById(radio_group.getCheckedRadioButtonId());
             int answerNr = radio_group.indexOfChild(rbSelected) + 1;
@@ -296,8 +296,8 @@ public class PreguntasModoLibre extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
+        if (countDownTimerII != null) {
+            countDownTimerII.cancel();
         }
 
         if (mediaPlayerCountdown != null) {

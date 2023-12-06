@@ -46,7 +46,7 @@ public class Login extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), Preguntas.class);
+            Intent intent = new Intent(getApplicationContext(), Modocompeticion.class);
             startActivity(intent);
             finish();
         }
@@ -97,7 +97,7 @@ public class Login extends AppCompatActivity {
         blinkAnimation.setRepeatCount(Animation.INFINITE);
         blinkAnimation.setRepeatMode(Animation.REVERSE);
 
-        buttonLogIn.setOnClickListener(new View.OnClickListener() {
+    buttonLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
@@ -171,43 +171,7 @@ public class Login extends AppCompatActivity {
     private void showAlert(String title, String message) {
         showAlert(title, message, null);
     }
-//    private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener onPositiveClickListener) {
-//        AlertDialog dialog = new AlertDialog.Builder(this)
-//                .setTitle(title) // Set the title
-//                .setMessage(message)
-//                .setPositiveButton(android.R.string.ok, onPositiveClickListener)
-//                .setIcon(R.drawable.logotrivial) // Include the icon
-//                .create();
-//
-//        Window window = dialog.getWindow();
-//        if (window != null) {
-//            window.setBackgroundDrawableResource(R.drawable.dialog_background);
-//        }
-//
-//        dialog.show();
-//    }
-//
-//
-//    private void showAlert(String message, Runnable onPositiveAction) {
-//        AlertDialog dialog = new AlertDialog.Builder(Login.this)
-//                .setTitle("Atención") // Include a title
-//                .setMessage(message)
-//                .setPositiveButton("OK", (dialogInterface, i) -> {
-//                    if (onPositiveAction != null) {
-//                        onPositiveAction.run(); // Run the specified action when OK is clicked
-//                    }
-//                    dialogInterface.dismiss();
-//                })
-//                .setIcon(R.drawable.logotrivial)
-//                .create();
-//
-//        Window window = dialog.getWindow();
-//        if (window != null) {
-//            window.setBackgroundDrawableResource(R.drawable.dialog_background);
-//        }
-//
-//        dialog.show();
-//    }
+
 
     private void showRegistrationPrompt() {
         new AlertDialog.Builder(Login.this)

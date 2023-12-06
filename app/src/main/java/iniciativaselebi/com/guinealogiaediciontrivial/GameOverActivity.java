@@ -106,6 +106,11 @@ public class GameOverActivity extends AppCompatActivity {
             swooshPlayer.release();
             swooshPlayer = null;
         }
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
         super.onDestroy();
     }
+
 }

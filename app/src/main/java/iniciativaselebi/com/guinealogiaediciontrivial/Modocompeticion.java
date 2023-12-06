@@ -72,6 +72,9 @@ public class Modocompeticion extends AppCompatActivity {
 
              dataSource = new QuestionDataSource(this);
 
+
+
+//
         button_clasificacion = findViewById(R.id.button_clasificacion);
         button_clasificacion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,8 +113,8 @@ public class Modocompeticion extends AppCompatActivity {
                 }
             });
 
-                buttoncodigo = (Button)findViewById(R.id.buttoncodigo);
-                buttoncodigo.setOnClickListener(new View.OnClickListener() {
+            buttoncodigo = (Button)findViewById(R.id.buttoncodigo);
+            buttoncodigo.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         playSwoosh();
@@ -126,7 +129,7 @@ public class Modocompeticion extends AppCompatActivity {
             checkGameFallos();
 
 
-            authStateListener = new FirebaseAuth.AuthStateListener() {
+        authStateListener = new FirebaseAuth.AuthStateListener() {
                 @Override
                 public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                     user = firebaseAuth.getCurrentUser();
@@ -216,7 +219,69 @@ public class Modocompeticion extends AppCompatActivity {
                 });
             }
         }
+    private void checkAndFetchQuestionsIfNeeded() {
+        // Initialize FirestoreQuestionManager
+        final FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
 
+        // Initialize your QuestionDataSource
+        final QuestionDataSource dataSource = new QuestionDataSource(this);
+        dataSource.open();
+
+        // Enhanced logging
+        int totalQuestions = dataSource.getTotalQuestionsCount();
+        int unusedQuestionsCount = dataSource.getUnusedQuestionsCount();
+        int usedQuestionsCount = totalQuestions - unusedQuestionsCount;
+        Log.d(TAG, "[MyApp]Total questions: " + totalQuestions + ", Used: " + usedQuestionsCount + ", Unused: " + unusedQuestionsCount);
+
+        if (unusedQuestionsCount < 5) {
+            if (!isFetching) {
+                Log.d(TAG, "[MyApp]Starting the process to fetch questions because there is less than 5 unused questions left...");
+
+
+
+                // Fetch shuffled batch of questions based on the user's current batch
+                manager.fetchShuffledBatchQuestions(new FirestoreQuestionManager.QuestionsFetchCallback() {
+                    @Override
+                    public void onSuccess(List<QuestionModoCompeticion> fetchedQuestions) {
+                        // Optionally implement
+                    }
+
+                    @Override
+                    public void onQuestionsFetched(List<QuestionModoCompeticion> questions) {
+                        isFetching = false;
+                        Log.d(TAG, "[MyApp]Fetched " + questions.size() + " questions.");
+
+                        // Save fetched questions to local SQLite database
+                        dataSource.open();
+                        for (QuestionModoCompeticion question : questions) {
+                            dataSource.insertOrUpdateQuestion(question);
+                        }
+                        dataSource.close();
+
+
+                    }
+
+                    @Override
+                    public void onQuestionsUpdated(List<QuestionModoCompeticion> updatedQuestions) {
+                        // Optionally implement
+                    }
+
+                    @Override
+                    public void onError(Exception exception) {
+                        isFetching = false;
+                        Log.e(TAG, "[MyApp]Error fetching questions: " + exception.getMessage());
+
+                    }
+                });
+
+                isFetching = true;
+            } else {
+                Log.d(TAG, "[MyApp]Fetch operation already in progress...");
+            }
+        } else {
+            Log.d(TAG, "[MyApp]There are enough unused questions in the database, no need to fetch now.");
+        }
+    }
 
     private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener onPositiveClickListener) {
         AlertDialog dialog = new AlertDialog.Builder(this)
@@ -265,65 +330,6 @@ public class Modocompeticion extends AppCompatActivity {
         dialog.show();
     }
 
-
-
-    private void checkAndFetchQuestionsIfNeeded() {
-        // Initialize FirestoreQuestionManager
-        final FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
-
-        // Initialize your QuestionDataSource
-        final QuestionDataSource dataSource = new QuestionDataSource(this);
-        dataSource.open();
-        int unusedQuestionsCount = dataSource.getUnusedQuestionsCount(); // assuming you have a method like this in QuestionDataSource
-        dataSource.close();
-
-        // Check if unusedQuestionsCount is < 5
-        if (unusedQuestionsCount < 5) {
-            if (!isFetching) {
-                Log.d(TAG, "Starting the process to fetch questions because there is less than 5 unused questions left...");
-
-                // Fetch shuffled batch of questions based on the user's current batch
-                manager.fetchShuffledBatchQuestions(new FirestoreQuestionManager.QuestionsFetchCallback() {
-                    @Override
-                    public void onSuccess(List<QuestionModoCompeticion> fetchedQuestions) {
-
-                    }
-
-                    @Override
-                    public void onQuestionsFetched(List<QuestionModoCompeticion> questions) {
-                        isFetching = false;
-                        Log.d(TAG, "Fetched " + questions.size() + " questions.");
-
-                        // Save fetched questions to local SQLite database
-                        dataSource.open();
-                        for (QuestionModoCompeticion question : questions) {
-                            dataSource.insertOrUpdateQuestion(question);
-                        }
-                        dataSource.close();
-                    }
-
-                    @Override
-                    public void onQuestionsUpdated(List<QuestionModoCompeticion> updatedQuestions) {
-
-                    }
-
-                    @Override
-                    public void onError(Exception exception) {
-                        isFetching = false;
-                        Log.e(TAG, "Error fetching questions: " + exception.getMessage());
-                    }
-
-                });
-
-                isFetching = true;
-
-            } else {
-                Log.d(TAG, "Fetch operation already in progress...");
-            }
-        } else {
-            Log.d(TAG, "There are enough unused questions in the database, no need to fetch now.");
-        }
-    }
     private void playSwoosh() {
         if (swooshPlayer != null) {
             swooshPlayer.seekTo(0);

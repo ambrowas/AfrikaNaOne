@@ -14,6 +14,8 @@ public class QuestionDataSource {
     private QuestionDatabaseHelperII dbHelper;
     private static final String TAG = "QuestionDataSource";
 
+    private boolean isMarkingQuestionAsUsed = false;
+
     public QuestionDataSource(Context context) {
         dbHelper = QuestionDatabaseHelperII.getInstance(context);
     }
@@ -51,7 +53,7 @@ public class QuestionDataSource {
     }
 
     public int getUnusedQuestionsCount() {
-        Log.d(TAG, "Fetching the count of unused questions.");
+        Log.d(TAG, "[MyApp]Fetching the count of unused questions.");
         ensureOpen();
         String query = "SELECT COUNT(*) FROM " + QuestionDatabaseHelperII.TABLE_QUESTIONS +
                 " WHERE " + QuestionDatabaseHelperII.COLUMN_USED + " = 0";
@@ -60,18 +62,18 @@ public class QuestionDataSource {
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 count = cursor.getInt(0);
-                Log.d(TAG, "Count of unused questions retrieved: " + count);
+                Log.d(TAG, "[MyApp]Count of unused questions retrieved: " + count);
             }
             cursor.close();
         } else {
-            Log.e(TAG, "Failed to fetch the count of unused questions - cursor is null.");
+            Log.e(TAG, "[MyApp]Failed to fetch the count of unused questions - cursor is null.");
         }
         return count;
     }
 
 
     public QuestionModoCompeticion getUnusedQuestion() {
-        Log.d(TAG, "Fetching a random unused question.");
+        Log.d(TAG, "[MyApp]Fetching a random unused question.");
         ensureOpen();
         String query = "SELECT * FROM " + QuestionDatabaseHelperII.TABLE_QUESTIONS +
                 " WHERE " + QuestionDatabaseHelperII.COLUMN_USED + " = 0" +
@@ -82,18 +84,18 @@ public class QuestionDataSource {
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 question = cursorToQuestion(cursor);
-                Log.d(TAG, "A random unused question was successfully fetched.");
+                Log.d(TAG, "[MyApp]A random unused question was successfully fetched.");
             }
             cursor.close();
         } else {
-            Log.e(TAG, "Failed to fetch a random unused question - cursor is null.");
+            Log.e(TAG, "[MyApp]Failed to fetch a random unused question - cursor is null.");
         }
         return question;
     }
 
 
     public List<QuestionModoCompeticion> fetchRandomUnusedQuestions(int count) {
-        Log.d(TAG, "Fetching " + count + " random unused questions.");
+        Log.d(TAG, "[MyApp]Fetching " + count + " random unused questions.");
         ensureOpen();
         List<QuestionModoCompeticion> questions = new ArrayList<>();
         String query = "SELECT * FROM " + QuestionDatabaseHelperII.TABLE_QUESTIONS +
@@ -106,11 +108,11 @@ public class QuestionDataSource {
                 do {
                     questions.add(cursorToQuestion(cursor));
                 } while (cursor.moveToNext());
-                Log.d(TAG, "Successfully fetched " + questions.size() + " random unused questions.");
+                Log.d(TAG, "[MyApp]Successfully fetched " + questions.size() + " random unused questions.");
             }
             cursor.close();
         } else {
-            Log.e(TAG, "Failed to fetch random unused questions - cursor is null.");
+            Log.e(TAG, "[MyApp]Failed to fetch random unused questions - cursor is null.");
         }
         return questions;
     }
@@ -189,7 +191,7 @@ public class QuestionDataSource {
     }
 
     public long insertOrUpdateQuestion(QuestionModoCompeticion question) {
-        Log.d(TAG, "Inserting new question with number: " + question.getNUMBER());
+        Log.d(TAG, "[MyApp]Inserting new question with number: " + question.getNUMBER());
         ensureOpen();
         long result = -1;
         database.beginTransaction();
@@ -199,7 +201,7 @@ public class QuestionDataSource {
 
             database.setTransactionSuccessful();
         } catch (SQLException e) {
-            Log.e(TAG, "Error inserting new question with number: " + question.getNUMBER(), e);
+            Log.e(TAG, "[MyApp]Error inserting new question with number: " + question.getNUMBER(), e);
         } finally {
             database.endTransaction();
         }
@@ -238,14 +240,51 @@ public class QuestionDataSource {
     }
 
     public void deleteUsedQuestions() {
-        Log.d(TAG, "Deleting all used questions from database.");
+        Log.d(TAG, "[MyApp]Deleting all used questions from database.");
         ensureOpen();
         int deletedRows = database.delete(QuestionDatabaseHelperII.TABLE_QUESTIONS, QuestionDatabaseHelperII.COLUMN_USED + " = 1", null);
-        Log.d(TAG, "Deleted " + deletedRows + " used questions from database.");
+        Log.d(TAG, "[MyApp]Deleted " + deletedRows + " used questions from database.");
+    }
+
+    public int getTotalQuestionsCount() {
+        Log.d(TAG, "[MyApp]Fetching total count of questions.");
+        ensureOpen();
+        String query = "SELECT COUNT(*) FROM " + QuestionDatabaseHelperII.TABLE_QUESTIONS;
+        Cursor cursor = database.rawQuery(query, null);
+        int count = 0;
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                count = cursor.getInt(0);
+                Log.d(TAG, "[MyApp]Total count of questions retrieved: " + count);
+            }
+            cursor.close();
+        } else {
+            Log.e(TAG, "[MyApp]Failed to fetch total count of questions - cursor is null.");
+        }
+        return count;
+    }
+
+    public int getUsedQuestionsCount() {
+        Log.d(TAG, "[MyApp]Fetching the count of used questions.");
+        ensureOpen();
+        String query = "SELECT COUNT(*) FROM " + QuestionDatabaseHelperII.TABLE_QUESTIONS +
+                " WHERE " + QuestionDatabaseHelperII.COLUMN_USED + " = 1";
+        Cursor cursor = database.rawQuery(query, null);
+        int count = 0;
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                count = cursor.getInt(0);
+                Log.d(TAG, "[MyApp]Count of used questions retrieved: " + count);
+            }
+            cursor.close();
+        } else {
+            Log.e(TAG, "[MyApp]Failed to fetch the count of used questions - cursor is null.");
+        }
+        return count;
     }
 
     public List<QuestionModoCompeticion> getLastFiveQuestions() {
-        Log.d(TAG, "Fetching the last five questions from database.");
+        Log.d(TAG, "[MyApp]Fetching the last five questions from database.");
         List<QuestionModoCompeticion> questions = new ArrayList<>();
 
         String selectQuery = "SELECT * FROM " + QuestionDatabaseHelperII.TABLE_QUESTIONS +
@@ -261,19 +300,51 @@ public class QuestionDataSource {
             } while (cursor.moveToNext());
             cursor.close();
         } else {
-            Log.e(TAG, "Cursor is null or empty for getLastFiveQuestions.");
+            Log.e(TAG, "[MyApp]Cursor is null or empty for getLastFiveQuestions.");
         }
-        Log.d(TAG, "Fetched " + questions.size() + " questions from database as the last five questions.");
+        Log.d(TAG, "[MyApp]Fetched " + questions.size() + " questions from database as the last five questions.");
         return questions;
     }
 
     public void markQuestionAsUsed(String questionNumber) {
-        Log.d(TAG, "Marking question as used with number: " + questionNumber);
+        if (isMarkingQuestionAsUsed) {
+            Log.d(TAG, "[MyApp]Already processing question: " + questionNumber + ". Skipping duplicate call.");
+            return;
+        }
+
+        Log.d(TAG, "[MyApp]Marking question as used with number: " + questionNumber);
+        isMarkingQuestionAsUsed = true;
         ensureOpen();
         ContentValues values = new ContentValues();
         values.put(QuestionDatabaseHelperII.COLUMN_USED, 1); // 1 for true
-        int updatedRows = database.update(QuestionDatabaseHelperII.TABLE_QUESTIONS, values, QuestionDatabaseHelperII.COLUMN_NUMBER + " = ?", new String[]{questionNumber});
-        Log.d(TAG, "Marked " + updatedRows + " question(s) as used with number: " + questionNumber);
+        int updatedRows = database.update(QuestionDatabaseHelperII.TABLE_QUESTIONS, values,
+                QuestionDatabaseHelperII.COLUMN_NUMBER + " = ?",
+                new String[]{questionNumber});
+        Log.d(TAG, "[MyApp]Marked " + updatedRows + " question(s) as used with number: " + questionNumber);
+        isMarkingQuestionAsUsed = false;
+    }
+
+    public void markFortyRandomQuestionsAsUsed() {
+        Log.d(TAG, "[MyApp]Marking 40 random questions as used");
+        ensureOpen();
+
+        // SQL query to select 40 random question IDs
+        String subQuery = "SELECT " + QuestionDatabaseHelperII.COLUMN_ID +
+                " FROM " + QuestionDatabaseHelperII.TABLE_QUESTIONS +
+                " WHERE " + QuestionDatabaseHelperII.COLUMN_USED + " = 0 " +
+                "ORDER BY RANDOM() LIMIT 40";
+
+        // SQL query to update the selected questions
+        String sql = "UPDATE " + QuestionDatabaseHelperII.TABLE_QUESTIONS +
+                " SET " + QuestionDatabaseHelperII.COLUMN_USED + " = 1 " +
+                "WHERE " + QuestionDatabaseHelperII.COLUMN_ID + " IN (" + subQuery + ")";
+
+        try {
+            database.execSQL(sql);
+            Log.d(TAG, "[MyApp]Successfully marked 40 random questions as used");
+        } catch (Exception e) {
+            Log.e(TAG, "[MyApp]Error marking 40 random questions as used", e);
+        }
     }
 
     public void open() {
