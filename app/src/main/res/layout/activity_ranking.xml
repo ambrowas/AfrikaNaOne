@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/coolbackground"
+    tools:context=".ProfileActivity">
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -14,118 +22,51 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:screenReaderFocusable="true"
         android:text="CLASIFICACION GLOBAL DE SABELOTODOS"
+        android:background="@drawable/blackbackground"
         android:textStyle="bold"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="16sp"
         android:layout_marginTop="60dp"
         android:layout_marginBottom="20dp"/>
-
-    <Button
-
-        android:id="@+id/button_retorno"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:text="VOLVER"
-        android:textColor="@color/white"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="10dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/radio_normal2"
-        app:strokeWidth="3dp"/>
-
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TableLayout
-            android:id="@+id/tableLayout"
+        <!-- Container with border for TableLayout -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:stretchColumns="*"
-            android:paddingLeft="10dp">
+            android:background="@drawable/rectangulo"
+            android:padding="8dp">
 
-            <!-- Table header -->
-            <TableRow
-                android:background="@drawable/radio_selector_blue"
-                android:padding="12dp"
-                android:layout_height="wrap_content">
+            <TableLayout
+                android:id="@+id/tableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="*"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
 
+                <!-- Table header and rows go here -->
 
-
-                <TextView
-                    android:id="@+id/tvName"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.8"
-                android:text="Jugador@"
-                android:textColor="@color/white"
-                android:gravity="center"
-                    android:paddingLeft="-40dp"
-                android:textSize="18sp" />
-
-
-
-
-
-                <TextView
-                    android:id="@+id/tvScore"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.8"
-                android:text="Francos CFA."
-                android:textColor="@color/white"
-                android:gravity="right"
-                android:textSize="18sp" />
-
-            </TableRow>
-
-            <!-- Table row example -->
-            <TableRow
-                android:padding="25dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="60dp"
-                    android:layout_weight="0.5"
-                android:gravity="left"
-                android:maxLines="1"
-                    android:textStyle="bold"
-                android:text="10"
-                android:textSize="25sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="60dp"
-                    android:layout_weight="2.8"
-                android:gravity="left"
-                android:text="John Doe"
-                android:textSize="25sp" />
-
-
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="60dp"
-                    android:layout_weight="1.8"
-                android:gravity="left"
-                android:text="1200"
-                android:textSize="25sp" />
-
-            </TableRow>
-
-            <!-- Add more table rows as needed -->
-        </TableLayout>
+            </TableLayout>
+        </LinearLayout>
     </ScrollView>
 
-
-
-
-
-
-
+    <Button
+        android:id="@+id/button_retorno"
+        android:layout_width="250dp"
+        android:layout_height="55dp"
+        android:text="VOLVER"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@color/blue"
+        app:strokeWidth="3dp"/>
 </LinearLayout>
-
+</ScrollView>

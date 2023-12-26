@@ -40,6 +40,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -426,18 +428,16 @@ public class Preguntas extends AppCompatActivity {
     }
 
     private void showCustomDialog(String title, String message, DialogInterface.OnClickListener positiveClickListener) {
-        AlertDialog dialog = new AlertDialog.Builder(Preguntas.this)
-                .setTitle(title)
+        AlertDialog.Builder builder = new AlertDialog.Builder(Preguntas.this);
+        builder.setTitle(title)
                 .setMessage(message)
                 .setPositiveButton("OK", positiveClickListener)
-                .setIcon(R.drawable.logotrivial)
-                .create();
+                .setIcon(R.drawable.logotrivial);
 
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background); // Your custom shape drawable
         }
-
         dialog.show();
     }
 
@@ -551,7 +551,7 @@ public class Preguntas extends AppCompatActivity {
                 }
 
                 // Show an AlertDialog when buttonterminar is pressed
-                new AlertDialog.Builder(Preguntas.this)
+                AlertDialog dialog = new AlertDialog.Builder(Preguntas.this)
                         .setTitle("Confirmar")
                         .setMessage("¿Seguro que quieres terminar la partida?")
                         .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
@@ -564,7 +564,14 @@ public class Preguntas extends AppCompatActivity {
                         })
                         .setNegativeButton("No", null) // null listener results in dismissing the dialog without additional actions
                         .setIcon(R.drawable.logotrivial)
-                        .show();
+                        .create(); // create the AlertDialog to manipulate its window properties
+
+                Window window = dialog.getWindow(); // Get the Window object of the dialog
+                if (window != null) {
+                    window.setBackgroundDrawableResource(R.drawable.dialog_background); // Set your custom background drawable here
+                }
+
+                dialog.show(); // Show the dialog
             }
         });
 
@@ -677,11 +684,20 @@ public class Preguntas extends AppCompatActivity {
     }
 
     private void updateCurrentGameValues(int aciertos, int fallos, int puntuacion) {
+        // Create a map for the game statistics
         Map<String, Object> gameStats = new HashMap<>();
         gameStats.put("currentGameAciertos", aciertos);
         gameStats.put("currentGameFallos", fallos);
         gameStats.put("currentGamePuntuacion", puntuacion);
 
+        // Create a timestamp for the current time
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
+        String currentDateAndTime = sdf.format(new Date());
+
+        // Add the LastPlay timestamp to the map
+        gameStats.put("LastPlay", currentDateAndTime);
+
+        // Update the database
         gameStatsRef.updateChildren(gameStats).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -709,6 +725,7 @@ public class Preguntas extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         showExitConfirmation();
     }
 
@@ -785,22 +802,28 @@ public class Preguntas extends AppCompatActivity {
             }
 
             // Show an AlertDialog
-            new AlertDialog.Builder(Preguntas.this)
+            AlertDialog dialog = new AlertDialog.Builder(Preguntas.this)
                     .setTitle("Aviso")
                     .setMessage("No abandones la aplicación mientras haya una pregunta activa.")
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // Restart the timer and apply the penalty when OK is clicked
-
                             applyPenalty();
                         }
                     })
                     .setCancelable(false)
                     .setIcon(R.drawable.logotrivial)
-                    .show();
+                    .create(); // Use create() here to be able to customize the dialog before showing it
 
+// Access the window of the dialog to set the background drawable
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.setBackgroundDrawableResource(R.drawable.dialog_background); // Your custom shape drawable
+            }
 
+// Finally, show the dialog
+            dialog.show();
             isAlertDisplayed = true; // Indicate that an alert is being displayed
         }
     }

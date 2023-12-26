@@ -20,8 +20,6 @@
         app:civ_border_color="#000000"
         app:civ_border_width="5dp" />
 
-
-
     <TextView
         android:id="@+id/textviewNoRanking"
         android:layout_width="50dp"
@@ -41,7 +39,7 @@
         android:shadowRadius="6"
         android:textColor="@color/black"
         android:textColorHighlight="@color/black"
-        android:textSize="15pt"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:strokeWidth="3dp" />
 
@@ -57,7 +55,7 @@
             android:layout_marginLeft="55dp"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="30dp"
-            android:background="@drawable/radio_selector"
+            android:backgroundTint="@color/green"
             android:shadowDx="4"
             android:shadowDy="4"
             android:shadowRadius="6"
@@ -87,10 +85,10 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:text="Nombre Completo"
                 android:textAllCaps="true"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
                 android:button="@android:color/transparent"
@@ -110,7 +108,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:text="Telefono"
                 android:textColor="@color/black"
                 android:button="@android:color/transparent"
@@ -129,7 +127,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:text="Barrio"
                 android:textColor="@color/black"
                 android:button="@android:color/transparent"
@@ -148,7 +146,7 @@
                 android:layout_weight="1"
                 android:gravity="left"
                 android:hint="Ciudad"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:textColor="@color/black"
                 android:button="@android:color/transparent"
                 android:background="@drawable/table_border"/>
@@ -167,7 +165,7 @@
                 android:gravity="left"
                 android:hint="País"
                 android:textColor="@color/black"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:button="@android:color/transparent"
                 android:background="@drawable/table_border"/>
         </TableRow>
@@ -185,7 +183,7 @@
                 android:gravity="left"
                 android:textColor="@color/black"
                 android:hint="Record"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:button="@android:color/transparent"
                 android:background="@drawable/table_border"/>
         </TableRow>
@@ -202,7 +200,7 @@
                 android:gravity="left"
                 android:textColor="@color/black"
                 android:hint="2500 "
-                android:padding="10dp"
+                android:padding="8dp"
                 android:button="@android:color/transparent"
                 android:background="@drawable/table_border"/>
         </TableRow>
@@ -219,7 +217,7 @@
                 android:gravity="left"
                 android:textColor="@color/black"
                 android:hint="30"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:button="@android:color/transparent"
                 android:background="@drawable/table_border"/>
         </TableRow>
@@ -236,7 +234,7 @@
                 android:gravity="left"
                 android:textColor="@color/black"
                 android:hint="23"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:button="@android:color/transparent"
                 android:background="@drawable/table_border"/>
         </TableRow>
@@ -253,7 +251,7 @@
                 android:gravity="left"
                 android:textColor="@color/black"
                 android:hint="23"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:button="@android:color/transparent"
                 android:background="@drawable/table_border"/>
         </TableRow>
@@ -261,34 +259,35 @@
 
     </TableLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="20dp">
 
+        <Button
+            android:id="@+id/buttonatras"
+            android:layout_width="150dp"
+            android:layout_height="55dp"
+            android:text="VOLVER"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_marginLeft="52dp"
+            app:strokeWidth="3dp" />
 
+        <Button
+            android:id="@+id/btn_borrarusuario"
+            android:layout_width="150dp"
+            android:layout_height="55dp"
+            android:backgroundTint="@color/red"
+            android:text="BORRAR"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_marginLeft="10dp"
+            app:strokeWidth="3dp" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/buttonatras"
-        android:layout_width="300dp"
-        android:layout_height="55dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/radio_selector_blue"
-        android:text="VOLVER"
-        android:layout_marginTop="20dp"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        app:strokeWidth="3dp" />
-
-    <Button
-        android:id="@+id/btn_borrarusuario"
-        android:layout_width="300dp"
-        android:layout_height="60dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/radio_normal2"
-        android:shadowDx="4"
-        android:shadowDy="4"
-        android:shadowRadius="6"
-        android:text="BORRAR USUARIO"
-        android:textColor="@color/white"
-        android:layout_marginTop="10dp"
-        app:strokeWidth="3dp" />
 
 
 

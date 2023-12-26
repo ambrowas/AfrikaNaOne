@@ -11,6 +11,10 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -19,18 +23,27 @@ import org.json.JSONObject;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        // Check if the message contains data
-        if (remoteMessage.getData().size() > 0) {
-            // Process the data here
-            String message = remoteMessage.getData().get("key"); // Replace 'key' with actual data key
-            // Display notification based on the data
-        }
+        super.onMessageReceived(remoteMessage);
 
+        // Retrieve the current user's ID
+        String userId = getCurrentUserId();
+
+        if (userId != null) {
+            // User is logged in, log the message receipt
+            String messageId = remoteMessage.getMessageId();
+            logMessageReceipt(messageId, userId);
+        } else {
+            // User is not logged in, handle gracefully
+            // For example, you can log a message or perform any other necessary actions
+            Log.d("FCM", "User is not logged in, cannot log message receipt");
+        }
         // Check if the message contains a notification
         if (remoteMessage.getNotification() != null) {
             String notificationBody = remoteMessage.getNotification().getBody();
@@ -125,5 +138,33 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
         }
     }
+
+    private void logMessageReceipt(String messageId, String userId) {
+        // Reference to the user's node in the Firebase Realtime Database
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(userId);
+
+        // Concatenate messageId and the current timestamp
+        String receiptData = messageId + ", " + System.currentTimeMillis();
+
+        // Update the user's data with the concatenated receipt information
+        userRef.child("ReceivedMsgs").setValue(receiptData)
+                .addOnSuccessListener(aVoid -> Log.d("FCM", "Message receipt logged successfully in user node"))
+                .addOnFailureListener(e -> Log.e("FCM", "Failed to log message receipt in user node", e));
+    }
+
+
+    private String getCurrentUserId() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            // User is signed in
+            return currentUser.getUid();
+        } else {
+            // User is not signed in
+            return null; // Or handle it as per your requirement
+        }
+    }
+
+
+
 
 }

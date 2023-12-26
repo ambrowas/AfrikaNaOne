@@ -22,6 +22,13 @@
     <string name="aciertos">Aciertos: %1$d</string>
     <string name="fallos">Fallos: %1$d</string>
     <string name="puntuacion">Puntuación: %1$d</string>
+    <string name="tipo_dispositivo">Tipo de Dispositivo</string>
+    <string name="Dispositivo"> Dispositivo</string>
+    <string-array name="tipo_dispositivo_options">
+        <item>Apple</item>
+        <item>Android</item>
+    </string-array>
+
 
 
 </resources>

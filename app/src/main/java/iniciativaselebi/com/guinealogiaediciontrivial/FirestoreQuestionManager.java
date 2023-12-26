@@ -347,6 +347,8 @@ import java.util.concurrent.atomic.AtomicInteger;
                     public void onDataChange(@NonNull DataSnapshot currentBatchSnapshot) {
                         if (currentBatchSnapshot.exists()) {
                             int currentBatchId = currentBatchSnapshot.getValue(Integer.class);
+                            logCompletedBatch(userId, currentBatchId);
+
 
                             // Retrieve total batch count to determine the next batch ID
                             getTotalBatches(new BatchCountCallback() {
@@ -389,6 +391,32 @@ import java.util.concurrent.atomic.AtomicInteger;
                     }
                 });
             }
+
+        public void logCompletedBatch(String userId, int completedBatch) {
+            DatabaseReference userRef = database.getReference("user").child(userId).child("CompletedBatch");
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String existingBatches = dataSnapshot.exists() ? dataSnapshot.getValue(String.class) : "";
+                    String updatedBatches = existingBatches.isEmpty() ? String.valueOf(completedBatch) : existingBatches + ", " + completedBatch;
+
+                    userRef.setValue(updatedBatches).addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("CompletedBatch", "Batch " + completedBatch + " added to completed list for user: " + userId);
+                        } else {
+                            Log.e("CompletedBatch", "Failed to update completed batch list for user: " + userId, task.getException());
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e("CompletedBatch", "Error updating completed batch list for user: " + userId, databaseError.toException());
+                }
+            });
+        }
+
+
 
         interface BatchPreparationCallback {
                 void onBatchPreparationComplete();

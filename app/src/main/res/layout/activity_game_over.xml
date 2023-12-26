@@ -16,6 +16,7 @@ tools:context=".GameOverActivity">
     android:text="Game Over"
     android:textSize="24sp"
     android:textStyle="bold"
+    android:backgroundTint="@color/red"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
@@ -23,7 +24,6 @@ tools:context=".GameOverActivity">
     android:textColor="@color/white"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
-    android:background="@drawable/radio_normal2"
     app:strokeWidth="3dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

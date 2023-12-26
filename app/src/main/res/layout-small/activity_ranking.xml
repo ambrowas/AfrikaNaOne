@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/coolbackground"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textviewclasificacion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="CLASIFICACION GLOBAL DE SABELOTODOS"
+        android:background="@drawable/blackbackground"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="20dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Container with border for TableLayout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rectangulo"
+            android:padding="10dp">
+
+            <TableLayout
+                android:id="@+id/tableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="*"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <!-- Table header and rows go here -->
+
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/button_retorno"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="VOLVER"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/blackbackground"
+        app:strokeWidth="3dp"/>
+</LinearLayout>

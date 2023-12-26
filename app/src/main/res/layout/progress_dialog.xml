@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="20dp"
-    android:background="@drawable/trivialbackground">
+    android:background="@drawable/radio_normal3">
 
     <ProgressBar
         android:layout_width="wrap_content"
@@ -14,7 +14,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Procesando.Paciencia,abeg..."
+        android:text="Procesando.Abeg, no vex.."
         android:textStyle="bold"
         android:textColor="@color/black"
         android:layout_marginTop="10dp" />

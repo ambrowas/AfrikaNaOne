@@ -48,9 +48,9 @@
     <TextView
         android:id="@+id/textviewtiempo"
         android:layout_width="114dp"
-        android:layout_height="70dp"
+        android:layout_height="90dp"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="40dp"
         android:layout_marginEnd="20dp"
         android:layout_marginRight="10dp"
         android:fontFamily="?android:attr/fontFamily"
@@ -64,20 +64,21 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/textviewpregunta"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textviewtiempo"
-        android:layout_marginTop="80dp"
-        android:layout_marginBottom="50dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:text="¿Quien descubrió America el 12 de Octubre de 1492?"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="18sp" />
+    android:id="@+id/textviewpregunta"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/textviewtiempo"
+    android:layout_marginTop="80dp"
+    android:layout_marginBottom="50dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:text="¿Quien descubrió America el 12 de Octubre de 1492?"
+    android:gravity="center_horizontal"
+    android:layout_centerHorizontal="true"
+    android:textColor="@color/black"
+    android:textSize="18sp" />
 
-        <RadioGroup
+    <RadioGroup
             android:id="@+id/radio_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -148,9 +149,10 @@
             android:layout_width="300dp"
             android:layout_height="75dp"
             android:layout_marginTop="50dp"
-            android:background="@drawable/radio_normal3"
-            android:button="@android:color/transparent"
             android:elevation="4dp"
+            android:background="@drawable/radio_normal3"
+            app:backgroundTint="@null"
+            android:textStyle="bold"
             android:textAllCaps="true"
             android:gravity="center"
             android:text="CONFIRMAR"

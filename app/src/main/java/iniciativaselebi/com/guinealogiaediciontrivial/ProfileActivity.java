@@ -1,5 +1,7 @@
 package iniciativaselebi.com.guinealogiaediciontrivial;
 
+import static iniciativaselebi.com.guinealogiaediciontrivial.R.drawable.dialog_background;
+
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
@@ -12,11 +14,15 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -193,7 +199,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         textViewRecord = (TextView)findViewById(R.id.textViewRecord);
         profilepic = (CircleImageView) findViewById(R.id.profilepic);
-        btn_borrarusuario = (Button)findViewById(R.id.btn_borrarusuario);
+//        btn_borrarusuario = (Button)findViewById(R.id.btn_borrarusuario);
 
     buttonatras = (Button)findViewById(R.id.buttonatras);
     buttonatras.setOnClickListener(new View.OnClickListener() {
@@ -221,13 +227,13 @@ public class ProfileActivity extends AppCompatActivity {
 
     mAuth = FirebaseAuth.getInstance();
      
-    btn_borrarusuario = (Button)findViewById(R.id.btn_borrarusuario);
-    btn_borrarusuario.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                borraUsuario();
-            }
-        });
+   btn_borrarusuario = (Button)findViewById(R.id.btn_borrarusuario);
+   btn_borrarusuario.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+              borraUsuario();
+           }
+       });
 
     profilepic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -278,7 +284,7 @@ public class ProfileActivity extends AppCompatActivity {
         DialogInterface.OnClickListener positiveAction = (dialog, which) -> navigateToModoCompeticion();
         DialogInterface.OnClickListener negativeAction = (dialog, which) -> dialog.dismiss();
 
-        showCustomAlertDialog("Confirmar salida", "¿Seguro que quieres salir sin poner una foto?", positiveAction, negativeAction);
+        showAlertDialogWithActions("Confirmar salida", "¿Seguro que quieres salir sin poner una foto?", positiveAction, negativeAction);
     }
     private void navigateToModoCompeticion() {
         playSwoosh();
@@ -301,31 +307,17 @@ public class ProfileActivity extends AppCompatActivity {
         super.onDestroy();
     }
     private void borraUsuario() {
-        // Create a DialogInterface.OnClickListener for the positive button
-        DialogInterface.OnClickListener positiveClickListener = (dialog, which) -> {
-            reauthenticateAndDelete();  // Call re-authentication process
-        };
+        // Positive button listener for confirming user deletion
+        DialogInterface.OnClickListener positiveClickListener = (dialog, which) -> reauthenticateAndDelete();
 
-        // Use the custom alert dialog method to show the confirmation
-        showCustomAlertDialog("Confirmar acción",
+        // Negative button listener for dismissing the dialog
+        DialogInterface.OnClickListener negativeClickListener = (dialog, which) -> dialog.dismiss();
+
+        // Show the dialog with the listeners
+        showAlertDialogWithActions("Confirmar acción",
                 "¿Seguro que quieres borrar este usuario? Esta acción es irreversible.",
-                positiveClickListener);
-    }
-    private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener onPositiveClickListener) {
-        AlertDialog dialog = new AlertDialog.Builder(ProfileActivity.this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("SÍ", onPositiveClickListener)
-                .setNegativeButton("NO", (dialogInterface, i) -> dialogInterface.dismiss())
-                .setIcon(R.drawable.logotrivial)
-                .create();
-
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setBackgroundDrawableResource(R.drawable.dialog_background);
-        }
-
-        dialog.show();
+                positiveClickListener,
+                negativeClickListener);
     }
     private void deleteUserProcess() {
         FirebaseUser user = mAuth.getCurrentUser();
@@ -337,43 +329,24 @@ public class ProfileActivity extends AppCompatActivity {
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user").child(userID);
                     ref.removeValue((error, ref1) -> {
                         if (error != null) {
-                            showCustomAlertDialog("Error", "Error borrando al usuario: " + error.getMessage());
+                            showInformationalAlertDialog("Error", "Error borrando al usuario: " + error.getMessage());
                             return;
                         }
-
-                        // Log deleted user
+                        // Log the deleted user
                         logDeletedUser(user.getDisplayName(), user.getEmail());
+                        // Show a success dialog with navigation upon dismissal
                         showCustomAlertDialog("Éxito", "Usuario y datos asociados borrados con éxito. Bye Bye", this::navigateToMenuPrincipal);
                     });
                 } else {
-                    showCustomAlertDialog("Error", "Error borrando al usuario: " + task.getException().getMessage());
+                    showInformationalAlertDialog("Error", "Error borrando al usuario: " + task.getException().getMessage());
                 }
             });
         } else {
-            showCustomAlertDialog("Error", "Usuario no autenticado.");
+            showInformationalAlertDialog("Error", "Usuario no autenticado.");
         }
     }
 
-    private void showCustomAlertDialog(String title, String message, final Runnable onDismiss) {
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
-                    dialogInterface.dismiss();
-                    if (onDismiss != null) {
-                        onDismiss.run();
-                    }
-                })
-                .setIcon(R.drawable.logotrivial)
-                .create();
 
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setBackgroundDrawableResource(R.drawable.dialog_background);
-        }
-
-        dialog.show();
-    }
     private void reauthenticateAndDelete() {
         FirebaseUser user = mAuth.getCurrentUser();
 
@@ -383,25 +356,39 @@ public class ProfileActivity extends AppCompatActivity {
             builder.setTitle("Reintroduce tu contraseña");
 
             final EditText passwordField = new EditText(this);
+
+            // Set input type to password to hide password entries
+            passwordField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             builder.setView(passwordField);
 
             builder.setPositiveButton("Enviar", (dialog, which) -> {
                 String password = passwordField.getText().toString();
+
+                // Check if password field is not empty
+                if (TextUtils.isEmpty(password)) {
+                    Toast.makeText(ProfileActivity.this, "Por favor, introduce tu contraseña.", Toast.LENGTH_SHORT).show();
+                    return; // Don't proceed with re-authentication
+                }
+
                 // Re-authenticate using email and password
                 AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
                 user.reauthenticate(credential).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         deleteUserProcess();
                     } else {
-                        showCustomAlertDialog("Error", "Fallo de Login.");
+                        // Show the error message in the dialog to keep context for the user
+                        Toast.makeText(ProfileActivity.this, "Fallo de Login: " + task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             });
+
             builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
-            builder.show();
+
+            // Create the AlertDialog and show it
+            AlertDialog passwordDialog = builder.create();
+            passwordDialog.show();
         }
     }
-
     private void navigateToMenuPrincipal() {
         playSwoosh();
         Intent intent = new Intent(ProfileActivity.this, Menuprincipal.class);
@@ -436,70 +423,190 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
     private void uploadImage() {
+        // Check if an image has been selected
         if (imagePath == null) {
-            showCustomAlertDialog("Atención", "No seleccionaste ninguna imagen");
+            showInformationalAlertDialog("Atención", "No seleccionaste ninguna imagen");
             return;
         }
 
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Subiendo ...");
-        progressDialog.show();
+        AlertDialog uploadDialog = createUploadDialog();
+        uploadDialog.show();
+        // Setup a new progress dialog
+//        ProgressDialog progressDialog = new ProgressDialog(this);
+//        progressDialog.setTitle("Subiendo ...");
+//        progressDialog.show();
 
-        FirebaseStorage.getInstance().getReference("images/" + UUID.randomUUID().toString())
+        // Generate a unique image filename path using UUID
+        String imageFilename = "images/" + UUID.randomUUID().toString();
+        // Start uploading the image to Firebase Storage
+        FirebaseStorage.getInstance().getReference(imageFilename)
                 .putFile(imagePath)
                 .addOnCompleteListener(task -> {
-                    progressDialog.dismiss();
+                    // Dismiss the progress dialog upon completion of the upload task
+                    uploadDialog.dismiss();
                     if (task.isSuccessful()) {
+                        // Get the download URL for the uploaded image
                         task.getResult().getStorage().getDownloadUrl().addOnCompleteListener(urlTask -> {
                             if (urlTask.isSuccessful()) {
-                                updateProfilePicture(urlTask.getResult().toString());
-                                playSwoosh();
-                                showCustomAlertDialog("Exito", "Foto de perfil establecida. Molas");
+                                String imageUrl = urlTask.getResult().toString();
+                                // Update the profile picture URL in the user's profile
+                                updateProfilePicture(imageUrl);
+                                playSwoosh(); // Play a sound effect
+                                // Show a success dialog and navigate back to MenuModoCompeticion on dismiss
+                                showCustomAlertDialogWithDismissListener("Éxito", "Foto de perfil establecida. Molas", dialogInterface -> {
+                                    navigateToModoCompeticion();
+                                });
+                                // Hide the upload button after a successful upload
                                 btn_upload.setVisibility(View.INVISIBLE);
                             }
                         });
                     } else {
-                        showCustomAlertDialog("Error", task.getException().getLocalizedMessage());
+                        // If the upload task failed, show an error message
+                        showInformationalAlertDialog("Error", task.getException().getLocalizedMessage());
                     }
                 })
                 .addOnProgressListener(snapshot -> {
+                    // Update the progress dialog message with the upload progress percentage
                     double progress = 100.0 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount();
-                    progressDialog.setMessage("Subido " + (int) progress + "%");
+                    uploadDialog.setMessage("Subido " + (int) progress + "%");
                 });
     }
 
-    private void showCustomAlertDialog(String title, String message) {
-        AlertDialog dialog = new AlertDialog.Builder(ProfileActivity.this)
+    // Simple method to show an informational alert dialog
+    private void showInformationalAlertDialog(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> dialogInterface.dismiss())
-                .setIcon(R.drawable.logotrivial) // Set the icon here
-                .create();
+                .setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss())
+                .setIcon(R.drawable.logotrivial); // Set the custom icon
+
+        // Create the AlertDialog from the builder
+        AlertDialog dialog = builder.create();
+
+        // Check if the Window for the AlertDialog is available and set the custom background
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(dialog_background); // Set the custom background directly
+        }
+
+        // Show the dialog to the user
+        dialog.show();
+    }
+
+
+    private void showCustomAlertDialog(String title, String message, final Runnable onDismiss) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (dialogInterface, i) -> {
+                    if (onDismiss != null) {
+                        onDismiss.run();
+                    }
+                })
+                .setIcon(R.drawable.logotrivial);
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnDismissListener(dialogInterface -> {
+            // The Runnable runs after the dialog is dismissed, including
+            // when the positive button is pressed or the dialog is canceled.
+            if (onDismiss != null) {
+                onDismiss.run();
+            }
+        });
 
         Window window = dialog.getWindow();
         if (window != null) {
-            window.setBackgroundDrawableResource(R.drawable.dialog_background); // Set the background here
+            window.setBackgroundDrawableResource(dialog_background);
+        }
+
+        dialog.show();
+    }
+    // Method to show an alert dialog that runs a task when dismissed
+//    private void showAlertDialogWithTask(String title, String message, Runnable task) {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+//                .setTitle(title)
+//                .setMessage(message)
+//                .setPositiveButton("OK", (dialogInterface, i) -> {
+//                    dialogInterface.dismiss();
+//                    if (task != null) {
+//                        task.run();
+//                    }
+//                })
+//                .setIcon(R.drawable.logotrivial);
+//        AlertDialog dialog = builder.create();
+//        setDialogBackground(dialog);
+//        dialog.show();
+//    }
+
+    // Method to show an alert dialog with custom positive and negative actions
+    private void showAlertDialogWithActions(String title, String message,
+                                            DialogInterface.OnClickListener positiveAction,
+                                            DialogInterface.OnClickListener negativeAction) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("SÍ", positiveAction)
+                .setNegativeButton("NO", negativeAction != null ? negativeAction : (dialogInterface, i) -> dialogInterface.dismiss())
+                .setIcon(R.drawable.logotrivial);
+        AlertDialog dialog = builder.create();
+        setDialogBackground(dialog);
+        dialog.show();
+    }
+
+    private void showCustomAlertDialogWithDismissListener(String title, String message, DialogInterface.OnDismissListener dismissListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", null) // OK button to dismiss the dialog
+                .setIcon(R.drawable.logotrivial); // Replace with your drawable resource
+
+        AlertDialog dialog = builder.create();
+
+        if (dismissListener != null) {
+            dialog.setOnDismissListener(dismissListener);
+        }
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(dialog_background); // Replace with your drawable resource for the dialog background
         }
 
         dialog.show();
     }
 
-    private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener positiveAction, DialogInterface.OnClickListener negativeAction) {
-        AlertDialog dialog = new AlertDialog.Builder(ProfileActivity.this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("Sí", positiveAction)
-                .setNegativeButton("No", negativeAction)
-                .setIcon(R.drawable.logotrivial) // Set your custom icon
-                .create();
-
+    // Common method to set dialog background (if required)
+    private void setDialogBackground(AlertDialog dialog) {
         Window window = dialog.getWindow();
         if (window != null) {
-            window.setBackgroundDrawableResource(R.drawable.dialog_background); // Set your custom background
+            window.setBackgroundDrawableResource(dialog_background);
+        }
+    }
+
+    private AlertDialog createUploadDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // Set up the input
+        final ProgressBar progressBar = new ProgressBar(this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        progressBar.setLayoutParams(lp);
+        builder.setView(progressBar);
+
+        // Set up the buttons
+        builder.setTitle("Subiendo ...")
+                .setIcon(R.drawable.logotrivial);
+
+        AlertDialog dialog = builder.create();
+
+        // Get the Window of the AlertDialog and set the custom background
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
         }
 
-        dialog.show();
+        return dialog;
     }
+
 
     private void updateProfilePicture(String url) {
         FirebaseDatabase.getInstance().getReference("user/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/profilePicture").setValue(url);

@@ -47,7 +47,7 @@
         android:shadowRadius="6"
         android:textColor="@color/black"
         android:textColorHighlight="@color/black"
-        android:textSize="15pt"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:strokeWidth="3dp" />
 
@@ -74,7 +74,7 @@
         android:layout_marginLeft="50dp">
 
         <TableLayout
-            android:layout_width="wrap_content"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:background="@drawable/table_border"
@@ -98,7 +98,7 @@
             </TableRow>
 
             <TableRow
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal">
                 <TextView
@@ -115,7 +115,7 @@
             </TableRow>
 
             <TableRow
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal">
                 <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
@@ -132,7 +132,7 @@
             </TableRow>
 
             <TableRow
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal">
                 <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
@@ -149,7 +149,7 @@
             </TableRow>
 
             <TableRow
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal">
                 <TextView
@@ -166,7 +166,7 @@
             </TableRow>
 
             <TableRow
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal">
                 <TextView
@@ -186,10 +186,10 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
+        android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         >
@@ -198,12 +198,12 @@
             android:id="@+id/buttoncodigocobro"
             android:layout_width="300dp"
             android:layout_height="75dp"
-            android:background="@drawable/radio_normal3"
             android:freezesText="true"
             android:text="GENERAR COBRO"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textStyle="bold"
             app:strokeWidth="3dp"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"/>
 
@@ -212,9 +212,10 @@
             android:id="@+id/buttonmenuprincipal"
             android:layout_width="300dp"
             android:layout_height="75dp"
-            android:background="@drawable/radio_normal2"
+           android:backgroundTint="@color/red"
             android:freezesText="true"
             android:text="FINALIZAR"
+            android:layout_gravity="center_horizontal"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:strokeWidth="3dp"/>

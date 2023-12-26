@@ -59,7 +59,7 @@
         android:layout_height="75dp"
         android:text="@string/conectar"
         android:gravity="center"
-        android:background="@drawable/radio_selector"
+        android:backgroundTint="@color/green"
         android:textColor="@color/white"
         android:layout_marginTop="30dp"
         android:layout_gravity="center_horizontal"
@@ -75,9 +75,7 @@
         android:layout_height="75dp"
         android:text="REGISTRAR"
         android:gravity="center"
-        android:background="@drawable/radio_normal3"
         android:textStyle="bold"
-        android:shadowColor="@color/white"
         android:shadowDx="4"
         android:shadowDy="4"
         android:layout_marginTop="20dp"
@@ -102,7 +100,7 @@
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/black"
-        android:textSize="10pt"
+        android:textSize="20dp"
         android:textStyle="bold" />
 
 

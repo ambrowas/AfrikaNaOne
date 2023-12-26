@@ -46,7 +46,6 @@
         android:id="@+id/buttonguardar"
         android:layout_width="300dp"
         android:layout_height="75dp"
-        android:background="@drawable/radio_normal"
         android:freezesText="true"
         android:layout_gravity="center_horizontal"
         android:text="GUARDAR"
@@ -60,12 +59,12 @@
         android:id="@+id/buttonvolver"
         android:layout_width="300dp"
         android:layout_height="75dp"
-        android:background="@drawable/radio_normal3"
+        android:backgroundTint="@color/red"
         android:freezesText="true"
         android:layout_gravity="center_horizontal"
         android:text="VOLVER"
         android:layout_marginBottom="10dp"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textStyle="bold"
         app:strokeWidth="3dp" />
 

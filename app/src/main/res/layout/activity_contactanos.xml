@@ -17,10 +17,9 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:background="@drawable/table_border"
-        android:text="Para ruegos, propuestas, sugerencias, correcciones, quejas, insultos, amenazas,
-etc...contáctenos por Whatsapp e intentaremos arreglarlo.
+        android:text="Para ruegos, preguntas, propuestas, sugerencias, correcciones, quejas, insultos, amenazas,
+ o intimidaciones pulsa el icono de Whatsapp más abajo y escribenos; intentaremos arreglarlo.
 Gracias por apoyarnos, saludos."
-        android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="16sp" />
 
@@ -44,7 +43,6 @@ Gracias por apoyarnos, saludos."
         android:layout_marginTop="15dp"
         android:layout_marginBottom="10dp"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/radio_normal2"
         app:strokeWidth="3dp"/>
 
 

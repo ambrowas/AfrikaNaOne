@@ -64,8 +64,11 @@ public class PreguntasModoLibre extends AppCompatActivity {
     MediaPlayer mediaPlayerCountdown;
     MediaPlayer mediaPlayerRight;
     MediaPlayer mediaPlayerNotRight;
-
     MediaPlayer swooshPlayer;
+
+    private Handler blinkHandler = new Handler();
+    private Runnable blinkRunnable;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +122,10 @@ public class PreguntasModoLibre extends AppCompatActivity {
     }
 
     private void showNextQuestion() {
+        if (blinkRunnable != null) {
+            blinkHandler.removeCallbacks(blinkRunnable);
+            resetRadioButtonsVisibility();
+        }
 
         textviewpregunta.setText("");
         textviewpregunta.setTextColor(Color.BLACK);
@@ -170,6 +177,11 @@ public class PreguntasModoLibre extends AppCompatActivity {
         });
 
     }
+    private void resetRadioButtonsVisibility() {
+        radio_button1.setVisibility(View.VISIBLE);
+        radio_button2.setVisibility(View.VISIBLE);
+        radio_button3.setVisibility(View.VISIBLE);
+    }
 
     private void startCountDown() {
         countDownTimerII = new CountDownTimer(timeLeftInMillis, 1000) {
@@ -206,39 +218,76 @@ public class PreguntasModoLibre extends AppCompatActivity {
     }
 
 
-        private void checkAnswer () {
-            answered = true;
-            countDownTimerII.cancel();
+    private void checkAnswer() {
+        answered = true;
+        countDownTimerII.cancel();
 
-            RadioButton rbSelected = findViewById(radio_group.getCheckedRadioButtonId());
-            int answerNr = radio_group.indexOfChild(rbSelected) + 1;
+        RadioButton rbSelected = findViewById(radio_group.getCheckedRadioButtonId());
+        int answerNr = radio_group.indexOfChild(rbSelected) + 1;
 
-            if (answerNr == currentQuestion.getAnswerNr()) {
-                score = score + 1;
-                scoretotal = scoretotal + 500;
-                mediaPlayerRight.start();
-                textviewpregunta.setText("RESPUESTA CORRECTA");
-                textviewpregunta.setTextColor(getColor(R.color.green));
-                textviewpregunta.setTypeface(null, Typeface.BOLD);
-                textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            } else {
-                mediaPlayerNotRight.start();
-                errores = errores + 1;
-
-
-
-
-                textviewpregunta.setText("RESPUESTA INCORRECTA");
-                textviewpregunta.setTextColor(getColor(R.color.red));
-                textviewpregunta.setTypeface(null, Typeface.BOLD);
-                textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            }
-
-            textviewpuntuacion.setText("PUNTUACION: " + scoretotal);
-            textviewaciertos.setText("ACIERTOS: " + score);
-            showSolution();
+        if (answerNr == currentQuestion.getAnswerNr()) {
+            score++;
+            scoretotal += 500;
+            mediaPlayerRight.start();
+            textviewpregunta.setText("RESPUESTA CORRECTA");
+            textviewpregunta.setTextColor(getColor(R.color.green));
+            textviewpregunta.setTypeface(null, Typeface.BOLD);
+            textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        } else {
+            errores++;
+            mediaPlayerNotRight.start();
+            textviewpregunta.setText("RESPUESTA INCORRECTA");
+            textviewpregunta.setTextColor(getColor(R.color.red));
+            textviewpregunta.setTypeface(null, Typeface.BOLD);
+            textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            blinkCorrectAnswer();
         }
 
+        textviewpuntuacion.setText("PUNTUACION: " + scoretotal);
+        textviewaciertos.setText("ACIERTOS: " + score);
+        showSolution();
+    }
+
+    private void blinkCorrectAnswer() {
+        RadioButton correctRb = getCorrectRadioButton();
+        final int blinkTimes = 6; // Total number of blinks
+        final int blinkInterval = 500; // Milliseconds for each blink
+
+        blinkRunnable = new Runnable() {
+            private int times = 0;
+
+            @Override
+            public void run() {
+                if (times < blinkTimes) {
+                    if (correctRb.getVisibility() == View.VISIBLE) {
+                        correctRb.setVisibility(View.INVISIBLE);
+                    } else {
+                        correctRb.setVisibility(View.VISIBLE);
+                    }
+                    blinkHandler.postDelayed(this, blinkInterval);
+                    times++;
+                } else {
+                    correctRb.setVisibility(View.VISIBLE);
+                }
+            }
+        };
+
+        blinkHandler.post(blinkRunnable);
+    }
+
+
+    private RadioButton getCorrectRadioButton() {
+        switch (currentQuestion.getAnswerNr()) {
+            case 1:
+                return radio_button1;
+            case 2:
+                return radio_button2;
+            case 3:
+                return radio_button3;
+            default:
+                return null;
+        }
+    }
 
     private void showSolution() {
         if (questionCounter < questionCountTotal) {
@@ -247,6 +296,7 @@ public class PreguntasModoLibre extends AppCompatActivity {
             buttonconfirmar.setText("TERMINAR");
         }
     }
+
 
 
     private void finishQuiz() {

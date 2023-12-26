@@ -1,6 +1,7 @@
 package iniciativaselebi.com.guinealogiaediciontrivial;
 
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -11,6 +12,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.android.play.core.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.inappmessaging.FirebaseInAppMessaging;
@@ -23,11 +31,35 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     MediaPlayer swooshPlayer;
     MediaPlayer mediaPlayer;
+    private static final int MY_REQUEST_CODE = 100;
+    private AppUpdateManager appUpdateManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        appUpdateManager = AppUpdateManagerFactory.create(this);
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+        // Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                // Request the update.
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            AppUpdateType.IMMEDIATE,
+                            this,
+                            MY_REQUEST_CODE);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
 
         FirebaseApp.initializeApp(this);
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
@@ -103,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
     private void saveInstallationIdInPreferences(String installationId) {
         SharedPreferences sharedPreferences = getSharedPreferences("appPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -129,5 +162,43 @@ public class MainActivity extends AppCompatActivity {
             swooshPlayer.seekTo(0);
             swooshPlayer.start();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == MY_REQUEST_CODE) {
+            if (resultCode != RESULT_OK) {
+                // The update was cancelled by the user or it failed.
+                // You can prompt the user again to update the app.
+                checkForAppUpdate();
+            }
+        }
+    }
+
+    private void checkForAppUpdate() {
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            AppUpdateType.IMMEDIATE,
+                            this,
+                            MY_REQUEST_CODE);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                    // Handle the exception here
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkForAppUpdate(); // Check for app update when the app resumes
     }
 }

@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -37,15 +38,19 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import Model.User;
 
 public class RankingActivity extends AppCompatActivity {
     TableLayout tableLayout;
     Button button_retorno;
-    ValueAnimator animator;
+    private Map<String, ValueAnimator> flashingAnimators = new HashMap<>();
     MediaPlayer swooshPlayer;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,13 +85,21 @@ public class RankingActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        // Stop all flashing animations
+        for (ValueAnimator animator : flashingAnimators.values()) {
+            if (animator != null) {
+                animator.cancel();
+            }
+        }
+        flashingAnimators.clear(); // Clear the map with animators
+
         if (swooshPlayer != null) {
             swooshPlayer.release();
             swooshPlayer = null;
         }
+
         super.onDestroy();
     }
-
     private void loadTopUsers() {
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("user");
         Query topUsersQuery = usersRef.orderByChild("accumulatedPuntuacion").limitToLast(15);
@@ -117,12 +130,17 @@ public class RankingActivity extends AppCompatActivity {
                     // Create a new TableRow
                     TableRow row = new TableRow(RankingActivity.this);
                     row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-                    row.setPadding(0, 18, 0, 18); // Add vertical padding for increased row height
+                    row.setPadding(0, 22, 0, 22); // Add vertical padding for increased row height
+
+                    if (user.getUid().equals(currentUserId)) {
+                        startFlashingAnimation(user.getUid(), row); // Correct call
+                    }
+
 
                     // Create and configure the Rank TextView
                     TextView tvRank = new TextView(RankingActivity.this);
                     tvRank.setText(String.valueOf(rank));
-                    tvRank.setLayoutParams(new TableRow.LayoutParams(dpToPx(0, RankingActivity.this), TableRow.LayoutParams.WRAP_CONTENT));
+                    tvRank.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.4f));
                     tvRank.setGravity(Gravity.LEFT);
                     tvRank.setTextSize(16); // Set text size as needed
                     row.addView(tvRank);
@@ -130,10 +148,10 @@ public class RankingActivity extends AppCompatActivity {
                     // Create and configure the Name TextView
                     TextView tvName = new TextView(RankingActivity.this);
                     tvName.setText(user.fullname);
-                    TableRow.LayoutParams nameParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2f); // Weighted layout parameters for Name TextView
-                    nameParams.setMargins(dpToPx(-20, RankingActivity.this), 0, 0, 0); // Adjusting left margin to bring Name closer to Rank
+                    TableRow.LayoutParams nameParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 2.5f); // Weighted layout parameters for Name TextView
+                    nameParams.setMargins(dpToPx(-50, RankingActivity.this), 0, 0, 0); // Adjusting left margin to bring Name closer to Rank
                     tvName.setGravity(Gravity.LEFT);
-                    tvName.setTextSize(16); // Set text size as needed
+                    tvName.setTextSize(14); // Set text size as needed
                     tvName.setOnClickListener(v -> {
                         Intent intent = new Intent(RankingActivity.this, LeadersProfileActivity.class);
                         intent.putExtra("user_id", user.getUid());
@@ -150,7 +168,7 @@ public class RankingActivity extends AppCompatActivity {
                     scoreParams.setMargins(dpToPx(-20, RankingActivity.this), 0, 0, 0); // Adjusting left margin
                     tvScore.setLayoutParams(scoreParams);
                     tvScore.setGravity(Gravity.LEFT);
-                    tvScore.setTextSize(16); // Set text size as needed
+                    tvScore.setTextSize(14); // Set text size as needed
                     tvScore.setMaxLines(1);
                     tvScore.setEllipsize(TextUtils.TruncateAt.END);
                     row.addView(tvScore);
@@ -182,6 +200,38 @@ public class RankingActivity extends AppCompatActivity {
         }
     }
 
+    private void startFlashingAnimation(String userId, final TableRow row) {
+        // Define the flashing colors
+        final int colorGreen = ContextCompat.getColor(this, R.color.green);
+        final int colorRed = ContextCompat.getColor(this, R.color.red);
+        final int colorWhite = ContextCompat.getColor(this, R.color.white);
+        final int colorBlue = ContextCompat.getColor(this, R.color.blue);
+        // The colorWhite and colorBlue are commented out, add them back if needed.
+
+        final ValueAnimator colorAnimator = ValueAnimator.ofArgb(colorGreen, colorRed, colorWhite, colorBlue);
+
+        colorAnimator.setDuration(4000); // Duration of the animation between two colors
+        colorAnimator.setEvaluator(new ArgbEvaluator());
+        colorAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        colorAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                // Change the text color for each TextView cell in the row
+                for (int i = 0; i < row.getChildCount(); i++) {
+                    View view = row.getChildAt(i);
+                    if (view instanceof TextView) {
+                        ((TextView) view).setTextColor((int) animator.getAnimatedValue());
+                    }
+                }
+            }
+        });
+
+        colorAnimator.start();
+
+        // Save the animator on the map
+        flashingAnimators.put(userId, colorAnimator);
+    }
     private void checkAndLaunchNumberOneActivity(User user, int rank) {
         String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         if (rank == 1 && currentUserUid.equals(user.getUid())) {

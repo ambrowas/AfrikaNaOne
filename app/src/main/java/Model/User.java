@@ -1,21 +1,48 @@
 package Model;
 public class User {
 
-    public String fullname, email, telefono, ciudad, barrio, pais, profilePicture;
-    public String uid;
-    private int highestScore, accumulatedAciertos, accumulatedFallos, accumulatedPuntuacion, positionInLeaderboard;
+
+
+        public String fullname, email, telefono, ciudad, barrio, pais, profilePicture, deviceType, fechadeCreacion;;
+        public String uid;
+        private int highestScore, accumulatedAciertos, accumulatedFallos, accumulatedPuntuacion, positionInLeaderboard;
+
 
     public User() {
     }
 
-    public User(String fullname, String email, String telefono, String barrio, String ciudad, String pais, String profilePicture) {
-        this.fullname = fullname;
-        this.email = email;
-        this.telefono = telefono;
-        this.barrio = barrio;
-        this.ciudad = ciudad;
-        this.pais = pais;
-        this.profilePicture = profilePicture;
+
+    public User(String fullname, String email, String telefono, String barrio, String ciudad, String pais, String profilePicture, String deviceType, String fechadeCreacion) {
+            this.fullname = fullname;
+            this.email = email;
+            this.telefono = telefono;
+            this.barrio = barrio;
+            this.ciudad = ciudad;
+            this.pais = pais;
+            this.profilePicture = profilePicture;
+            this.deviceType = deviceType;
+            this.fechadeCreacion = fechadeCreacion;
+        }
+
+        // Existing constructor without deviceType
+        public User(String fullname, String email, String telefono, String barrio, String ciudad, String pais, String profilePicture) {
+            this.fullname = fullname;
+            this.email = email;
+            this.telefono = telefono;
+            this.barrio = barrio;
+            this.ciudad = ciudad;
+            this.pais = pais;
+            this.deviceType = "Unknown"; // Default value
+            this.profilePicture = profilePicture;
+        }
+
+    // Getter and setter for deviceType
+    public String getDeviceType() {
+        return deviceType;
+    }
+
+    public void setDeviceType(String deviceType) {
+        this.deviceType = deviceType;
     }
 
     public String getFullname() {
@@ -125,5 +152,13 @@ public class User {
     public void updatePositionInLeaderboard(int newPosition) {
         this.positionInLeaderboard = newPosition;
     }
+    public void setFechadeCreacion(String FechadeCreacion) {
+        this.fechadeCreacion = fechadeCreacion;
+    }
+
+    public String getFechadeCreacion() {
+        return this.fechadeCreacion;
+    }
+
 }
 

@@ -5,8 +5,11 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -32,26 +35,39 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.checkerframework.common.reflection.qual.NewInstance;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import Model.User;
 public class Register extends AppCompatActivity {
     Button btn_register;
     private FirebaseAuth mAuth;
-    String password, email, nombre, ciudad, telefono, barrio, pais;
+    String password, email, nombre, ciudad, telefono, barrio, pais, deviceType;
     MediaPlayer swooshPlayer;
-    FirestoreQuestionManager firestoreQuestionManager;
 
     TextView TextViewVolver2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        FirestoreQuestionManager questionManager = new FirestoreQuestionManager(this);
+
+
+        AutoCompleteTextView dropdownTipoDispositivo = findViewById(R.id.deviceTypeDropdown);
+        String[] devices = getResources().getStringArray(R.array.tipo_dispositivo_options);
+        String[] items = new String[] {"Apple", "Android"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, items);
+        dropdownTipoDispositivo.setAdapter(adapter);
+
+
         TextViewVolver2 = findViewById(R.id.TextViewVolver2);
         mAuth = FirebaseAuth.getInstance();
         btn_register = findViewById(R.id.btn_register);
         swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
-        firestoreQuestionManager = new FirestoreQuestionManager(this);
 
         TextViewVolver2.setOnClickListener(v -> {
             playSwoosh();
@@ -69,6 +85,7 @@ public class Register extends AppCompatActivity {
             EditText editTextCiudad = findViewById(R.id.ciudad);
             EditText editTextPais = findViewById(R.id.pais);
 
+
             // Set the values
             nombre = editTextNombre.getText().toString().trim();
             email = editTextEmail.getText().toString().trim();
@@ -77,6 +94,8 @@ public class Register extends AppCompatActivity {
             barrio = editTextBarrio.getText().toString().trim();
             ciudad = editTextCiudad.getText().toString().trim();
             pais = editTextPais.getText().toString().trim();
+            deviceType = dropdownTipoDispositivo.getText().toString();
+
 
             if (!areAllFieldsValid()) {
                 return;
@@ -90,21 +109,57 @@ public class Register extends AppCompatActivity {
             pais = sanitizeInput(editTextPais.getText().toString().trim());
             email = editTextEmail.getText().toString().trim();
             password = editTextPassword.getText().toString().trim();
-
-
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+            String currentDate = sdf.format(new Date());
 
             // Proceed with Firebase authentication
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            if (user != null) {
-                                User newUser = new User(nombre, email, telefono, barrio, ciudad, pais, "");
-                                FirebaseDatabase.getInstance().getReference("user/" + user.getUid())
+                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                            if (firebaseUser != null) {
+                                User newUser = new User(nombre, email, telefono, barrio, ciudad, pais, "", deviceType, currentDate);
+                                FirebaseDatabase.getInstance().getReference("user/" + firebaseUser.getUid())
                                         .setValue(newUser)
                                         .addOnCompleteListener(task1 -> {
                                             if (task1.isSuccessful()) {
-                                                showCustomAlertDialog("Éxito", "Usuario creado correctamente. Establece una foto de perfil", this::navigateToProfileActivity);
+                                                // Construct the AlertDialog and set the positive button action
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
+                                                builder.setTitle("Éxito") // Set the title of the dialog
+                                                        .setMessage("Usuario creado correctamente. Establece una foto de perfil") // Set the message to display
+                                                        .setPositiveButton(android.R.string.ok, null) // Configure the positive button
+                                                        .setIcon(R.drawable.logotrivial) // Set the icon of the dialog using drawable resource
+                                                        .create(); // Create the AlertDialog
+
+// Now, display the AlertDialog and then customize its window
+                                                AlertDialog dialog = builder.show(); // Show the dialog and store the reference
+
+// Get the Window of the AlertDialog and set the background drawable resource
+                                                Window window = dialog.getWindow(); // Get the window of the dialog
+                                                if (window != null) {
+                                                    window.setBackgroundDrawableResource(R.drawable.dialog_background); // Set the custom background drawable
+                                                }
+                                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
+                                                    // Invoke assignBatchForNewUser method when OK button is clicked
+                                                    questionManager.assignBatchForNewUser(new FirestoreQuestionManager.BatchAssignmentCallback() {
+                                                        @Override
+                                                        public void onBatchAssigned(int batchNumber) {
+                                                            // Batch assignment is successful, dismiss the dialog
+                                                            dialog.dismiss();
+                                                            // Navigate to the profile activity
+                                                            navigateToProfileActivity();
+                                                        }
+
+                                                        @Override
+                                                        public void onError(Exception e) {
+                                                            // Handle batch assignment error
+                                                            dialog.dismiss(); // Optionally dismiss the dialog
+                                                            Log.e("AssignBatch", "Error assigning batch: ", e);
+                                                            // Show an error message to the user if necessary
+                                                        }
+                                                    });
+                                                });
+                                                // Make sure to define BatchAssignmentCallback in FirestoreQuestionManager class
                                             } else {
                                                 showCustomAlertDialog("Error", "Error registrando usuario en la base de datos");
                                             }
@@ -118,7 +173,12 @@ public class Register extends AppCompatActivity {
                             }
                         }
                     });
-        });
+        });}
+
+
+    public interface BatchAssignmentCallback {
+        void onBatchAssigned(int batchNumber);
+        void onError(Exception e);
     }
 
     private String sanitizeInput(String input) {
@@ -160,20 +220,24 @@ public class Register extends AppCompatActivity {
             return false;
         }
 
+        if (TextUtils.isEmpty(deviceType)) {
+            showCustomAlertDialog("Atención", "Elige Dispositivo");
+            return false;
+        }
+
         return true;
     }
 
     private boolean isValidEmail(String email) {
-        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
-        return email.matches(emailPattern);
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private boolean isValidName(String name) {
         if (name == null || name.trim().isEmpty()) {
             return false;
         }
-        // Allow Unicode letters, apostrophes, hyphens, and spaces
-        String namePattern = "[\\p{L}\\s.'-]+";
+        // Allow Unicode letters, apostrophes, hyphens, spaces, and numbers
+        String namePattern = "[\\p{L}\\s.'-]+|\\d+";
         return name.matches(namePattern);
     }
 
