@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -45,7 +46,7 @@ public class Modocompeticion extends AppCompatActivity {
         FirebaseAuth auth;
         Button button_jugar2, button_perfil, button_login, button_register, button_clasificacion, buttoncodigo;
 
-        TextView TextViewSaludo2, TextViewRecord, TextViewVolver;
+        TextView TextViewSaludo2, TextViewRecord, TextViewVolver, TextViewMarcar;
         FirebaseUser user;
         private FirebaseAuth.AuthStateListener authStateListener;
         private int newScore;
@@ -61,8 +62,15 @@ public class Modocompeticion extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_modo_competicion);
-            FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
+        final FirebaseUser[] user = {FirebaseAuth.getInstance().getCurrentUser()};
+        if (user[0] == null) {
+            // User is not authenticated, return early
+            return;
+        }
 
+        // User is authenticated, continue with the activity logic
+        FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(user[0].getUid());
 
             checkAndFetchQuestionsIfNeeded();
 
@@ -74,7 +82,16 @@ public class Modocompeticion extends AppCompatActivity {
 
 
 
-//
+
+//             TextViewMarcar = findViewById(R.id.TextViewMarcar);
+//             TextViewMarcar.setOnClickListener(new View.OnClickListener() {
+//                 @Override
+//                 public void onClick(View view) {
+//                     dataSource.markFortyRandomQuestionsAsUsed();
+//                 }
+//             });
+
+
         button_clasificacion = findViewById(R.id.button_clasificacion);
         button_clasificacion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,8 +149,8 @@ public class Modocompeticion extends AppCompatActivity {
         authStateListener = new FirebaseAuth.AuthStateListener() {
                 @Override
                 public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                    user = firebaseAuth.getCurrentUser();
-                    if (user != null) {
+                    user[0] = firebaseAuth.getCurrentUser();
+                    if (user[0] != null) {
                         button_login.setText("CERRAR SESION");
                     } else {
                         button_login.setText("INICIAR SESION");
@@ -204,9 +221,13 @@ public class Modocompeticion extends AppCompatActivity {
                 ref.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+
                         if (snapshot.exists() && snapshot.hasChild("fullname")) {
                             String fullname = snapshot.child("fullname").getValue(String.class);
                             TextViewSaludo2.setText("¡Bienvenid@, " + fullname + "!");
+                            updateFcmTokenIfNeeded(userRef, snapshot);
+                            updateInstallationIdIfNeeded(userRef, snapshot);
+
                         } else {
                             TextViewSaludo2.setText("¡Bienvenid@!");
                         }
@@ -420,4 +441,36 @@ public class Modocompeticion extends AppCompatActivity {
         }
     }
 
+    private String getInstallationIdFromPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("appPreferences", MODE_PRIVATE);
+        return sharedPreferences.getString("firebaseInstallationId", null);
     }
+
+    private void updateFcmTokenIfNeeded(DatabaseReference userRef, DataSnapshot snapshot) {
+        String newFcmToken = getFcmTokenFromPreferences();
+        String currentFcmTokenInDb = snapshot.child("fcmToken").getValue(String.class);
+        if (newFcmToken != null && !newFcmToken.equals(currentFcmTokenInDb)) {
+            userRef.child("fcmToken").setValue(newFcmToken)
+                    .addOnSuccessListener(aVoid -> Log.d("ModoCompeticion", "FCM Token updated successfully"))
+                    .addOnFailureListener(e -> Log.e("ModoCompeticion", "Failed to update FCM Token", e));
+        }
+    }
+
+    private void updateInstallationIdIfNeeded(DatabaseReference userRef, DataSnapshot snapshot) {
+        String newInstallationId = getInstallationIdFromPreferences();
+        String currentInstallationIdInDb = snapshot.child("installationID").getValue(String.class);
+        if (newInstallationId != null && !newInstallationId.equals(currentInstallationIdInDb)) {
+            userRef.child("installationID").setValue(newInstallationId)
+                    .addOnSuccessListener(aVoid -> Log.d("ModoCompeticion", "Installation ID updated successfully"))
+                    .addOnFailureListener(e -> Log.e("ModoCompeticion", "Failed to update Installation ID", e));
+        }
+
+    }
+
+    private String getFcmTokenFromPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("appPreferences", MODE_PRIVATE);
+        return sharedPreferences.getString("fcmToken", null); // Returns null if "fcmToken" doesn't exist
+    }
+
+
+}

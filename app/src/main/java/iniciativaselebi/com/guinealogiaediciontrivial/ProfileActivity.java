@@ -179,8 +179,8 @@ public class ProfileActivity extends AppCompatActivity {
                         }
 
                         // Update FCM token and Installation ID if necessary
-                        updateFcmTokenIfNeeded(userRef, snapshot);
-                        updateInstallationIdIfNeeded(userRef, snapshot);
+//                        updateFcmTokenIfNeeded(userRef, snapshot);
+//                        updateInstallationIdIfNeeded(userRef, snapshot);
                     }
                 }
                 loadUserHighestScore();
@@ -253,32 +253,32 @@ public class ProfileActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("appPreferences", MODE_PRIVATE);
         return sharedPreferences.getString("firebaseInstallationId", null);
     }
-
-    private void updateFcmTokenIfNeeded(DatabaseReference userRef, DataSnapshot snapshot) {
-        String newFcmToken = getFcmTokenFromPreferences();
-        String currentFcmTokenInDb = snapshot.child("fcmToken").getValue(String.class);
-        if (newFcmToken != null && !newFcmToken.equals(currentFcmTokenInDb)) {
-            userRef.child("fcmToken").setValue(newFcmToken)
-                    .addOnSuccessListener(aVoid -> Log.d("ProfileActivity", "FCM Token updated successfully"))
-                    .addOnFailureListener(e -> Log.e("ProfileActivity", "Failed to update FCM Token", e));
-        }
-    }
-
-    private void updateInstallationIdIfNeeded(DatabaseReference userRef, DataSnapshot snapshot) {
-        String newInstallationId = getInstallationIdFromPreferences();
-        String currentInstallationIdInDb = snapshot.child("installationID").getValue(String.class);
-        if (newInstallationId != null && !newInstallationId.equals(currentInstallationIdInDb)) {
-            userRef.child("installationID").setValue(newInstallationId)
-                    .addOnSuccessListener(aVoid -> Log.d("ProfileActivity", "Installation ID updated successfully"))
-                    .addOnFailureListener(e -> Log.e("ProfileActivity", "Failed to update Installation ID", e));
-        }
-
-    }
-
-    private String getFcmTokenFromPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("appPreferences", MODE_PRIVATE);
-        return sharedPreferences.getString("fcmToken", null); // Returns null if "fcmToken" doesn't exist
-    }
+//
+//    private void updateFcmTokenIfNeeded(DatabaseReference userRef, DataSnapshot snapshot) {
+//        String newFcmToken = getFcmTokenFromPreferences();
+//        String currentFcmTokenInDb = snapshot.child("fcmToken").getValue(String.class);
+//        if (newFcmToken != null && !newFcmToken.equals(currentFcmTokenInDb)) {
+//            userRef.child("fcmToken").setValue(newFcmToken)
+//                    .addOnSuccessListener(aVoid -> Log.d("ProfileActivity", "FCM Token updated successfully"))
+//                    .addOnFailureListener(e -> Log.e("ProfileActivity", "Failed to update FCM Token", e));
+//        }
+//    }
+//
+//    private void updateInstallationIdIfNeeded(DatabaseReference userRef, DataSnapshot snapshot) {
+//        String newInstallationId = getInstallationIdFromPreferences();
+//        String currentInstallationIdInDb = snapshot.child("installationID").getValue(String.class);
+//        if (newInstallationId != null && !newInstallationId.equals(currentInstallationIdInDb)) {
+//            userRef.child("installationID").setValue(newInstallationId)
+//                    .addOnSuccessListener(aVoid -> Log.d("ProfileActivity", "Installation ID updated successfully"))
+//                    .addOnFailureListener(e -> Log.e("ProfileActivity", "Failed to update Installation ID", e));
+//        }
+//
+//    }
+//
+//    private String getFcmTokenFromPreferences() {
+//        SharedPreferences sharedPreferences = getSharedPreferences("appPreferences", MODE_PRIVATE);
+//        return sharedPreferences.getString("fcmToken", null); // Returns null if "fcmToken" doesn't exist
+//    }
 
     private void showExitConfirmation() {
         DialogInterface.OnClickListener positiveAction = (dialog, which) -> navigateToModoCompeticion();

@@ -191,21 +191,28 @@ public class QuestionDataSource {
     }
 
     public long insertOrUpdateQuestion(QuestionModoCompeticion question) {
-        Log.d(TAG, "[MyApp]Inserting new question with number: " + question.getNUMBER());
-        ensureOpen();
-        long result = -1;
-        database.beginTransaction();
-        try {
-            // Directly insert the question using your insert method
-            result = insertQuestion(question);
+        Log.d(TAG, "[MyApp]Checking for duplicate before inserting question with number: " + question.getNUMBER());
 
-            database.setTransactionSuccessful();
-        } catch (SQLException e) {
-            Log.e(TAG, "[MyApp]Error inserting new question with number: " + question.getNUMBER(), e);
-        } finally {
-            database.endTransaction();
+        if (!isQuestionInDatabase(question.getNUMBER())) {
+            Log.d(TAG, "[MyApp]Inserting new question with number: " + question.getNUMBER());
+            ensureOpen();
+            long result = -1;
+            database.beginTransaction();
+            try {
+                // Directly insert the question using your insert method
+                result = insertQuestion(question);
+                database.setTransactionSuccessful();
+                Log.d(TAG, "[MyApp]Successfully inserted question with number: " + question.getNUMBER());
+            } catch (SQLException e) {
+                Log.e(TAG, "[MyApp]Error inserting new question with number: " + question.getNUMBER(), e);
+            } finally {
+                database.endTransaction();
+            }
+            return result;
+        } else {
+            Log.d(TAG, "[MyApp]Question already exists in the database with number: " + question.getNUMBER() + ". Skipping insertion.");
+            return -1; // Indicate that no insertion was made due to duplication
         }
-        return result;
     }
 
     private long updateQuestion(QuestionModoCompeticion question) {

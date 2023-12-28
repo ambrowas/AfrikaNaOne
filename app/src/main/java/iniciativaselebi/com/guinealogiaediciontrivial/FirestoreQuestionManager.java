@@ -339,83 +339,62 @@ import java.util.concurrent.atomic.AtomicInteger;
             });
         }
 
-        public void prepareNextBatchIfRequired(String userId, BatchPreparationCallback callback)  {
-                DatabaseReference userRef = database.getReference("user").child(userId).child("currentBatch");
+        public void prepareNextBatchIfRequired(String userId, BatchPreparationCallback callback) {
+            DatabaseReference userRef = database.getReference("user").child(userId).child("currentBatch");
 
-                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot currentBatchSnapshot) {
-                        if (currentBatchSnapshot.exists()) {
-                            int currentBatchId = currentBatchSnapshot.getValue(Integer.class);
-                            logCompletedBatch(userId, currentBatchId);
-
-
-                            // Retrieve total batch count to determine the next batch ID
-                            getTotalBatches(new BatchCountCallback() {
-                                @Override
-                                public void onBatchCountRetrieved(int totalCount) {
-                                    int nextBatchId = currentBatchId + 1;
-                                    // Wrap around if the nextBatchId exceeds total batches
-                                    if (nextBatchId > totalCount) {
-                                        nextBatchId = 1;
-                                    }
-
-                                    // final variable for use in lambda
-                                    final int newBatchId = nextBatchId;
-
-                                    // Update the user's current batch ID in the database
-                                    userRef.setValue(newBatchId).addOnCompleteListener(task -> {
-                                        if (task.isSuccessful()) {
-                                            Log.d("[MyApp]FetchAndSaveFlow", "Set new batch for user: " + userId + " to batch number: " + newBatchId);
-                                        } else {
-                                            Log.e("[MyApp]FetchAndSaveFlow", "Failed to set new batch for user: " + userId, task.getException());
-                                        }
-                                    });
-                                }
-
-                                @Override
-                                public void onError(Exception e) {
-                                    Log.e("[MyApp]FetchAndSaveFlow", "Error retrieving total batch count.", e);
-                                }
-                            });
-
-                        } else {
-                            Log.e("[MyApp]FetchAndSaveFlow", "No current batch found for user: " + userId);
-                            // Possibly initialize the user's batch here
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e("[MyApp]FetchAndSaveFlow", "Database error occurred while checking current batch.", databaseError.toException());
-                    }
-                });
-            }
-
-        public void logCompletedBatch(String userId, int completedBatch) {
-            DatabaseReference userRef = database.getReference("user").child(userId).child("CompletedBatch");
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    String existingBatches = dataSnapshot.exists() ? dataSnapshot.getValue(String.class) : "";
-                    String updatedBatches = existingBatches.isEmpty() ? String.valueOf(completedBatch) : existingBatches + ", " + completedBatch;
+                public void onDataChange(@NonNull DataSnapshot currentBatchSnapshot) {
+                    if (currentBatchSnapshot.exists()) {
+                        int currentBatchId = currentBatchSnapshot.getValue(Integer.class);
 
-                    userRef.setValue(updatedBatches).addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Log.d("CompletedBatch", "Batch " + completedBatch + " added to completed list for user: " + userId);
-                        } else {
-                            Log.e("CompletedBatch", "Failed to update completed batch list for user: " + userId, task.getException());
-                        }
-                    });
+                        // Log the current batch as completed
+                        logCompletedBatch(userId, currentBatchId);
+
+                        // Retrieve total batch count to determine the next batch ID
+                        getTotalBatches(new BatchCountCallback() {
+                            @Override
+                            public void onBatchCountRetrieved(int totalCount) {
+                                int newBatchId = currentBatchId + 1;
+                                if (newBatchId > totalCount) {
+                                    newBatchId = 1; // Wrap around to the first batch if the last one is reached
+                                }
+
+                                // Declare newBatchIdFinal as final so that it can be used within the lambda expression
+                                final int newBatchIdFinal = newBatchId;
+
+                                // Update the user's current batch ID in the database and proceed with preparation
+                                userRef.setValue(newBatchIdFinal).addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        Log.d("[MyApp]FetchAndSaveFlow", "Set new batch for user: " + userId + " to batch number: " + newBatchIdFinal);
+                                        // Since newBatchIdFinal is effectively final, it can be used here.
+                                        // Other operations or notifications can go here
+                                    } else {
+                                        Log.e("[MyApp]FetchAndSaveFlow", "Failed to set new batch for user: " + userId, task.getException());
+                                        callback.onBatchPreparationFailed(task.getException());
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("[MyApp]FetchAndSaveFlow", "Error retrieving total batch count.", e);
+                                callback.onBatchPreparationFailed(e);
+                            }
+                        });
+                    } else {
+                        Log.e("[MyApp]FetchAndSaveFlow", "No current batch found for user: " + userId);
+                        // The process for assigning a new user's first batch could be initiated here as well.
+                    }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.e("CompletedBatch", "Error updating completed batch list for user: " + userId, databaseError.toException());
+                    Log.e("[MyApp]FetchAndSaveFlow", "Database error occurred while checking current batch.", databaseError.toException());
+                    callback.onBatchPreparationFailed(databaseError.toException());
                 }
             });
         }
-
 
 
         interface BatchPreparationCallback {
@@ -466,41 +445,54 @@ import java.util.concurrent.atomic.AtomicInteger;
                     });
         }
 
-        public void updateLocalDatabaseWithNewQuestions(List<QuestionModoCompeticion> newQuestions, QuestionsFetchCallback callback) {
-            Log.d("[MyApp]FetchAndSaveFlow", "[MyApp]Updating local database with new questions.");
+        public void updateLocalDatabaseWithNewQuestions(List<QuestionModoCompeticion> newQuestions, int completedBatchId, QuestionsFetchCallback callback) {
+            Log.d("[MyApp]FetchAndSaveFlow", "Starting update of local database with new questions.");
 
-            dataSource.open();
+            if (currentUser != null) {
+                Log.d("[MyApp]FetchAndSaveFlow", "Current user's UID: " + currentUser.getUid());
+            } else {
+                Log.d("[MyApp]FetchAndSaveFlow", "Current user is null.");
+            }
+            Log.d("[MyApp]FetchAndSaveFlow", "Batch ID to be marked as completed: " + completedBatchId);
+
+            dataSource.open(); // Open the data source to update the database
 
             try {
-                Log.d("[MyApp]FetchAndSaveFlow", "[MyApp]Local data source opened.");
+                Log.d("[MyApp]FetchAndSaveFlow", "Local data source opened successfully.");
 
                 List<QuestionModoCompeticion> lastFiveQuestions = getLastFiveUnusedQuestions();
-                dataSource.deleteUsedQuestions();
+                Log.d("[MyApp]FetchAndSaveFlow", "Retrieved last five unused questions. Count: " + lastFiveQuestions.size());
 
-                // Ensure that only unused questions are preserved.
-                if (lastFiveQuestions.size() > 0) {
-                    for (QuestionModoCompeticion question : lastFiveQuestions) {
+                dataSource.deleteUsedQuestions();
+                Log.d("[MyApp]FetchAndSaveFlow", "Deleted used questions from local database.");
+
+                // Insert or update last five unused questions after checking for duplicates
+                for (QuestionModoCompeticion question : lastFiveQuestions) {
+                    if (!dataSource.isQuestionInDatabase(question.getNUMBER())) {
                         dataSource.insertOrUpdateQuestion(question);
                     }
                 }
+                Log.d("[MyApp]FetchAndSaveFlow", "Processed last five unused questions in local database.");
 
-                // Insert the new questions into the database.
+                // Insert or update new questions after checking for duplicates
                 for (QuestionModoCompeticion question : newQuestions) {
-                    dataSource.insertOrUpdateQuestion(question);
+                    if (!dataSource.isQuestionInDatabase(question.getNUMBER())) {
+                        dataSource.insertOrUpdateQuestion(question);
+                    }
                 }
+                Log.d("[MyApp]FetchAndSaveFlow", "Inserted new questions into local database.");
 
-                Log.d("[MyApp]FetchAndSaveFlow", "[MyApp]Local database updated with new questions.");
-                callback.onQuestionsUpdated(newQuestions); // Notify that questions have been updated
+                callback.onQuestionsUpdated(newQuestions); // Notify callback that questions have been updated
+                Log.d("[MyApp]FetchAndSaveFlow", "Callback notified that questions have been updated.");
 
             } catch (Exception e) {
-                Log.e("[MyApp]FetchAndSaveFlow", "[MyApp]Error updating local database with new questions.", e);
-                callback.onError(e); // Notify about the error
+                Log.e("[MyApp]FetchAndSaveFlow", "Error when updating local database with new questions.", e);
+                callback.onError(e); // Notify callback about the error
             } finally {
-                dataSource.close();
-                Log.d("[MyApp]FetchAndSaveFlow", "[MyApp]Local database closed.");
+                dataSource.close(); // Close the data source regardless of previous success or failure
+                Log.d("[MyApp]FetchAndSaveFlow", "Local data source has been closed.");
             }
         }
-
 
         public List<QuestionModoCompeticion> getLastFiveUnusedQuestions() {
             Log.d("[MyApp]FetchAndSaveFlow", "[MyApp]Fetching last five unused questions from local database.");
@@ -553,4 +545,29 @@ import java.util.concurrent.atomic.AtomicInteger;
             // Parsing and creating the QuestionModoCompeticion object
             return new QuestionModoCompeticion(question, optionA, optionB, optionC, answer, category, imageUrl, number);
         }
+
+        public void logCompletedBatch(String userId, int completedBatch) {
+            DatabaseReference userRef = database.getReference("user").child(userId).child("CompletedBatch");
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String existingBatches = dataSnapshot.exists() ? dataSnapshot.getValue(String.class) : "";
+                    String updatedBatches = existingBatches.isEmpty() ? String.valueOf(completedBatch) : existingBatches + ", " + completedBatch;
+
+                    userRef.setValue(updatedBatches).addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("[MyApp]CompletedBatch", "Batch " + completedBatch + " added to completed list for user: " + userId);
+                        } else {
+                            Log.e("[MyApp]CompletedBatch", "Failed to update completed batch list for user: " + userId, task.getException());
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e("[MyApp]CompletedBatch", "Error updating completed batch list for user: " + userId, databaseError.toException());
+                }
+            });
+        }
+
     }

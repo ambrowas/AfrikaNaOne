@@ -87,6 +87,8 @@ public class PreguntasModoCompeticion extends  AppCompatActivity{
 
     private boolean isBackPressed = false;
 
+    private int currentBatchId; // Class level field
+
 
 
 
@@ -231,34 +233,37 @@ public class PreguntasModoCompeticion extends  AppCompatActivity{
     }
 
     private void fetchAndSaveNewQuestions() {
-        startDatabaseOperations(); // Begin database operation and show progress dialog
-
         firestoreQuestionManager.fetchShuffledBatchQuestions(new FirestoreQuestionManager.QuestionsFetchCallback() {
             @Override
             public void onSuccess(List<QuestionModoCompeticion> fetchedQuestions) {
-                // Implement logic if necessary, or leave empty
+
             }
 
             @Override
             public void onQuestionsFetched(List<QuestionModoCompeticion> fetchedQuestions) {
-                saveFetchedQuestionsToLocalDatabase(fetchedQuestions);
+                // Assuming currentBatchId is accessible here and represents the batch that the questions belong to
+                int completedBatchId = currentBatchId; // currentBatchId should be the ID of the current batch
+                saveFetchedQuestionsToLocalDatabase(fetchedQuestions, completedBatchId);
             }
 
             @Override
             public void onQuestionsUpdated(List<QuestionModoCompeticion> updatedQuestions) {
-
+                // This method might not be used here if it's intended for after the questions have been saved to the database
+                // If so, you could leave this implementation empty, or consider removing this method from the callback
+                // if it's not necessary for the interface contract in all use cases.
             }
 
             @Override
             public void onError(Exception e) {
-                Log.e("[MyApp]QuestionFlow", "Error fetching new batch of questions", e);
-                completeDatabaseOperations(); // End database operation and hide progress dialog
+                Log.e("QuestionFlow", "Error fetching new batch of questions", e);
+                // Handle the fetch error
             }
         });
     }
 
-    private void saveFetchedQuestionsToLocalDatabase(List<QuestionModoCompeticion> fetchedQuestions) {
-        firestoreQuestionManager.updateLocalDatabaseWithNewQuestions(fetchedQuestions, new FirestoreQuestionManager.QuestionsFetchCallback() {
+
+    private void saveFetchedQuestionsToLocalDatabase(List<QuestionModoCompeticion> fetchedQuestions, int completedBatchId) {
+        firestoreQuestionManager.updateLocalDatabaseWithNewQuestions(fetchedQuestions, completedBatchId, new FirestoreQuestionManager.QuestionsFetchCallback() {
             @Override
             public void onSuccess(List<QuestionModoCompeticion> fetchedQuestions) {
                 // Implement logic if necessary, or leave empty

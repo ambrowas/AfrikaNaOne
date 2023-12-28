@@ -63,6 +63,12 @@ public class Register extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, items);
         dropdownTipoDispositivo.setAdapter(adapter);
 
+        AutoCompleteTextView paisDropdown = findViewById(R.id.paisDropdown);
+        String[] countries = getResources().getStringArray(R.array.countries_array);
+        ArrayAdapter<String> adapter1 = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, countries);
+        paisDropdown.setAdapter(adapter1);
+
+
 
         TextViewVolver2 = findViewById(R.id.TextViewVolver2);
         mAuth = FirebaseAuth.getInstance();
@@ -123,63 +129,64 @@ public class Register extends AppCompatActivity {
                                         .setValue(newUser)
                                         .addOnCompleteListener(task1 -> {
                                             if (task1.isSuccessful()) {
-                                                // Construct the AlertDialog and set the positive button action
-                                                AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
-                                                builder.setTitle("Éxito") // Set the title of the dialog
-                                                        .setMessage("Usuario creado correctamente. Establece una foto de perfil") // Set the message to display
-                                                        .setPositiveButton(android.R.string.ok, null) // Configure the positive button
-                                                        .setIcon(R.drawable.logotrivial) // Set the icon of the dialog using drawable resource
-                                                        .create(); // Create the AlertDialog
+                                                // Construct the AlertDialog
+                                                AlertDialog dialog = new AlertDialog.Builder(Register.this)
+                                                        .setTitle("Éxito")
+                                                        .setMessage("Usuario creado correctamente. Establece una foto de perfil")
+                                                        .setPositiveButton(android.R.string.ok, null) // Initially, don't set an OnClickListener
+                                                        .setIcon(R.drawable.logotrivial)
+                                                        .create();
 
-// Now, display the AlertDialog and then customize its window
-                                                AlertDialog dialog = builder.show(); // Show the dialog and store the reference
+                                                dialog.setOnShowListener(dialogInterface -> {
+                                                    Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                                                    positiveButton.setOnClickListener(view -> {
+                                                        // Invoke assignBatchForNewUser method when OK button is clicked
+                                                        questionManager.assignBatchForNewUser(new FirestoreQuestionManager.BatchAssignmentCallback() {
+                                                            @Override
+                                                            public void onBatchAssigned(int batchNumber) {
+                                                                // Batch assignment is successful, dismiss the dialog and navigate
+                                                                dialog.dismiss();
+                                                                navigateToProfileActivity();
+                                                            }
 
-// Get the Window of the AlertDialog and set the background drawable resource
-                                                Window window = dialog.getWindow(); // Get the window of the dialog
-                                                if (window != null) {
-                                                    window.setBackgroundDrawableResource(R.drawable.dialog_background); // Set the custom background drawable
-                                                }
-                                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
-                                                    // Invoke assignBatchForNewUser method when OK button is clicked
-                                                    questionManager.assignBatchForNewUser(new FirestoreQuestionManager.BatchAssignmentCallback() {
-                                                        @Override
-                                                        public void onBatchAssigned(int batchNumber) {
-                                                            // Batch assignment is successful, dismiss the dialog
-                                                            dialog.dismiss();
-                                                            // Navigate to the profile activity
-                                                            navigateToProfileActivity();
-                                                        }
-
-                                                        @Override
-                                                        public void onError(Exception e) {
-                                                            // Handle batch assignment error
-                                                            dialog.dismiss(); // Optionally dismiss the dialog
-                                                            Log.e("AssignBatch", "Error assigning batch: ", e);
-                                                            // Show an error message to the user if necessary
-                                                        }
+                                                            @Override
+                                                            public void onError(Exception e) {
+                                                                // Handle batch assignment error
+                                                                dialog.dismiss(); // Dismiss the dialog
+                                                                Log.e("AssignBatchError", "Error assigning batch: ", e);
+                                                                // Optional: Show an error message to the user
+                                                            }
+                                                        });
                                                     });
                                                 });
-                                                // Make sure to define BatchAssignmentCallback in FirestoreQuestionManager class
+
+                                                Window window = dialog.getWindow();
+                                                if (window != null) {
+                                                    window.setBackgroundDrawableResource(R.drawable.dialog_background);
+                                                }
+
+                                                dialog.show(); // Display the dialog after setting up the OnShowListener
+
+
                                             } else {
+                                                // Handle error on database user registration
                                                 showCustomAlertDialog("Error", "Error registrando usuario en la base de datos");
                                             }
                                         });
                             }
                         } else {
+                            // Handle exceptions
                             if (task.getException() instanceof FirebaseAuthUserCollisionException) {
-                                showCustomAlertDialog("Atención", "La cuenta ya existe, ¿quieres conectarte?");
+                                showCustomAlertDialog("Atención", "Una cuenta asociada a este email ya existe. Inicia sesión");
                             } else {
                                 showCustomAlertDialog("Error", "Error registrando usuario");
                             }
                         }
                     });
+
         });}
 
 
-    public interface BatchAssignmentCallback {
-        void onBatchAssigned(int batchNumber);
-        void onError(Exception e);
-    }
 
     private String sanitizeInput(String input) {
         // Firebase Realtime Database keys cannot contain '.', '#', '$', '[', or ']'
@@ -254,7 +261,6 @@ public class Register extends AppCompatActivity {
         return field != null && !field.trim().isEmpty();
     }
 
-
     private void showCustomAlertDialog(String title, String message) {
         AlertDialog dialog = new AlertDialog.Builder(Register.this)
                 .setTitle(title) // Set the title
@@ -270,7 +276,6 @@ public class Register extends AppCompatActivity {
 
         dialog.show();
     }
-
 
     private void showCustomAlertDialog(String title, String message, final Runnable onDismiss) {
         AlertDialog dialog = new AlertDialog.Builder(Register.this)
@@ -294,7 +299,7 @@ public class Register extends AppCompatActivity {
     }
 
     private void navigateToProfileActivity() {
-        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+        Intent intent = new Intent(Register.this, ProfileActivity.class);
         startActivity(intent);
         finish();
     }

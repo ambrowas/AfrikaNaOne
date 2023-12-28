@@ -94,6 +94,8 @@ public class Preguntas extends AppCompatActivity {
 
     MediaPlayer swooshPlayer;
 
+    private int currentBatchId; // Class level field
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -243,8 +245,9 @@ public class Preguntas extends AppCompatActivity {
 
             @Override
             public void onQuestionsFetched(List<QuestionModoCompeticion> fetchedQuestions) {
-                // Save fetched questions to local database
-                saveFetchedQuestionsToLocalDatabase(fetchedQuestions);
+                // Assuming currentBatchId is accessible here and represents the batch that the questions belong to
+                int completedBatchId = currentBatchId; // currentBatchId should be the ID of the current batch
+                saveFetchedQuestionsToLocalDatabase(fetchedQuestions, completedBatchId);
             }
 
             @Override
@@ -262,17 +265,19 @@ public class Preguntas extends AppCompatActivity {
         });
     }
 
-    private void saveFetchedQuestionsToLocalDatabase(List<QuestionModoCompeticion> fetchedQuestions) {
-        firestoreQuestionManager.updateLocalDatabaseWithNewQuestions(fetchedQuestions, new FirestoreQuestionManager.QuestionsFetchCallback() {
+    private void saveFetchedQuestionsToLocalDatabase(List<QuestionModoCompeticion> fetchedQuestions, int completedBatchId) {
+        firestoreQuestionManager.updateLocalDatabaseWithNewQuestions(fetchedQuestions, completedBatchId, new FirestoreQuestionManager.QuestionsFetchCallback() {
             @Override
             public void onQuestionsUpdated(List<QuestionModoCompeticion> questions) {
                 Log.d("QuestionFlow", "Local database updated with new batch of questions.");
-                // You can implement additional logic here if needed
+                // Now that the questions are updated and the batch is considered complete,
+                // you can mark the batch as completed here if needed.
             }
 
             @Override
             public void onSuccess(List<QuestionModoCompeticion> fetchedQuestions) {
-
+                // onSuccess is not used in this context, you might consider removing it from the interface
+                // if it doesn't serve any purpose elsewhere.
             }
 
             @Override
@@ -287,7 +292,6 @@ public class Preguntas extends AppCompatActivity {
             }
         });
     }
-
     private void displayNextUnusedQuestion() {
         List<QuestionModoCompeticion> questions = questionDataSource.fetchRandomUnusedQuestions(1);
         if (!questions.isEmpty()) {
@@ -445,14 +449,12 @@ public class Preguntas extends AppCompatActivity {
         showCustomDialog(title, message, null);
     }
 
-
     private void playSwoosh() {
         if (swooshPlayer != null) {
             swooshPlayer.seekTo(0);
             swooshPlayer.start();
         }
     }
-
 
     private void showSolution() {
             int selectedRadioButtonId = radio_group.getCheckedRadioButtonId();
@@ -494,7 +496,6 @@ public class Preguntas extends AppCompatActivity {
             buttonterminar.setVisibility(View.VISIBLE);
             resetTextView();
         }
-
 
     private void stopImageAnimation() {
         ImageView resultImage = findViewById(R.id.resultImage);
@@ -867,12 +868,6 @@ public class Preguntas extends AppCompatActivity {
         // Reset the isAlertDisplayed flag as the alert has been handled
         isAlertDisplayed = false;
     }
-
-
-
-
-
-
 
 }
 

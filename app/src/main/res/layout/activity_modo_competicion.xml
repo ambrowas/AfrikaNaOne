@@ -161,5 +161,24 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
+<!--    <TextView-->
+<!--        android:id="@+id/TextViewMarcar"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:layout_below="@+id/button_login"-->
+<!--        android:layout_marginTop="90dp"-->
+<!--        android:shadowColor="@color/white"-->
+<!--        android:shadowDx="4"-->
+<!--        android:shadowDy="4"-->
+<!--        android:shadowRadius="6"-->
+<!--        android:text="MARCAR"-->
+<!--        android:letterSpacing=".20"-->
+<!--        android:textAlignment="center"-->
+<!--        android:textAppearance="@style/TextAppearance.AppCompat.Body1"-->
+<!--        android:textColor="@color/black"-->
+<!--        android:textSize="16sp"-->
+<!--        android:textStyle="bold" />-->
+
 
 </RelativeLayout>
