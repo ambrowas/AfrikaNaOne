@@ -17,7 +17,7 @@
         android:backgroundTint="@color/red"
         android:text="Game Over"
         android:layout_marginTop="200dp"
-        android:layout_marginLeft="110dp"
+        android:layout_gravity="center_horizontal"
         android:textColor="@color/white"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -25,7 +25,7 @@
 
     <TextView
         android:id="@+id/TextViewClicAca"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/gameOverText"
         android:layout_gravity="center_horizontal"

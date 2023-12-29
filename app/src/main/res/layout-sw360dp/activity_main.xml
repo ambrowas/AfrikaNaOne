@@ -25,8 +25,9 @@
         android:textStyle="bold"
         android:textSize="18sp"
         android:layout_below="@id/logo"
+        android:layout_marginTop="-70dp"
         android:visibility="gone"
-        android:gravity="center" />
+        android:gravity="center_horizontal" />
 
 
 

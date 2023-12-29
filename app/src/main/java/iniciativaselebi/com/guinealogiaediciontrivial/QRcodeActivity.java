@@ -330,7 +330,7 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
             TaskCompletionSource<String> tcs = new TaskCompletionSource<>();
 
             if (isWithinCoolDownPeriod()) {
-                showCustomAlertDialog("Atención", "Debes esperar 3 minutos antes de poder guardar otro código QR.");
+                showCustomAlertDialog("Atención", "Ya generaste este código QR.");
                 tcs.setException(new RuntimeException("Cooldown period active"));
                 return tcs.getTask();
             }
@@ -365,7 +365,7 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                             qrCodesRef.child(qrCodeKey).setValue(qrCodeData).addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
                                     playSwoosh();
-                                    showCustomAlertDialog("Éxito", "Código QR creado");
+                                    showCustomAlertDialog("Éxito", "Código QR creado. Ya puedes ir a cobrar");
                                     tcs.setResult(qrCodeKey);
                                     lastSavedTimestamp = System.currentTimeMillis();
                                 } else {

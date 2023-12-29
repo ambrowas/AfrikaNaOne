@@ -311,8 +311,8 @@ public class ClassficationActivity extends AppCompatActivity {
 
     private void showCooldownAlertDialog() {
         AlertDialog dialog = new AlertDialog.Builder(ClassficationActivity.this)
-                .setTitle("Espera Necesaria")
-                .setMessage("Debes esperar 3 minutos antes de poder generar otro código QR.")
+                .setTitle("Atención")
+                .setMessage("Ya generaste este código.")
                 .setPositiveButton(android.R.string.ok, null)
                 .setIcon(R.drawable.logotrivial)
                 .create();

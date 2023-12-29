@@ -13,6 +13,6 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Custom font -->
-        <item name="android:fontFamily">@font/cairo_light</item>
+
     </style>
 </resources>
