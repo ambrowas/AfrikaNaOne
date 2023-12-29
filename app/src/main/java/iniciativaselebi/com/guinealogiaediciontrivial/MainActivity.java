@@ -1,16 +1,20 @@
 package iniciativaselebi.com.guinealogiaediciontrivial;
 
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.play.core.appupdate.AppUpdateInfo;
@@ -31,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     MediaPlayer swooshPlayer;
     MediaPlayer mediaPlayer;
+
+    TextView TextViewClicAqui;
     private static final int MY_REQUEST_CODE = 100;
     private AppUpdateManager appUpdateManager;
 
@@ -84,6 +90,18 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("MainActivity", "Unable to get Installation ID", task.getException());
             }
         });
+
+        TextView textViewClicAqui = findViewById(R.id.TextViewClicAqui);
+
+// Handler to delay the visibility
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!isFinishing()) { // Check if the activity is still active
+                    textViewClicAqui.setVisibility(View.VISIBLE);
+                }
+            }
+        }, 10000); // 2000ms delay
 
 
         imageView = findViewById(R.id.logo);

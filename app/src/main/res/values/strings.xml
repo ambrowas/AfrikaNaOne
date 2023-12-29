@@ -27,6 +27,7 @@
     <string-array name="tipo_dispositivo_options">
         <item>Apple</item>
         <item>Android</item>
+    </string-array>
         <string-array name="countries_array">
             <item>Afganistán</item>
             <item>Albania</item>
@@ -223,9 +224,5 @@
             <item>Zambia</item>
             <item>Zimbabue</item>
         </string-array>
-
-    </string-array>
-
-
 
 </resources>

@@ -11,11 +11,22 @@
     <ImageView
         android:id="@+id/logo"
         android:layout_width="200dp"
-        android:layout_height="441dp"
+        android:layout_height="300dp"
         android:contentDescription="logotipoapp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
         android:src="@drawable/logotrivial" />
+
+    <TextView
+        android:id="@+id/TextViewClicAqui"
+        android:text="CLIC AQUI PARA COMENZAR"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_below="@id/logo"
+        android:visibility="gone"
+        android:gravity="center" />
 
 
 

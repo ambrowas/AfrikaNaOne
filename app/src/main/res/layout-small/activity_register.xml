@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/coolbackground"
+    tools:context=".Register">
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,31 +15,31 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@drawable/trivialbackground"
+    android:background="@drawable/coolbackground"
     tools:context=".Register">
 
     <TextView
         android:text="REGISTRAR USUARIO"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="55dp"
         android:textStyle="bold"
-        android:textSize="24sp"
-        android:layout_marginTop="110dp"
+        android:textSize="16sp"
+        android:layout_marginTop="10dp"
         android:gravity="center" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="300dp"
-        android:layout_height="wrap_content">
+        android:layout_height="55dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/nombre"
             android:hint="@string/nombre"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="55dp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="300dp"
-        android:layout_height="wrap_content">
+        android:layout_height="55dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/email"
             android:hint="@string/email"
@@ -41,7 +50,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="300dp"
-        android:layout_height="wrap_content">
+        android:layout_height="55dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/password"
             android:hint="@string/contrase_a"
@@ -52,7 +61,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="300dp"
-        android:layout_height="wrap_content">
+        android:layout_height="55dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/telefono"
             android:hint="@string/telefono"
@@ -62,7 +71,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="300dp"
-        android:layout_height="wrap_content">
+        android:layout_height="55dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/barrio"
             android:hint="Barrio"
@@ -72,7 +81,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="300dp"
-        android:layout_height="wrap_content">
+        android:layout_height="55dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/ciudad"
             android:hint="@string/ciudad"
@@ -82,7 +91,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="300dp"
-        android:layout_height="wrap_content">
+        android:layout_height="55dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/pais"
             android:hint="@string/pa_s"
@@ -94,7 +103,7 @@
         android:id="@+id/menu_tipo_dispositivo"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="300dp"
-        android:layout_height="wrap_content">
+        android:layout_height="55dp">
         <AutoCompleteTextView
             android:id="@+id/deviceTypeDropdown"
             android:layout_width="match_parent"
@@ -111,10 +120,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
     <Button
         android:id="@+id/btn_register"
-        android:layout_width="280dp"
+        android:layout_width="130dp"
         android:layout_height="55dp"
+        android:layout_marginLeft="25dp"
         android:text="@string/registrar"
         android:gravity="center"
         android:textStyle="bold"
@@ -128,11 +143,11 @@
 
     <TextView
         android:id="@+id/TextViewVolver2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="130dp"
+        android:layout_marginLeft="10dp"
+        android:layout_height="55dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/button_login"
-        android:layout_marginTop="10dp"
         android:shadowColor="@color/white"
         android:shadowDx="4"
         android:shadowDy="4"
@@ -145,4 +160,7 @@
         android:textSize="20dp"
         android:textStyle="bold" />
 
+    </LinearLayout>
+
 </LinearLayout>
+</ScrollView>

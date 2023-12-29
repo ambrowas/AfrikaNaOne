@@ -12,16 +12,16 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="100dp"
         android:paddingLeft="10dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:background="@drawable/table_border"
-        android:text="Para ruegos, preguntas, propuestas, sugerencias, correcciones, quejas, insultos, amenazas,
+        android:text="Para ruegos, preguntas, propuestas, sugerencias, correcciones, quejas, insultos, amenazas
 o intimidaciones, pulsa el icono de Whatsapp más abajo y escríbenos; intentaremos arreglarlo.
 Gracias por apoyarnos, saludos."
         android:textColor="@color/black"
-        android:textSize="16sp" />
+        android:textSize="10sp" />
 
 
     <ImageButton
@@ -35,8 +35,8 @@ Gracias por apoyarnos, saludos."
 
     <Button
         android:id="@+id/buttonvolver3"
-        android:layout_width="300dp"
-        android:layout_height="75dp"
+        android:layout_width="200dp"
+        android:layout_height="55dp"
         android:text="VOLVER"
         android:textColor="@color/white"
         android:textStyle="bold"

@@ -60,13 +60,14 @@ public class Register extends AppCompatActivity {
         AutoCompleteTextView dropdownTipoDispositivo = findViewById(R.id.deviceTypeDropdown);
         String[] devices = getResources().getStringArray(R.array.tipo_dispositivo_options);
         String[] items = new String[] {"Apple", "Android"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, items);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.dropdown_item, items);
         dropdownTipoDispositivo.setAdapter(adapter);
 
         AutoCompleteTextView paisDropdown = findViewById(R.id.paisDropdown);
         String[] countries = getResources().getStringArray(R.array.countries_array);
-        ArrayAdapter<String> adapter1 = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, countries);
-        paisDropdown.setAdapter(adapter1);
+        ArrayAdapter<String> countriesAdapter = new ArrayAdapter<>(this, R.layout.dropdown_item, countries);
+        paisDropdown.setAdapter(countriesAdapter);
+
 
 
 
@@ -89,7 +90,7 @@ public class Register extends AppCompatActivity {
             EditText editTextTelefono = findViewById(R.id.telefono);
             EditText editTextBarrio = findViewById(R.id.barrio);
             EditText editTextCiudad = findViewById(R.id.ciudad);
-            EditText editTextPais = findViewById(R.id.pais);
+
 
 
             // Set the values
@@ -99,7 +100,7 @@ public class Register extends AppCompatActivity {
             telefono = editTextTelefono.getText().toString().trim();
             barrio = editTextBarrio.getText().toString().trim();
             ciudad = editTextCiudad.getText().toString().trim();
-            pais = editTextPais.getText().toString().trim();
+            pais = paisDropdown.getText().toString();
             deviceType = dropdownTipoDispositivo.getText().toString();
 
 
@@ -112,7 +113,6 @@ public class Register extends AppCompatActivity {
             telefono = sanitizeInput(editTextTelefono.getText().toString().trim());
             barrio = sanitizeInput(editTextBarrio.getText().toString().trim());
             ciudad = sanitizeInput(editTextCiudad.getText().toString().trim());
-            pais = sanitizeInput(editTextPais.getText().toString().trim());
             email = editTextEmail.getText().toString().trim();
             password = editTextPassword.getText().toString().trim();
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());

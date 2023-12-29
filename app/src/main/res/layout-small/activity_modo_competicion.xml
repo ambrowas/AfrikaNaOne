@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="180dp"
+        android:layout_marginTop="100dp"
         android:shadowColor="@color/white"
         android:shadowDx="4"
         android:shadowDy="4"
@@ -44,12 +44,12 @@
 
     <Button
         android:id="@+id/button_jugar2"
-        android:layout_width="300dp"
-        android:layout_height="85dp"
+        android:layout_width="200dp"
+        android:layout_height="55dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/TextViewRecord"
         android:backgroundTint="@color/red"
-        android:layout_marginTop="60dp"
+
         android:text="JUGAR"
         android:textSize="16sp"
         android:textColor="@color/white"
@@ -61,8 +61,8 @@
 
     <Button
         android:id="@+id/buttoncodigo"
-        android:layout_width="300dp"
-        android:layout_height="85dp"
+        android:layout_width="200dp"
+        android:layout_height="55dp"
         android:layout_centerHorizontal="true"
         android:backgroundTint="@color/red"
         android:layout_below="@+id/button_jugar2"
@@ -78,8 +78,8 @@
 
     <Button
         android:id="@+id/button_clasificacion"
-        android:layout_width="300dp"
-        android:layout_height="85dp"
+        android:layout_width="200dp"
+        android:layout_height="55dp"
         android:layout_centerHorizontal="true"
         android:backgroundTint="@color/white"
         android:layout_below="@+id/buttoncodigo"
@@ -95,8 +95,8 @@
 
     <Button
         android:id="@+id/button_perfil"
-        android:layout_width="300dp"
-        android:layout_height="85dp"
+        android:layout_width="200dp"
+        android:layout_height="55dp"
         android:layout_centerHorizontal="true"
         android:backgroundTint="@color/green"
         android:layout_below="@+id/button_clasificacion"
@@ -112,8 +112,8 @@
 
     <Button
         android:id="@+id/button_login"
-        android:layout_width="300dp"
-        android:layout_height="85dp"
+        android:layout_width="200dp"
+        android:layout_height="55dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/button_perfil"
         android:text="INICIAR SESION"
@@ -128,8 +128,8 @@
 
     <Button
         android:id="@+id/button_register"
-        android:layout_width="300dp"
-        android:layout_height="85dp"
+        android:layout_width="200dp"
+        android:layout_height="55dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/radio_normal"
         android:layout_below="@+id/button_login"
@@ -145,8 +145,8 @@
 
     <TextView
         android:id="@+id/TextViewVolver"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="200dp"
+        android:layout_height="55dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/button_login"
         android:layout_marginTop="30dp"
