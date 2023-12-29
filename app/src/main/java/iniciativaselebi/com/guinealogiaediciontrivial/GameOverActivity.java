@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,11 +26,55 @@ public class GameOverActivity extends AppCompatActivity {
     private Animation pulseAnimation;
     int aciertos, puntuacion, errores;
 
+    TextView TextViewClicAca;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_over);
+
+
+
+// Handler to delay the visibility
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!isFinishing()) { // Check if the activity is still active
+                    TextView TextViewClicAca = findViewById(R.id.TextViewClicAca);
+                    TextViewClicAca.setVisibility(View.VISIBLE);
+
+                    // Set up click listener on the root view
+                    View rootView = findViewById(android.R.id.content);
+                    rootView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+
+
+                        public
+
+                        void
+
+                        onClick(View v) {
+                            playSwoosh();
+
+                            int aciertos = getIntent().getIntExtra("aciertos", 0);
+                            int puntuacion = getIntent().getIntExtra("puntuacion", 0);
+                            int errores = getIntent().getIntExtra("errores", 0);
+
+                            saveToSharedPreferences(aciertos, puntuacion, errores);
+
+                            Intent nextActivityIntent = new Intent(GameOverActivity.this, ClassficationActivity.class);
+                            nextActivityIntent.putExtra("aciertos", aciertos);
+                            nextActivityIntent.putExtra("puntuacion", puntuacion);
+                            nextActivityIntent.putExtra("errores", errores);
+
+                            startActivity(nextActivityIntent);
+                            finish();
+                        }
+                    });
+                }
+            }
+        }, 10000);
 
 
         swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
@@ -59,28 +104,28 @@ public class GameOverActivity extends AppCompatActivity {
 
         gameOverText.startAnimation(disintegratingAnimation);
 
-        // Listen for any touch on the screen to navigate to the next activity
-        View rootView = findViewById(android.R.id.content);
-        rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playSwoosh();
-
-                int aciertos = getIntent().getIntExtra("aciertos", 0);
-                int puntuacion = getIntent().getIntExtra("puntuacion", 0);
-                int errores = getIntent().getIntExtra("errores", 0);
-
-                saveToSharedPreferences(aciertos, puntuacion, errores);
-
-                Intent nextActivityIntent = new Intent(GameOverActivity.this, ClassficationActivity.class);
-                nextActivityIntent.putExtra("aciertos", aciertos);
-                nextActivityIntent.putExtra("puntuacion", puntuacion);
-                nextActivityIntent.putExtra("errores", errores);
-
-                startActivity(nextActivityIntent);
-                finish();
-            }
-        });
+//        // Listen for any touch on the screen to navigate to the next activity
+//        View rootView = findViewById(android.R.id.content);
+//        rootView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                playSwoosh();
+//
+//                int aciertos = getIntent().getIntExtra("aciertos", 0);
+//                int puntuacion = getIntent().getIntExtra("puntuacion", 0);
+//                int errores = getIntent().getIntExtra("errores", 0);
+//
+//                saveToSharedPreferences(aciertos, puntuacion, errores);
+//
+//                Intent nextActivityIntent = new Intent(GameOverActivity.this, ClassficationActivity.class);
+//                nextActivityIntent.putExtra("aciertos", aciertos);
+//                nextActivityIntent.putExtra("puntuacion", puntuacion);
+//                nextActivityIntent.putExtra("errores", errores);
+//
+//                startActivity(nextActivityIntent);
+//                finish();
+//            }
+//        });
     }
     private void saveToSharedPreferences(int aciertos, int puntuacion, int errores) {
         SharedPreferences sharedPreferences = getSharedPreferences("GameStats", Context.MODE_PRIVATE);

@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         appUpdateManager = AppUpdateManagerFactory.create(this);
         Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
 
@@ -65,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+
 
 
         FirebaseApp.initializeApp(this);
@@ -91,14 +92,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        TextView textViewClicAqui = findViewById(R.id.TextViewClicAqui);
 
+        TextViewClicAqui = findViewById(R.id.TextViewClicAqui);
 // Handler to delay the visibility
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (!isFinishing()) { // Check if the activity is still active
-                    textViewClicAqui.setVisibility(View.VISIBLE);
+                    TextViewClicAqui.setVisibility(View.VISIBLE);
                 }
             }
         }, 10000); // 2000ms delay
@@ -181,6 +182,8 @@ public class MainActivity extends AppCompatActivity {
             swooshPlayer.start();
         }
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -32,24 +32,44 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
+        // Log the receipt of a message
+        Log.d("FCM", "onMessageReceived: Received a message");
+
         // Retrieve the current user's ID
         String userId = getCurrentUserId();
-
         if (userId != null) {
             // User is logged in, log the message receipt
             String messageId = remoteMessage.getMessageId();
             logMessageReceipt(messageId, userId);
+            Log.d("FCM", "onMessageReceived: User is logged in, logging message receipt");
         } else {
-            // User is not logged in, handle gracefully
-            // For example, you can log a message or perform any other necessary actions
-            Log.d("FCM", "User is not logged in, cannot log message receipt");
+            // User is not logged in
+            Log.d("FCM", "onMessageReceived: User is not logged in, cannot log message receipt");
         }
+
         // Check if the message contains a notification
         if (remoteMessage.getNotification() != null) {
             String notificationBody = remoteMessage.getNotification().getBody();
             String notificationTitle = remoteMessage.getNotification().getTitle();
+            Log.d("FCM", "onMessageReceived: Notification received - Title: " + notificationTitle + ", Body: " + notificationBody);
             // Display notification
             showNotification(notificationTitle, notificationBody);
+        } else {
+            // No notification payload, might be a data message
+            Log.d("FCM", "onMessageReceived: No Notification payload, might be a data message");
+            // Additional handling for data messages if needed
+        }
+    }
+    private String getCurrentUserId() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            // User is signed in
+            Log.d("FCM", "getCurrentUserId: User ID: " + currentUser.getUid());
+            return currentUser.getUid();
+        } else {
+            // User is not signed in
+            Log.d("FCM", "getCurrentUserId: User not logged in");
+            return null; // Or handle it as per your requirement
         }
     }
     private void showNotification(String title, String body) {
@@ -138,7 +158,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
         }
     }
-
     private void logMessageReceipt(String messageId, String userId) {
         // Reference to the user's node in the Firebase Realtime Database
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(userId);
@@ -151,20 +170,5 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .addOnSuccessListener(aVoid -> Log.d("FCM", "Message receipt logged successfully in user node"))
                 .addOnFailureListener(e -> Log.e("FCM", "Failed to log message receipt in user node", e));
     }
-
-
-    private String getCurrentUserId() {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null) {
-            // User is signed in
-            return currentUser.getUid();
-        } else {
-            // User is not signed in
-            return null; // Or handle it as per your requirement
-        }
-    }
-
-
-
 
 }

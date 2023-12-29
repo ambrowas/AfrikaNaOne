@@ -27,6 +27,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -127,7 +128,7 @@ public class Preguntas extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         questionDataSource = new QuestionDataSource(this);
         questionDataSource.open();
-
+        resetTextView();
         moveToNextQuestion();
 
 
