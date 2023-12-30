@@ -32,34 +32,26 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        // Log the receipt of a message
-        Log.d("FCM", "onMessageReceived: Received a message");
-
-        // Retrieve the current user's ID
         String userId = getCurrentUserId();
-        if (userId != null) {
-            // User is logged in, log the message receipt
-            String messageId = remoteMessage.getMessageId();
-            logMessageReceipt(messageId, userId);
-            Log.d("FCM", "onMessageReceived: User is logged in, logging message receipt");
-        } else {
-            // User is not logged in
-            Log.d("FCM", "onMessageReceived: User is not logged in, cannot log message receipt");
-        }
+        String messageId = remoteMessage.getMessageId();
 
-        // Check if the message contains a notification
-        if (remoteMessage.getNotification() != null) {
-            String notificationBody = remoteMessage.getNotification().getBody();
-            String notificationTitle = remoteMessage.getNotification().getTitle();
-            Log.d("FCM", "onMessageReceived: Notification received - Title: " + notificationTitle + ", Body: " + notificationBody);
-            // Display notification
-            showNotification(notificationTitle, notificationBody);
+        if (userId != null && messageId != null) {
+            // User is logged in, log the message receipt
+            logMessageReceipt(messageId, userId);
+
+            // Check if the message contains a notification
+            if (remoteMessage.getNotification() != null) {
+                String notificationBody = remoteMessage.getNotification().getBody();
+                String notificationTitle = remoteMessage.getNotification().getTitle();
+
+                // Display notification with the additional messageId and userId
+                showNotification(notificationTitle, notificationBody, messageId, userId);
+            }
         } else {
-            // No notification payload, might be a data message
-            Log.d("FCM", "onMessageReceived: No Notification payload, might be a data message");
-            // Additional handling for data messages if needed
+            Log.d("FCM", "User is not logged in or message ID is null");
         }
     }
+
     private String getCurrentUserId() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
@@ -72,11 +64,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             return null; // Or handle it as per your requirement
         }
     }
-    private void showNotification(String title, String body) {
+    private void showNotification(String title, String body, String messageId, String userId) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         String NOTIFICATION_CHANNEL_ID = "my_channel_id_01";
 
-        // Since Android Oreo, notification channels are required.
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     NOTIFICATION_CHANNEL_ID,
@@ -87,22 +78,26 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(channel);
         }
 
-        // Create an intent that does nothing
-        Intent intent = new Intent();
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(this, NotificationReceiver.class);
+        intent.putExtra("messageId", messageId);
+        intent.putExtra("userId", userId);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
         notificationBuilder.setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.drawable.ic_stat_name) // Use the resource ID of your icon
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setContentInfo("Info")
-                .setContentIntent(pendingIntent); // Set the do-nothing intent
+                .setContentIntent(pendingIntent);
 
         notificationManager.notify(1, notificationBuilder.build());
     }
+
+
     @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
@@ -159,16 +154,27 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
     private void logMessageReceipt(String messageId, String userId) {
-        // Reference to the user's node in the Firebase Realtime Database
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(userId);
+        Log.d("FCM", "Attempting to log message receipt for user: " + userId + " with message ID: " + messageId);
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(userId).child("ReceivedMsgs");
 
-        // Concatenate messageId and the current timestamp
-        String receiptData = messageId + ", " + System.currentTimeMillis();
+        // Create a unique key for each message receipt
+        String key = userRef.push().getKey();
 
-        // Update the user's data with the concatenated receipt information
-        userRef.child("ReceivedMsgs").setValue(receiptData)
-                .addOnSuccessListener(aVoid -> Log.d("FCM", "Message receipt logged successfully in user node"))
-                .addOnFailureListener(e -> Log.e("FCM", "Failed to log message receipt in user node", e));
+        // Format the receipt data
+        Map<String, Object> receiptData = new HashMap<>();
+        receiptData.put("messageId", messageId);
+        receiptData.put("timestamp", System.currentTimeMillis());
+
+        // Use the unique key to store each receipt
+        if (key != null) {
+            userRef.child(key).setValue(receiptData)
+                    .addOnSuccessListener(aVoid -> Log.d("FCM", "Message receipt logged successfully for user: " + userId))
+                    .addOnFailureListener(e -> Log.e("FCM", "Failed to log message receipt for user: " + userId, e));
+        } else {
+            Log.e("FCM", "Failed to generate a unique key for message receipt");
+        }
     }
+
+
 
 }

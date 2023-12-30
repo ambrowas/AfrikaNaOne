@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="CLASIFICACION GLOBAL DE SABELOTODOS"
+        android:textSize="12sp"
         android:background="@drawable/blackbackground"
         android:textStyle="bold"
         android:textColor="@color/white"

@@ -1,14 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/trivialbackground"
+    android:fillViewport="true"
     tools:context=".Modocompeticion">
 
-    <TextView
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/coolbackground">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/logotrivial"
+            />
+
+        <TextView
         android:id="@+id/TextViewSaludo2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -161,24 +173,6 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
-<!--    <TextView-->
-<!--        android:id="@+id/TextViewMarcar"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_centerHorizontal="true"-->
-<!--        android:layout_below="@+id/button_login"-->
-<!--        android:layout_marginTop="90dp"-->
-<!--        android:shadowColor="@color/white"-->
-<!--        android:shadowDx="4"-->
-<!--        android:shadowDy="4"-->
-<!--        android:shadowRadius="6"-->
-<!--        android:text="MARCAR"-->
-<!--        android:letterSpacing=".20"-->
-<!--        android:textAlignment="center"-->
-<!--        android:textAppearance="@style/TextAppearance.AppCompat.Body1"-->
-<!--        android:textColor="@color/black"-->
-<!--        android:textSize="16sp"-->
-<!--        android:textStyle="bold" />-->
-
 
 </RelativeLayout>
+</ScrollView>

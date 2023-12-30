@@ -3,19 +3,14 @@ package iniciativaselebi.com.guinealogiaediciontrivial;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TableLayout;
@@ -102,7 +97,7 @@ public class RankingActivity extends AppCompatActivity {
     }
     private void loadTopUsers() {
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("user");
-        Query topUsersQuery = usersRef.orderByChild("accumulatedPuntuacion").limitToLast(15);
+        Query topUsersQuery = usersRef.orderByChild("accumulatedPuntuacion").limitToLast(20);
 
         topUsersQuery.addValueEventListener(new ValueEventListener() {
             @Override

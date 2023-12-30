@@ -24,7 +24,6 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -32,7 +31,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.auth.FirebaseAuth;
@@ -49,9 +47,6 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -61,12 +56,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Random;
 
-import Model.User;
-import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
-
-    public class QRcodeActivity extends AppCompatActivity {
+public class QRcodeActivity extends AppCompatActivity {
         private ImageView qrCodeImageView;
         Button buttonguardar, buttonvolver;
         Bitmap qrCodeBitmap;
@@ -146,7 +137,7 @@ import iniciativaselebi.com.guinealogiaediciontrivial.R.layout;
                 public void onClick(View v) {
                     if (isWithinCoolDownPeriod()) {
                         // If the user has saved a QR code within the last three minutes, show a toast message
-                        showCustomAlertDialog("Atención", "Este Código QR ya ha sido guardado", null);
+                        showCustomAlertDialog("Atención", "Este código QR ya ha sido guardado", null);
                         return; // Exit the method early
                     }
 

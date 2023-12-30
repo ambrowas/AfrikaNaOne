@@ -3,26 +3,25 @@ package iniciativaselebi.com.guinealogiaediciontrivial;
 import static android.app.ProgressDialog.show;
 
 import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,11 +30,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.WriteBatch;
 
 import java.util.List;
 
@@ -53,17 +48,24 @@ public class Modocompeticion extends AppCompatActivity {
         private ValueAnimator animator;
         MediaPlayer swooshPlayer;
         private boolean isFetching = false;
+
+        ImageView logo;
     private List<QuestionModoCompeticion> unusedQuestions;
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     QuestionDataSource dataSource;
+
+    private Animation pulseAnimation;
+
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_modo_competicion);
-        //    FirestoreQuestionManager manager = new FirestoreQuestionManager(this);
 
+        logo = (ImageView) findViewById(R.id.logo);
+        pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);
+        logo.startAnimation(pulseAnimation);
 
             checkAndFetchQuestionsIfNeeded();
 
@@ -72,17 +74,6 @@ public class Modocompeticion extends AppCompatActivity {
              auth = FirebaseAuth.getInstance();
 
              dataSource = new QuestionDataSource(this);
-
-
-
-
-//             TextViewMarcar = findViewById(R.id.TextViewMarcar);
-//             TextViewMarcar.setOnClickListener(new View.OnClickListener() {
-//                 @Override
-//                 public void onClick(View view) {
-//                     dataSource.markFortyRandomQuestionsAsUsed();
-//                 }
-//             });
 
 
         button_clasificacion = findViewById(R.id.button_clasificacion);

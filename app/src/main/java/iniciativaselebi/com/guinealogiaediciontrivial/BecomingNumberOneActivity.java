@@ -19,7 +19,7 @@ public class BecomingNumberOneActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_becoming_number_one);
+        setContentView(R.layout.activity_becoming_number_ones);
 
 
             mediaPlayer = MediaPlayer.create(this, R.raw.hallelujah);

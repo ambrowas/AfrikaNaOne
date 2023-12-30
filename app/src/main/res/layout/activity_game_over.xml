@@ -16,11 +16,11 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/red"
         android:text="Game Over"
-        android:layout_marginTop="200dp"
-        android:layout_marginLeft="110dp"
+        android:layout_gravity="center_horizontal"
         android:textColor="@color/white"
         android:textSize="24sp"
         android:textStyle="bold"
+        android:layout_marginTop="250dp"
         app:strokeWidth="3dp" />
 
     <TextView
