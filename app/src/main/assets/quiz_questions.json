@@ -1,0 +1,802 @@
+[
+    {
+        "OPTION1": "Bata",
+        "OPTION2": "Machinda",
+        "OPTION3": "Kogo",
+        "_id": 1,
+        "answer_nr": 2,
+        "question": "¿Cuál de estas localidades no es uno de los tres distritos que conforman la provincia de Litoral?"
+    },
+    {
+        "OPTION1": "Puerto Iradier",
+        "OPTION2": "Sevilla de Río Muni",
+        "OPTION3": "Valladolid de los Bimbiles",
+        "_id": 2,
+        "answer_nr": 3,
+        "question": "¿Qué nombre le dieron los colonos españoles a la localidad de Añisok?"
+    },
+    {
+        "OPTION1": "Mbini",
+        "OPTION2": "Acalayong",
+        "OPTION3": "Ekuku",
+        "_id": 3,
+        "answer_nr": 1,
+        "question": "¿Qué pueblo costero era conocido anteriormente como Río Benito?"
+    },
+    {
+        "OPTION1": "Kie-Ossi",
+        "OPTION2": "Mibonde",
+        "OPTION3": "Alum",
+        "_id": 4,
+        "answer_nr": 1,
+        "question": "¿Dónde se encuentra el paso fronterizo oficial entre Camerún y Guinea Ecuatorial?"
+    },
+    {
+        "OPTION1": "Kateb",
+        "OPTION2": "Nora",
+        "OPTION3": "Santy",
+        "_id": 5,
+        "answer_nr": 2,
+        "question": "¿Qué panaderia de Malabo estaba situada entre la plaza del Ayuntamiento y Amilivia?"
+    },
+    {
+        "OPTION1": "Horacio",
+        "OPTION2": "Conga",
+        "OPTION3": "Elobey",
+        "_id": 6,
+        "answer_nr": 2,
+        "question": "Guinea Ecuatorial y Gabón se disputan la soberanía de los islotes de Mbañe, Cocoteros y.…"
+    },
+    {
+        "OPTION1": "Ureka",
+        "OPTION2": "Moka",
+        "OPTION3": "Baney",
+        "_id": 7,
+        "answer_nr": 1,
+        "question": "¿Qué localidad de Bioko Sur que recibe alrededor de 1.450 milímetros de lluvia anuales es considerada como el lugar mas húmedo de África?"
+    },
+    {
+        "OPTION1": "2017 Km2",
+        "OPTION2": "3935 Km2",
+        "OPTION3": "5935 Km2",
+        "_id": 8,
+        "answer_nr": 1,
+        "question": "¿Cuál es la superficie total de la Isla de Bioko?"
+    },
+    {
+        "OPTION1": "Mikomeseng",
+        "OPTION2": "Akonibe",
+        "OPTION3": "Kogo",
+        "_id": 9,
+        "answer_nr": 3,
+        "question": "¿En qué distrito se encuentra la Reserva Natural del Estuario del Muni?"
+    },
+    {
+        "OPTION1": "Pico Basilé",
+        "OPTION2": "Monte Bata",
+        "OPTION3": "Monte Alén",
+        "_id": 10,
+        "answer_nr": 1,
+        "question": "Con una altura aproximada de 3.011 metros sobre el nivel del mar, ¿cuál es el punto más elevado del país?"
+    },
+    {
+        "OPTION1": "de Cesar",
+        "OPTION2": "de Brandon",
+        "OPTION3": "de su santa madre",
+        "_id": 11,
+        "answer_nr": 2,
+        "question": "¿De quién eran las almas a las que se refirió Ndjocu Davies en su famoso libro de poemas?"
+    },
+    {
+        "OPTION1": "Jacint Creus",
+        "OPTION2": "Modesto Gene Roig",
+        "OPTION3": "Manuel Fernandez Magaz",
+        "_id": 12,
+        "answer_nr": 3,
+        "question": "¿Qué religioso y cooperante vinculado con las Escuelas Cristianas de la Salle escribió Ana y Nino Leen, La Familia Etugu y Milang?"
+    },
+    {
+        "OPTION1": "Tres almas para un corazón",
+        "OPTION2": "Las almas de Brandon",
+        "OPTION3": "El demonio existe: la mujer es la prueba",
+        "_id": 13,
+        "answer_nr": 1,
+        "question": "¿Melba, Zulema y Aisha son las enamoradas protagonistas de que provocadora obra literaria?"
+    },
+    {
+        "OPTION1": "Bocamandja",
+        "OPTION2": "Mookata",
+        "OPTION3": "Atanga",
+        "_id": 14,
+        "answer_nr": 1,
+        "question": "¿Cómo se llama la principal compañía teatral que opera en el país?"
+    },
+    {
+        "OPTION1": "Mene Manresa Bodipo",
+        "OPTION2": "Ramón Esono Ebale",
+        "OPTION3": "Gaspar Gomán",
+        "_id": 15,
+        "answer_nr": 1,
+        "question": "¿Qué pintor presentó en enero de 2022 una exposición de cuadros titulada “Suya”?"
+    },
+    {
+        "OPTION1": "Juan Tomás Ávila Laurel",
+        "OPTION2": "Tutu Alicante",
+        "OPTION3": "Estanislao Medina Huesca",
+        "_id": 16,
+        "answer_nr": 1,
+        "question": "Nacido en 1966, en la entonces Santa Isabel, este autor se presentó como “El escritor en un país sin librerías”"
+    },
+    {
+        "OPTION1": "Federico Edjo Ovono",
+        "OPTION2": "Anatolio Ndong Mba",
+        "OPTION3": "Agustín Nzé Nfumu",
+        "_id": 17,
+        "answer_nr": 3,
+        "question": "¿Qué político, diplomático y escritor es el actual Presidente de la Academia Ecuatoguineana de la Lengua Española?"
+    },
+    {
+        "OPTION1": "Carlos Nze Nsuga",
+        "OPTION2": "Filiberto Ntutumu Nguema",
+        "OPTION3": "Jesús Engonga Ndong",
+        "_id": 18,
+        "answer_nr": 3,
+        "question": "¿Cuál de estos académicos no ha sido nunca Rector de la UNGE?"
+    },
+    {
+        "OPTION1": "María Nsue Angue",
+        "OPTION2": "Trinidad Morgades Besari",
+        "OPTION3": "Raquel Ilombé",
+        "_id": 19,
+        "answer_nr": 2,
+        "question": "¿Qué escritora, diplomática y académica es considerada la primera mujer guineana en recibir educación universitaria?"
+    },
+    {
+        "OPTION1": "Sergio Nsue Ondo Mifumu",
+        "OPTION2": "José F. Siale Djangani",
+        "OPTION3": "Antimo Esono",
+        "_id": 20,
+        "answer_nr": 2,
+        "question": "\"Cenizas de Kalabo y Termes”, \"La Revuelta de los Disfraces\" y \"Autorretrato Con Un Infiel\" ¿son obras de qué consolidado autor?"
+    },
+    {
+        "OPTION1": "Perros de guerra",
+        "OPTION2": "Donde acaba el camino",
+        "OPTION3": "Lejos de África",
+        "_id": 21,
+        "answer_nr": 1,
+        "question": "¿Qué célebre obra de Robert Forsyth estuvo evidentemente ambientada en nuestro país refiriéndose a este como Zangaro?"
+    },
+    {
+        "OPTION1": "Rupee",
+        "OPTION2": "Botuku",
+        "OPTION3": "Bisila",
+        "_id": 22,
+        "answer_nr": 1,
+        "question": "¿En la cultura bubi, quién es el Ser Supremo, Creador del universo?"
+    },
+    {
+        "OPTION1": "Francisco Malabo Meosa",
+        "OPTION2": "Malabo Lopelo Melaka",
+        "OPTION3": "Esasi Ebuera",
+        "_id": 23,
+        "answer_nr": 1,
+        "question": "En noviembre de 2001 falleció en Moka el último hijo y sucesor legítimo del mítico rey Malabo. ¿Cuál era su nombre?"
+    },
+    {
+        "OPTION1": "Bonkó",
+        "OPTION2": "Ivanga",
+        "OPTION3": "Mekuyo",
+        "_id": 24,
+        "answer_nr": 3,
+        "question": "¿Con qué otro nombre más extendido se conoce la danza tradicional ndowe de Okuyi?"
+    },
+    {
+        "OPTION1": "Guitarra",
+        "OPTION2": "Tambor",
+        "OPTION3": "Cuerno",
+        "_id": 25,
+        "answer_nr": 2,
+        "question": "¿Qué tipo de instrumento es el MOSOMBA de los ndowés?"
+    },
+    {
+        "OPTION1": "Coco",
+        "OPTION2": "Caña de azúcar",
+        "OPTION3": "Banana",
+        "_id": 26,
+        "answer_nr": 1,
+        "question": "¿En la gastronomía típica anobonesa, qué fruto tropical es el principal ingrediente del pissoj jojonjo?"
+    },
+    {
+        "OPTION1": "Pagalú",
+        "OPTION2": "Portuñol",
+        "OPTION3": "Fa D'ambó",
+        "_id": 27,
+        "answer_nr": 3,
+        "question": "¿Qué nombre recibe la lengua criolla derivada del portugués que se habla en la isla de Annobón?"
+    },
+    {
+        "OPTION1": "Number Two",
+        "OPTION2": "Coro Bicomsua",
+        "OPTION3": "Añapsi",
+        "_id": 28,
+        "answer_nr": 1,
+        "question": "¿Qué famoso coro de animación de finales de los ochenta deleitó al pueblo con éxitos como OSIMANEMA ANEM, y CANDIDATO UNICO?"
+    },
+    {
+        "OPTION1": "Mercedes de Eló",
+        "OPTION2": "Euma",
+        "OPTION3": "Pina Besosa",
+        "_id": 29,
+        "answer_nr": 2,
+        "question": "ALUK BONG, algo así como \"matrimonio de jóvenes\" en español, es un éxito de ¿qué aclamada cantante ya retirada?"
+    },
+    {
+        "OPTION1": "Emilio Buale",
+        "OPTION2": "Malcolm Sitté",
+        "OPTION3": "Boré Buika",
+        "_id": 30,
+        "answer_nr": 3,
+        "question": "¿Qué actor hispano guineano ha participado en películas como Palmeras en la Nieve, Villaviciosa De Al Lado y Señor Dame Paciencia?"
+    },
+    {
+        "OPTION1": "Desaparecidos",
+        "OPTION2": "Historias Lamentables",
+        "OPTION3": "Caronte",
+        "_id": 31,
+        "answer_nr": 2,
+        "question": "¿La participación en qué película de 2020 le valió la nominación a un Goya en la categoría de actor revelación a Matías Janick?"
+    },
+    {
+        "OPTION1": "Chelsea Martina Mituy Avomo",
+        "OPTION2": "Serafina Nchama Eyene Ada",
+        "OPTION3": "Agnes Genoveva Cheba Adé",
+        "_id": 32,
+        "answer_nr": 1,
+        "question": "¿Qué hermosa joven representó a Guinea Ecuatorial en el certamen Miss Universo 2021?"
+    },
+    {
+        "OPTION1": "Mi Pueblo y Yo",
+        "OPTION2": "Mi Vida Por Mi Pueblo",
+        "OPTION3": "Guinea Ecuatorial, País Joven",
+        "_id": 33,
+        "answer_nr": 2,
+        "question": "¿Cuál es el título de la obra autobiográfica publicada por Obiang Nguema Mbasogo en 2012??"
+    },
+    {
+        "OPTION1": "Casa África",
+        "OPTION2": "Ëvóvë/Ëbóbë",
+        "OPTION3": "Ölöita lué Ésèsèmbè",
+        "_id": 34,
+        "answer_nr": 2,
+        "question": "¿Qué asociación constituida en 2017 busca “la promoción de las lenguas y culturas de los pueblos de GE, en especial y principalmente la lengua y cultura bubi??"
+    },
+    {
+        "OPTION1": "Trifonia Melibea Obono",
+        "OPTION2": "Carmela Oyono Ayingono",
+        "OPTION3": "Guillermina Mekuy",
+        "_id": 35,
+        "answer_nr": 2,
+        "question": "¿Qué escritora de pseudónimo Imelda publicó “Sabor a Caracol” en el 2020?"
+    },
+    {
+        "OPTION1": "Cuerda",
+        "OPTION2": "Viento",
+        "OPTION3": "Percusión",
+        "_id": 36,
+        "answer_nr": 1,
+        "question": "¿Qué tipo de instrumento es el nvet?"
+    },
+    {
+        "OPTION1": "Dario Tadeo Ndong Olomo",
+        "OPTION2": "Celestino Bacale Obiang",
+        "OPTION3": "Diosdado Nsue Minang",
+        "_id": 37,
+        "answer_nr": 2,
+        "question": "¿Cuál de estos políticos no ha sido nunca Ministro de Sanidad?"
+    },
+    {
+        "OPTION1": "Bikutsi",
+        "OPTION2": "Kwasa-Kwasa",
+        "OPTION3": "Makossa",
+        "_id": 38,
+        "answer_nr": 1,
+        "question": "¿Qué género musical originario de Camerún cuyo significado literal es “pisar la tierra” se popularizó en África Central durante el siglo XX?"
+    },
+    {
+        "OPTION1": "Baseke",
+        "OPTION2": "Benga",
+        "OPTION3": "Bujeba",
+        "_id": 39,
+        "answer_nr": 3,
+        "question": "¿Cuál de estos sub-grupos no pertenece a la etnia ndowé?"
+    },
+    {
+        "OPTION1": "Cinco",
+        "OPTION2": "Cuatro",
+        "OPTION3": "Seis",
+        "_id": 40,
+        "answer_nr": 1,
+        "question": "¿Cuántos obispos conforman la Conferencia Episcopal de Guinea Ecuatorial?"
+    },
+    {
+        "OPTION1": "Jesús Ndong Buendi Nanguande",
+        "OPTION2": "Damián Ondo Meñe",
+        "OPTION3": "Antonio Cándido Nnang",
+        "_id": 41,
+        "answer_nr": 1,
+        "question": "¿Qué economista ejerció como primer Gobernador del Banco Central de Guinea Ecuatorial?"
+    },
+    {
+        "OPTION1": "MONALIGE",
+        "OPTION2": "MUNGE",
+        "OPTION3": "IPGE",
+        "_id": 42,
+        "answer_nr": 3,
+        "question": "¿Al frente de qué partido político ganó las elecciones generales de 1968 el candidato Macías Nguema?"
+    },
+    {
+        "OPTION1": "Bonifacio Ondó Edu",
+        "OPTION2": "Federico Ngomo Nandong",
+        "OPTION3": "Andrés Moisés Mbá Adá",
+        "_id": 43,
+        "answer_nr": 2,
+        "question": "¿Quién encabezaba la Delegación guineana en la Conferencia Constitucional de 1967-68?"
+    },
+    {
+        "OPTION1": "1948",
+        "OPTION2": "1960",
+        "OPTION3": "1954",
+        "_id": 44,
+        "answer_nr": 1,
+        "question": "¿En qué año tuvo lugar la célebre “Protesta de los Jefes\", acto de valentía política precursora del nacionalismo guineano?"
+    },
+    {
+        "OPTION1": "Ndjiakom-Esambira",
+        "OPTION2": "Ntuba-Esamengón",
+        "OPTION3": "Esasom-Bidjabidjan",
+        "_id": 45,
+        "answer_nr": 1,
+        "question": "¿De dónde era natural D. Acació Mañé Elá?"
+    },
+    {
+        "OPTION1": "Rey Uganda",
+        "OPTION2": "Enrique Nvo",
+        "OPTION3": "Tomás Engono Nkogo",
+        "_id": 46,
+        "answer_nr": 2,
+        "question": "¿La imagen de qué personalidad histórica aparecía en los billetes de 5000 bipkwele?"
+    },
+    {
+        "OPTION1": "En Rebola",
+        "OPTION2": "En Moeri",
+        "OPTION3": "En Basakato de la Sagrada Familia",
+        "_id": 47,
+        "answer_nr": 1,
+        "question": "¿Dónde nació D. Edmundo Bossio Dioko?"
+    },
+    {
+        "OPTION1": "Angel Serafín Seriche Dougan",
+        "OPTION2": "Cristino Seriche Bioko",
+        "OPTION3": "Francisco Boddien Ngalo",
+        "_id": 48,
+        "answer_nr": 2,
+        "question": "¿Quién precedió a Silvestre Siale Bileka en el cargo de Primer Ministro?"
+    },
+    {
+        "OPTION1": "Julio de 1980",
+        "OPTION2": "Febrero de 1982",
+        "OPTION3": "Octubre de 1984",
+        "_id": 49,
+        "answer_nr": 2,
+        "question": "¿En qué histórica fecha visitó Juan Pablo II nuestro país?"
+    },
+    {
+        "OPTION1": "Santa Isabel de Hungría",
+        "OPTION2": "Santa Isabel de Aragón",
+        "OPTION3": "Santa Isabel de Clarence",
+        "_id": 50,
+        "answer_nr": 1,
+        "question": "¿El 17 de noviembre, día de su fiesta Patronal, Malabo rinde homenaje a qué santidad?"
+    },
+    {
+        "OPTION1": "Rafael M. Nzé Abuy",
+        "OPTION2": "Acacio Mañé",
+        "OPTION3": "Saturnino Ibongo",
+        "_id": 51,
+        "answer_nr": 3,
+        "question": "¿Junto a qué amigo y colaborador cercano compuso Atanasio Ndongo el himno de nuestro país?"
+    },
+    {
+        "OPTION1": "El Tratado de Lisboa",
+        "OPTION2": "El Tratado de Tordesillas",
+        "OPTION3": "El Tratado de San Ildefonso",
+        "_id": 52,
+        "answer_nr": 3,
+        "question": "¿Qué tratado de 1777 entre las coronas de Portugal y España transfiere a esta última la soberanía de ciertas posesiones en el Golfo de Guinea?"
+    },
+    {
+        "OPTION1": "La entrada de Guinea Ecuatorial en la UDEAC",
+        "OPTION2": "La fundación del PDGE",
+        "OPTION3": "La promulgación de la Carta Magna de Aconibe",
+        "_id": 53,
+        "answer_nr": 3,
+        "question": "¿Qué acontecimiento histórico tuvo lugar el 15 de Agosto de 1982?"
+    },
+    {
+        "OPTION1": "El Baile de los Malditos",
+        "OPTION2": "Macías, Verdugo o Víctima",
+        "OPTION3": "Cuando los Combes Luchaban",
+        "_id": 54,
+        "answer_nr": 1,
+        "question": "\"Es -probablemente- el libro más famoso, pero menos leído de la literatura política guineana, y habla sobre la “CRUZADA DE LIBERACIÓN POR CRISTO”."
+    },
+    {
+        "OPTION1": "La Crisis de las Banderas",
+        "OPTION2": "El Incidente de Ngolo",
+        "OPTION3": "La Quema de las Estatuas",
+        "_id": 55,
+        "answer_nr": 1,
+        "question": "¿Qué conflicto diplomático entre España y Guinea provocó la salida precipitada de la mayor parte de españoles que aun quedaban en Guinea tras la independencia?"
+    },
+    {
+        "OPTION1": "Fernando Poo",
+        "OPTION2": "Formosa",
+        "OPTION3": "Pagalú",
+        "_id": 56,
+        "answer_nr": 2,
+        "question": "¿Con qué nombre bautizó el navegante portugués Fernando Poo a la actual Isla de Bioko?"
+    },
+    {
+        "OPTION1": "William Napoleon Barleycorn",
+        "OPTION2": "Padre Sialó",
+        "OPTION3": "Ildefonso Obama",
+        "_id": 57,
+        "answer_nr": 2,
+        "question": "Desde Agosto de 1929 fue el primer sacerdote autóctono del Vicariato Apostólico de Fernando Poo"
+    },
+    {
+        "OPTION1": "San Carlos",
+        "OPTION2": "San Fernando",
+        "OPTION3": "Santiago de Baney",
+        "_id": 58,
+        "answer_nr": 2,
+        "question": "Macias la rebautizo con el nombre de su sobrino y más cercano consejero, Pedro Ela Nguema Andeme"
+    },
+    {
+        "OPTION1": "Teniente Coronel",
+        "OPTION2": "Capitan",
+        "OPTION3": "Sargento Primero",
+        "_id": 59,
+        "answer_nr": 1,
+        "question": "¿Qué rango militar ostentaba Obiang Nguema Mbasogo en el momento del Golpe de Libertad?"
+    },
+    {
+        "OPTION1": "Alcalde de Santa Isabel",
+        "OPTION2": "Presidente de la Diputación Provincial de Fernando Poo",
+        "OPTION3": "Delegado de Gobierno",
+        "_id": 60,
+        "answer_nr": 1,
+        "question": "¿Qué importante cargo ejerció D. Abilio Balboa Atkins de manera consecutiva entre 1961 y 1967?"
+    },
+    {
+        "OPTION1": "Las Tinieblas de tu Memoria Negra",
+        "OPTION2": "Ekomo",
+        "OPTION3": "Cuando los Combes Luchaban",
+        "_id": 61,
+        "answer_nr": 3,
+        "question": "¿Cual de estos títulos es una obra maestra de Leoncio Evita?"
+    },
+    {
+        "OPTION1": "Guillermina Mekuy",
+        "OPTION2": "Maria Nsue Angué",
+        "OPTION3": "Lucía Asué Mbomio",
+        "_id": 62,
+        "answer_nr": 2,
+        "question": "¿Ekomo es una novela de realismo mágico narrada por qué respetada autora?"
+    },
+    {
+        "OPTION1": "Beme",
+        "OPTION2": "Mbuandong",
+        "OPTION3": "Nokonoko",
+        "_id": 63,
+        "answer_nr": 2,
+        "question": "¿Qué personaje del gran Eyi Muan Ndong era antropófago?"
+    },
+    {
+        "OPTION1": "La Albina del Dinero",
+        "OPTION2": "La Bastarda",
+        "OPTION3": "El Llanto de la Perra",
+        "_id": 64,
+        "answer_nr": 2,
+        "question": "¿Qué obra de Trifonia Melibea Obono constituye un poderoso alegato sobre la homosexualidad femenina?"
+    },
+    {
+        "OPTION1": "Angela Nzambi",
+        "OPTION2": "Maria Jose Biong Bill",
+        "OPTION3": "Raquel Ilombé",
+        "_id": 65,
+        "answer_nr": 1,
+        "question": "¿Qué escritora natural de San Pedro de Lia es autora de \"Ngulsi\" (2012), \"Biyaare\" (2015) y \"Mayimbo\" (2019)?"
+    },
+    {
+        "OPTION1": "Donato Ndong",
+        "OPTION2": "Justo Bolekia Boleká",
+        "OPTION3": "Juan Balboa Boneke",
+        "_id": 66,
+        "answer_nr": 2,
+        "question": "¿Qué veterano autor da nombre a un premio internacional de literatura africana?"
+    },
+    {
+        "OPTION1": "el Padre Gabriel",
+        "OPTION2": "el Padre Andrés",
+        "OPTION3": "Monseñor Abuy",
+        "_id": 67,
+        "answer_nr": 1,
+        "question": "¿Qué joven religioso es el \"párroco de Niefang\" en la obra homónima de Joaquin Mbomio Bacheng\""
+    },
+    {
+        "OPTION1": "Barlock",
+        "OPTION2": "Suspeh",
+        "OPTION3": "El albino Micó",
+        "_id": 68,
+        "answer_nr": 2,
+        "question": "Según Medina Huesca, ¿quién contaba sus “memorias de ex-pandillero”?"
+    },
+    {
+        "OPTION1": "Ciriaco Bokesa",
+        "OPTION2": "Cesar Mba Abogo",
+        "OPTION3": "Emiliano Buale",
+        "_id": 69,
+        "answer_nr": 2,
+        "question": "¿\"El porteador de Marlow\" es una obra en verso de qué poeta?"
+    },
+    {
+        "OPTION1": "La Dote o Matrimonio Fang",
+        "OPTION2": "La Gramática Fang",
+        "OPTION3": "La Brujería",
+        "_id": 70,
+        "answer_nr": 3,
+        "question": "¿Qué aspecto de la cultura fang exploraba Joaquín Mbana Nchama en su libro de 2004?"
+    },
+    {
+        "OPTION1": "Peque Wambo",
+        "OPTION2": "Lolo Mr. Edward",
+        "OPTION3": "Party Boys",
+        "_id": 71,
+        "answer_nr": 1,
+        "question": "¿Quién puso banda sonora al \"ambiente de la calle\" que molaba mucho en los 90?"
+    },
+    {
+        "OPTION1": "Nick Mba",
+        "OPTION2": "Kiko B",
+        "OPTION3": "CH-B",
+        "_id": 72,
+        "answer_nr": 3,
+        "question": "¿Con quién trabajó Mr. Much Enga en su hit Tombé?"
+    },
+    {
+        "OPTION1": "Evom Nguan",
+        "OPTION2": "Chabeli",
+        "OPTION3": "Abom",
+        "_id": 73,
+        "answer_nr": 1,
+        "question": "En 1983 Maele Ndoho lanzó su primer álbum con éxitos como Madjing Mawoc, Yesua y Andem Ela. ¿Cual era el título?"
+    },
+    {
+        "OPTION1": "Nacho Pegaso",
+        "OPTION2": "Diddi Es",
+        "OPTION3": "Lil' Champ",
+        "_id": 74,
+        "answer_nr": 1,
+        "question": "¿Qué artista se llevó el galardón por la mejor canción popular en la edición 2022 de los premios Joncham?"
+    },
+    {
+        "OPTION1": "Rambo",
+        "OPTION2": "Gracias Dios",
+        "OPTION3": "Bidjango",
+        "_id": 75,
+        "answer_nr": 1,
+        "question": "Tony Mary el Insuperable y Nino Brown unieron fuerzas en qué éxito de 2015?"
+    },
+    {
+        "OPTION1": "Coro Bicomsua de Mongomo",
+        "OPTION2": "Coro Antorcha de Zaragoza",
+        "OPTION3": "Coro Bibulseng de Niefang",
+        "_id": 76,
+        "answer_nr": 1,
+        "question": "¿Qué coro de animación nos redescubrió el rito de la “Toalla de Flores” o “Tawola Mesam\"?"
+    },
+    {
+        "OPTION1": "Selin Samurai",
+        "OPTION2": "Bompe Ro",
+        "OPTION3": "Besoso",
+        "_id": 77,
+        "answer_nr": 3,
+        "question": "¿Con qué otro nombre más popular se conoce al artista Baltasar Nsue"
+    },
+    {
+        "OPTION1": "Iska",
+        "OPTION2": "Vanilla Karr",
+        "OPTION3": "Anguesomo",
+        "_id": 78,
+        "answer_nr": 3,
+        "question": "¿Qué joven y energética artista es autora de éxitos internacionales como \"Mah Yem Wa\" y \"Negra\"?"
+    },
+    {
+        "OPTION1": "Luis Mbomio",
+        "OPTION2": "Baron Ya Buk-Lu",
+        "OPTION3": "Mastho Ribocho",
+        "_id": 79,
+        "answer_nr": 2,
+        "question": "Trovador moderno de índole panafricanista afincado en España"
+    },
+    {
+        "OPTION1": "Wala Rioko",
+        "OPTION2": "Oberi",
+        "OPTION3": "Bweko Lele",
+        "_id": 80,
+        "answer_nr": 1,
+        "question": "¿Cuál es el título de la canción que Chuku Nene y SIta Richi convirtieron en un gran éxito a mediados de los 90?"
+    },
+    {
+        "OPTION1": "Bacake Pequeño",
+        "OPTION2": "Baho Grande",
+        "OPTION3": "Musola",
+        "_id": 81,
+        "answer_nr": 1,
+        "question": "¿Cuál de estas localidades se encuentra más al norte?"
+    },
+    {
+        "OPTION1": "Wele-Nzas",
+        "OPTION2": "Kie-Ntem",
+        "OPTION3": "Centro Sur",
+        "_id": 82,
+        "answer_nr": 3,
+        "question": "En términos de extensión, ¿cuál es la provincia más grande de Guinea Ecuatorial?"
+    },
+    {
+        "OPTION1": "425.762",
+        "OPTION2": "340.362",
+        "OPTION3": "525.702",
+        "_id": 83,
+        "answer_nr": 2,
+        "question": "De acuerdo con los últimos datos del INEGE, ¿cuál es la población de la región insular?"
+    },
+    {
+        "OPTION1": "Mbini",
+        "OPTION2": "Bata",
+        "OPTION3": "Kogo",
+        "_id": 84,
+        "answer_nr": 3,
+        "question": "¿En qué distrito de la provincia de Litoral ubicarías el Cabo San Juan?"
+    },
+    {
+        "OPTION1": "Acurenam",
+        "OPTION2": "Nsork",
+        "OPTION3": "Aconibe",
+        "_id": 85,
+        "answer_nr": 1,
+        "question": "¿Cuál de estas localidades está situada más al sur?"
+    },
+    {
+        "OPTION1": "Kie",
+        "OPTION2": "Ntem",
+        "OPTION3": "Benito",
+        "_id": 86,
+        "answer_nr": 2,
+        "question": "¿Con qué otro nombre se conoce el río Campo?"
+    },
+    {
+        "OPTION1": "Bantabaré",
+        "OPTION2": "Basacato de la Sagrada Familia",
+        "OPTION3": "Basacato del Oeste",
+        "_id": 87,
+        "answer_nr": 3,
+        "question": "¿En las inmediaciones de qué poblado bubi se ubica el Lago Claret?"
+    },
+    {
+        "OPTION1": "Bioko Norte",
+        "OPTION2": "Bioko Sur",
+        "OPTION3": "Annobon",
+        "_id": 88,
+        "answer_nr": 1,
+        "question": "¿En qué provincia situarías la Bahía de Venus?"
+    },
+    {
+        "OPTION1": "Kribi",
+        "OPTION2": "Limbe",
+        "OPTION3": "Buea",
+        "_id": 90,
+        "answer_nr": 2,
+        "question": "¿Cuál de estas ciudades camerunesas está más cerca de Malabo?"
+    },
+    {
+        "OPTION1": "Esteban Becker",
+        "OPTION2": "Jean Paul Mpila",
+        "OPTION3": "Sebastián Enga",
+        "_id": 91,
+        "answer_nr": 3,
+        "question": "¿Qué seleccionador estaba al frente del Nzalang femenino cuando esta ganó su primera copa de África en 2008?"
+    },
+    {
+        "OPTION1": "Mongomo Basket",
+        "OPTION2": "Arsenal",
+        "OPTION3": "Futuro Kings",
+        "_id": 92,
+        "answer_nr": 3,
+        "question": "¿Cuál de estos clubes no es ni ha  sido un equipo de baloncesto nacional?"
+    },
+    {
+        "OPTION1": "Mamelodi Sundowns",
+        "OPTION2": "Kaizer Chiefs",
+        "OPTION3": "Orlando Pirates",
+        "_id": 93,
+        "answer_nr": 1,
+        "question": "¿En qué club sudafricano jugó Genoveva Ayongman durante la temporada 2006/2007?"
+    },
+    {
+        "OPTION1": "Boxeo",
+        "OPTION2": "Halterofilia",
+        "OPTION3": "Atletismo",
+        "_id": 94,
+        "answer_nr": 3,
+        "question": "¿En qué modalidad deportiva destacó y fue internacional Jose Luis Ebatela Nvó?"
+    },
+    {
+        "OPTION1": "Baloncesto",
+        "OPTION2": "Tenis",
+        "OPTION3": "Volleyball",
+        "_id": 95,
+        "answer_nr": 2,
+        "question": "¿Miguel Ángel Fernández Bechiro, más conocido como “Puepue”, fue uno de los mejores de su generación en que modalidad deportiva?"
+    },
+    {
+        "OPTION1": "Akonangui",
+        "OPTION2": "Union Vesper",
+        "OPTION3": "Real X",
+        "_id": 96,
+        "answer_nr": 1,
+        "question": "¿Qué equipo de rojo ha representado históricamente a la ciudad de Ebebiyin en la primera división de futbol?"
+    },
+    {
+        "OPTION1": "E Waiso Ipola",
+        "OPTION2": "Claret",
+        "OPTION3": "Colegio Español",
+        "_id": 97,
+        "answer_nr": 3,
+        "question": "Pedro Mabale Fuga, actual Secretario de Deportes, tiene una larga carrera como profesor de Educación Física en qué centro escolar de Malabo?"
+    },
+    {
+        "OPTION1": "Menor Collins",
+        "OPTION2": "Pepe Collins",
+        "OPTION3": "Muñe Brown",
+        "_id": 98,
+        "answer_nr": 2,
+        "question": "¿Qué poderoso alero fue uno de los primeros africanos en destacar en el baloncesto español con equipos como el Espanyol y el Manresa?"
+    },
+    {
+        "OPTION1": "Inter Miami",
+        "OPTION2": "San José Earthquakes",
+        "OPTION3": "LA Galaxy",
+        "_id": 99,
+        "answer_nr": 2,
+        "question": "Al fichar por este equipo californiano, Carlos Akapo se ha convertido en el primer jugador guineano en debutar en la MLS."
+    },
+    {
+        "OPTION1": "Makwandja Ngongolo",
+        "OPTION2": "La Libertad",
+        "OPTION3": "Santiago Nguema Eneme",
+        "_id": 100,
+        "answer_nr": 3,
+        "question": "¿Con qué nombre está bautizado el Estadio de Mongomo?"
+    },
+    {
+        "OPTION1": "Corisco",
+        "OPTION2": "Annobon",
+        "OPTION3": "Luba",
+        "_id": 102,
+        "answer_nr": 2,
+        "question": "¿Dónde situarias la Playa del Amor?"
+    }
+]

@@ -321,7 +321,7 @@ public class QRcodeActivity extends AppCompatActivity {
             TaskCompletionSource<String> tcs = new TaskCompletionSource<>();
 
             if (isWithinCoolDownPeriod()) {
-                showCustomAlertDialog("Atención", "Ya generaste este código QR.");
+                showCustomAlertDialog("Atención", "Código recien generado.Inténtalo tras unos minutos.");
                 tcs.setException(new RuntimeException("Cooldown period active"));
                 return tcs.getTask();
             }

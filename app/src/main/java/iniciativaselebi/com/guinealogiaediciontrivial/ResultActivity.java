@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class ResultActivity extends AppCompatActivity {
 
@@ -72,8 +73,8 @@ public class ResultActivity extends AppCompatActivity {
         highscore = sp.getInt("score", 0);
         DisplayNivel = (TextView) findViewById(R.id.DisplayNivel);
 
-        QuizDBHelper dbHelper = new QuizDBHelper(this);
-        questionList = dbHelper.getRandomQuestions(10);
+        JsonQuestionManager questionManager = new JsonQuestionManager(this);
+        List<JsonQuestion> questionList = questionManager.getRandomQuestions(10);
         int questionCountTotal = questionList.size();
         Collections.shuffle(questionList);
 

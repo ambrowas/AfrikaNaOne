@@ -1,6 +1,7 @@
 package iniciativaselebi.com.guinealogiaediciontrivial;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -10,7 +11,10 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -21,7 +25,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -45,10 +48,7 @@ public class PreguntasModoLibre extends AppCompatActivity {
     private CountDownTimer countDownTimerII;
     private long timeLeftInMillis;
     int errores;
-    private List<Question> questionList;
-    public int questionCounter;
-    private int questionCountTotal;
-    private Question currentQuestion;
+    private List<JsonQuestion> questionList;
     int score;
     int scoretotal;
     private boolean answered;
@@ -63,11 +63,22 @@ public class PreguntasModoLibre extends AppCompatActivity {
     private Handler blinkHandler = new Handler();
     private Runnable blinkRunnable;
 
+    private JsonQuestionManager questionManager;
+    private JsonQuestion currentQuestion;
+
+    private int questionCounter;
+    private int questionCountTotal;
+    private AlertDialog dialog; // Class member for dialog
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preguntas_modo_libre);
+
+        questionManager = new JsonQuestionManager(this);
+        questionCountTotal = questionManager.getQuestionCount();
+
 
         textviewaciertos = findViewById(R.id.textviewaciertos);
         textviewcontadorpreguntas = findViewById(R.id.textviewcontadorpreguntas);
@@ -89,13 +100,13 @@ public class PreguntasModoLibre extends AppCompatActivity {
         mediaPlayerNotRight = MediaPlayer.create(this, R.raw.notright);
         swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
 
-        QuizDBHelper dbHelper = new QuizDBHelper(this);
-        ArrayList<Question> questions = dbHelper.getRandomQuestions(10);
-        questionList = dbHelper.getRandomQuestions(10);
-        questionCountTotal = questions.size();
+        questionManager = new JsonQuestionManager(this);
+        questionList = questionManager.getRandomQuestions(10); // Assuming you have a method like getRandomQuestions in your JsonQuestionManager
+        questionCountTotal = questionList.size();
         Collections.shuffle(questionList);
 
-        showNextQuestion();
+
+
 
         buttonconfirmar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,39 +124,7 @@ public class PreguntasModoLibre extends AppCompatActivity {
 
         });
 
-    }
 
-    private void showNextQuestion() {
-        if (blinkRunnable != null) {
-            blinkHandler.removeCallbacks(blinkRunnable);
-            resetRadioButtonsVisibility();
-        }
-
-        textviewpregunta.setText("");
-        textviewpregunta.setTextColor(Color.BLACK);
-        textviewpregunta.setTypeface(null, Typeface.NORMAL);
-        textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-
-
-        radio_button1.setTextColor(textColorDefaultRb);
-        radio_button2.setTextColor(textColorDefaultRb);
-        radio_button3.setTextColor(textColorDefaultRb);
-        radio_group.clearCheck();
-        if (questionCounter < questionCountTotal) {
-            currentQuestion = questionList.get(questionCounter);
-            textviewpregunta.setText(currentQuestion.getQuestion());
-            radio_button1.setText(currentQuestion.getOption1());
-            radio_button2.setText(currentQuestion.getOption2());
-            radio_button3.setText(currentQuestion.getOption3());
-            questionCounter++;
-            textviewcontadorpreguntas.setText("PREGUNTA: " + questionCounter + "/" + questionCountTotal);
-            answered = false;
-            buttonconfirmar.setText("CONFIRMAR");
-            timeLeftInMillis = COUNTDOWN_IN_MILLIS;
-            startCountDown();
-        } else {
-            finishQuiz();
-        }
         radio_group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -170,7 +149,52 @@ public class PreguntasModoLibre extends AppCompatActivity {
             }
         });
 
+        showNextQuestion();
+
     }
+
+    private void showNextQuestion() {
+            if (blinkRunnable != null) {
+                blinkHandler.removeCallbacks(blinkRunnable);
+                resetRadioButtonsVisibility();
+            }
+
+            textviewpregunta.setText("");
+            textviewpregunta.setTextColor(Color.BLACK);
+            textviewpregunta.setTypeface(null, Typeface.NORMAL);
+            textviewpregunta.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+
+            radio_button1.setTextColor(textColorDefaultRb);
+            radio_button2.setTextColor(textColorDefaultRb);
+            radio_button3.setTextColor(textColorDefaultRb);
+            radio_group.clearCheck();
+
+        if (questionCounter < questionCountTotal) {
+            currentQuestion = questionManager.getNextQuestion(this);
+            if (currentQuestion == null) {
+                // This means either all questions are shown, or the dialog is being shown
+                return; // Exit the method to avoid further UI updates
+            }
+
+                textviewpregunta.setText(currentQuestion.getQuestion());
+                radio_button1.setText(currentQuestion.getOPTION1());
+                radio_button2.setText(currentQuestion.getOPTION2());
+                radio_button3.setText(currentQuestion.getOPTION3());
+
+
+                questionCounter++;
+                textviewcontadorpreguntas.setText("PREGUNTA: " + questionCounter + "/" + questionCountTotal);
+                answered = false;
+                buttonconfirmar.setText("CONFIRMAR");
+                timeLeftInMillis = COUNTDOWN_IN_MILLIS;
+                startCountDown();
+            } else {
+                finishQuiz();
+            }
+        }
+
+
+
     private void resetRadioButtonsVisibility() {
         radio_button1.setVisibility(View.VISIBLE);
         radio_button2.setVisibility(View.VISIBLE);
@@ -219,7 +243,7 @@ public class PreguntasModoLibre extends AppCompatActivity {
         RadioButton rbSelected = findViewById(radio_group.getCheckedRadioButtonId());
         int answerNr = radio_group.indexOfChild(rbSelected) + 1;
 
-        if (answerNr == currentQuestion.getAnswerNr()) {
+        if (answerNr == currentQuestion.getAnswer_nr()) {
             score++;
             scoretotal += 500;
             mediaPlayerRight.start();
@@ -271,7 +295,7 @@ public class PreguntasModoLibre extends AppCompatActivity {
 
 
     private RadioButton getCorrectRadioButton() {
-        switch (currentQuestion.getAnswerNr()) {
+        switch (currentQuestion.getAnswer_nr()) {
             case 1:
                 return radio_button1;
             case 2:
@@ -290,8 +314,6 @@ public class PreguntasModoLibre extends AppCompatActivity {
             buttonconfirmar.setText("TERMINAR");
         }
     }
-
-
 
     private void finishQuiz() {
 
@@ -317,7 +339,7 @@ public class PreguntasModoLibre extends AppCompatActivity {
         showExitConfirmation();
     }
 
-        private void showExitConfirmation() {
+    private void showExitConfirmation() {
             new AlertDialog.Builder(this)
                     .setTitle("Confirmar salida")
                     .setMessage("¿Estás seguro de que quieres finalizar?")
@@ -328,6 +350,50 @@ public class PreguntasModoLibre extends AppCompatActivity {
                     .show();
         }
 
+
+    public void showAllQuestionsPlayedDialog() {
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Felicidades")
+                .setMessage("Completaste el Modo Libre. Deberías probar el Modo Competición.")
+                .setPositiveButton("OK", (dialogInterface, which) -> {
+                    dialogInterface.dismiss();
+                    resetAndContinueGame();
+                    Intent intent = new Intent(PreguntasModoLibre.this, Menuprincipal.class);
+                    startActivity(intent);
+                    finish();
+                })
+                .setIcon(R.drawable.logotrivial)
+                .setCancelable(false);
+
+        dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background); // Your custom shape drawable
+        }
+        dialog.show();
+
+
+        // Center the dialog
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.copyFrom(dialog.getWindow().getAttributes());
+        layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        layoutParams.gravity = Gravity.CENTER;
+        dialog.getWindow().setAttributes(layoutParams);
+    }
+
+
+    private void resetAndContinueGame() {
+        // Reset the question manager to start over
+        questionManager.resetShownQuestions();
+
+        // Continue with the game by showing the next question
+        showNextQuestion();
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -337,13 +403,22 @@ public class PreguntasModoLibre extends AppCompatActivity {
         }
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // Dismiss the dialog if it is showing
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+
+        // Cancel the countdown timer if it is running
         if (countDownTimerII != null) {
             countDownTimerII.cancel();
         }
 
+        // Release media players
         if (mediaPlayerCountdown != null) {
             mediaPlayerCountdown.release();
         }
@@ -354,4 +429,7 @@ public class PreguntasModoLibre extends AppCompatActivity {
             mediaPlayerNotRight.release();
         }
     }
+
+
+
 }
