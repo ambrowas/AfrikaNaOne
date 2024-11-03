@@ -11,7 +11,7 @@ android:background="@drawable/radio_normal">
     android:id="@+id/toast_image"
     android:layout_width="75dp"
     android:layout_height="75dp"
-    android:src="@drawable/logotrivial" />
+    android:src="@drawable/afrikanaonelogo" />
 
 <TextView
     android:id="@+id/toast_text"

@@ -1,45 +1,26 @@
 {
   "project_info": {
-    "project_number": "880260787416",
-    "firebase_url": "https://trivial-guineologia-default-rtdb.firebaseio.com",
-    "project_id": "trivial-guineologia",
-    "storage_bucket": "trivial-guineologia.appspot.com"
+    "project_number": "964624085160",
+    "project_id": "afrikanaone",
+    "storage_bucket": "afrikanaone.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:880260787416:android:ec95571d6ba3fb0f917bad",
+        "mobilesdk_app_id": "1:964624085160:android:f8026594345dde858dd29d",
         "android_client_info": {
-          "package_name": "iniciativaselebi.com.guinealogiaediciontrivial"
+          "package_name": "com.iniciativaselebi.afrikanaone"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "880260787416-l85cs268a5m6gqni4t9gm7rlk92sbkkl.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "iniciativaselebi.com.guinealogiaediciontrivial",
-            "certificate_hash": "cafda69d2c3ca94cb1034c4234fda15a868f917f"
-          }
-        },
-        {
-          "client_id": "880260787416-r4bepen1arg13tk00rkmvgjsibddr358.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyABbLv51XDsWiF7I0-tqeivlsU8t0L08xk"
+          "current_key": "AIzaSyD44KMjPoWV-slfZQCHQ8-MraTED-pHKGw"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "880260787416-r4bepen1arg13tk00rkmvgjsibddr358.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

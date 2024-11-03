@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/coolbackground">
+        android:background="@drawable/texture">
 
 
 
@@ -58,8 +58,8 @@
         android:id="@+id/textviewaciertos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ACIERTOS : 0 "
-        android:textColor="@color/black"
+        android:text="CORRECT ANS. : 0 "
+        android:textColor="@color/white"
         android:layout_marginTop="30dp"
         android:layout_marginLeft="10dp"
         android:textStyle="bold"
@@ -71,9 +71,9 @@
         android:id="@+id/textviewfallos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="FALLOS : 0 "
+        android:text="MISTAKES : 0 "
         android:layout_below="@id/textviewaciertos"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:layout_marginLeft="10dp"
         android:textStyle="bold"
         android:freezesText="true"
@@ -87,8 +87,8 @@
         android:layout_below="@+id/textviewfallos"
         android:layout_marginLeft="10dp"
         android:freezesText="true"
-        android:text="PUNTUACION : 0 "
-        android:textColor="@color/black"
+        android:text="SCORE : 0 "
+        android:textColor="@color/white"
         android:textStyle="bold"
         android:textSize="16sp"/>
 
@@ -111,7 +111,7 @@
         android:shadowRadius="6"
         android:text=""
         android:textAlignment="center"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="50sp"
         android:textStyle="bold"
         />
@@ -203,7 +203,7 @@
         android:layout_marginTop="20dp"
         android:freezesText="true"
         android:gravity="center"
-        android:text="CONFIRMAR"
+        android:text="CONFIRM"
         android:textColor="@color/white"
         android:textStyle="bold"
         app:strokeWidth="3dp" />
@@ -218,7 +218,7 @@
         android:layout_marginTop="20dp"
         android:freezesText="true"
         android:gravity="center"
-        android:text="SIGUIENTE"
+        android:text="NEXT"
         android:textColor="@color/white"
         android:textStyle="bold"
         app:strokeWidth="3dp"
@@ -235,7 +235,7 @@
         android:freezesText="true"
         android:gravity="center"
         android:backgroundTint="@color/red"
-        android:text="TERMINAR"
+        android:text="END GAME"
         android:textColor="@color/white"
         android:textStyle="bold"
         android:visibility="invisible"

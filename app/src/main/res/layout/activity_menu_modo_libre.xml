@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="@drawable/texture"
     tools:context=".ModoLibre">
 
     <LinearLayout
@@ -13,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:background="@drawable/coolbackground">
+       >
 
 
     <ImageView
@@ -21,7 +22,7 @@
         android:layout_width="250dp"
         android:layout_gravity="center_horizontal"
         android:layout_height="230dp"
-        android:src="@drawable/logotrivial"
+        android:src="@drawable/afrikanaonelogo"
          />
 
 
@@ -30,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:hint="INTRODUCE TU NOMBRE"
+        android:hint="ENTER YOUR NAME"
         android:textColor="@color/black"
         android:layout_gravity="center_horizontal"
         android:layout_below="@id/logo"
@@ -46,7 +47,7 @@
         android:shadowDx="4"
         android:shadowDy="4"
         android:shadowRadius="6"
-        android:text="HOLA POR AQUI"
+        android:text="HELLO THERE"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/black"
@@ -81,7 +82,7 @@
         android:layout_gravity="center_horizontal"
         android:backgroundTint="@color/blue"
         android:gravity="center"
-        android:text="GUARDAR"
+        android:text="SAVE"
         android:shadowDx="4"
         android:shadowDy="4"
         android:shadowRadius="6"
@@ -97,7 +98,7 @@
         android:layout_below="@id/TextViewRecord"
         android:gravity="center"
         android:textColor="@color/white"
-        android:text="JUGAR"
+        android:text="PLAY"
         android:shadowDx="4"
         android:shadowDy="4"
         android:layout_marginTop="40dp"
@@ -108,7 +109,7 @@
         android:id="@+id/buttonvolver"
         android:layout_width="300dp"
         android:layout_height="75dp"
-        android:text="VOLVER"
+        android:text="RETURN"
         android:textColor="@color/white"
         android:textStyle="bold"
         android:layout_marginTop="15dp"

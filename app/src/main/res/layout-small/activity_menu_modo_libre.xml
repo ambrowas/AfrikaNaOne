@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/coolbackground"
+    android:background="@drawable/texture"
     tools:context=".ModoLibre">
 
 
@@ -16,7 +16,7 @@
         android:layout_width="250dp"
         android:layout_gravity="center_horizontal"
         android:layout_height="250dp"
-        android:src="@drawable/logotrivial"
+        android:src="@drawable/afrikanaonelogo"
          />
 
 

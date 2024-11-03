@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:background="@drawable/coolbackground">
+        android:background="@drawable/texture">
 
     <TextView
         android:text="REGISTRAR USUARIO"
@@ -22,6 +22,7 @@
         android:textSize="24sp"
         android:layout_marginTop="20dp"
         android:gravity="center"
+        android:textColor="@color/white"
         android:layout_marginBottom="20dp"/>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -29,7 +30,7 @@
         android:layout_height="wrap_content">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/nombre"
-            android:hint="@string/nombre"
+            android:hint="Full Name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -50,7 +51,7 @@
         android:layout_height="wrap_content">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/password"
-            android:hint="@string/contrase_a"
+            android:hint="Password"
             android:inputType="textPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
@@ -61,7 +62,7 @@
         android:layout_height="wrap_content">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/telefono"
-            android:hint="@string/telefono"
+            android:hint="Telephone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -71,7 +72,7 @@
         android:layout_height="wrap_content">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/barrio"
-            android:hint="Barrio"
+            android:hint="Neighborhood"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -81,7 +82,7 @@
         android:layout_height="wrap_content">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/ciudad"
-            android:hint="@string/ciudad"
+            android:hint="City"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -99,7 +100,8 @@
             android:layout_height="wrap_content"
             android:inputType="none"
             android:editable="false"
-            android:hint="@string/pa_s" />
+            android:textColorHint="@color/white"
+            android:hint="Country" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -113,7 +115,7 @@
             android:layout_height="wrap_content"
             android:inputType="none"
             android:editable="false"
-            android:hint="@string/Dispositivo"
+            android:hint="Device"
           />
     </com.google.android.material.textfield.TextInputLayout>
 

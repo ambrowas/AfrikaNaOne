@@ -16,9 +16,11 @@
     <color name="blue">#1E1EBA</color>
     <color name="yellow">#FFFF00</color>
     <color name="pink">#E03D74</color>
-    <color name="default_radio_button_background">#E0E0E0</color>
-    <color name="correct_answer_background">#4CAF50</color>
-    <color name="incorrect_answer_background">#F44336</color>
+    <color name="default_radio_button_background">#0A2F9D</color>
+    <color name="selected_radio_button_background">#073718</color>
+    <color name="correct_answer_background">#064509</color>
+    <color name="incorrect_answer_background">#750F07</color>
+
 
 
 </resources>

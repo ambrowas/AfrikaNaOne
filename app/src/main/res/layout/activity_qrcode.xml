@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@drawable/coolbackground">
+        android:background="@drawable/texture">
 
 
 
@@ -52,7 +52,8 @@
         android:layout_height="75dp"
         android:freezesText="true"
         android:layout_gravity="center_horizontal"
-        android:text="GUARDAR"
+        android:text="SAVE"
+        android:backgroundTint="#80412A"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="50dp"
         android:textColor="@color/white"
@@ -63,10 +64,10 @@
         android:id="@+id/buttonvolver"
         android:layout_width="300dp"
         android:layout_height="75dp"
-        android:backgroundTint="@color/red"
+        android:backgroundTint="#80412A"
         android:freezesText="true"
         android:layout_gravity="center_horizontal"
-        android:text="VOLVER"
+        android:text="RETURN"
         android:layout_marginBottom="10dp"
         android:textColor="@color/white"
         android:textStyle="bold"

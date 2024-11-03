@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@drawable/coolbackground"
+        android:background="@drawable/texture"
         tools:context=".ContactanosActivity">
 
 
@@ -23,9 +23,8 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:background="@drawable/table_border"
-        android:text="Para ruegos, preguntas, propuestas, sugerencias, correcciones, quejas, insultos, amenazas o
- o intimidaciones pulsa el icono de Whatsapp más abajo y escribenos; intentaremos arreglarlo.
-Gracias por apoyarnos, saludos."
+        android:text="For questions, comments, suggestions, proposals, corrections, complaints, insults, intimidations and/or grievances kindly press the icon below to contact us via whatsapp.We will try to fix it. Thanks for the support
+"
         android:textColor="@color/black"
         android:textSize="16sp" />
 
@@ -43,7 +42,7 @@ Gracias por apoyarnos, saludos."
         android:id="@+id/buttonvolver3"
         android:layout_width="300dp"
         android:layout_height="75dp"
-        android:text="VOLVER"
+        android:text="RETURN"
         android:textColor="@color/white"
         android:textStyle="bold"
         android:layout_marginTop="15dp"

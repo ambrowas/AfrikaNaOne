@@ -10,7 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/coolbackground"
+        android:background="@drawable/texture"
         android:orientation="vertical">
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profilepic"
@@ -59,11 +59,11 @@
             android:layout_height="50dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="30dp"
-            android:backgroundTint="@color/green"
+            android:backgroundTint="#80412A"
             android:shadowDx="4"
             android:shadowDy="4"
             android:shadowRadius="6"
-            android:text="GUARDAR FOTO"
+            android:text="SAVE PIC"
             android:textColor="@color/white"
             app:strokeWidth="3dp" />
 
@@ -90,7 +90,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:padding="8dp"
-                android:text="Nombre Completo"
+                android:text="Full Name"
                 android:textAllCaps="true"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -113,7 +113,7 @@
                 android:layout_weight="1"
                 android:gravity="left"
                 android:padding="8dp"
-                android:text="Telefono"
+                android:text="Telephone"
                 android:textColor="@color/black"
                 android:button="@android:color/transparent"
                 android:background="@drawable/table_border"/>
@@ -132,7 +132,7 @@
                 android:layout_weight="1"
                 android:gravity="left"
                 android:padding="8dp"
-                android:text="Barrio"
+                android:text="Neighborhood"
                 android:textColor="@color/black"
                 android:button="@android:color/transparent"
                 android:background="@drawable/table_border"/>
@@ -149,7 +149,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:hint="Ciudad"
+                android:hint="City"
                 android:padding="8dp"
                 android:textColor="@color/black"
                 android:button="@android:color/transparent"
@@ -167,7 +167,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:hint="País"
+                android:hint="Country"
                 android:textColor="@color/black"
                 android:padding="8dp"
                 android:button="@android:color/transparent"
@@ -274,7 +274,8 @@
             android:id="@+id/buttonatras"
             android:layout_width="130dp"
             android:layout_height="55dp"
-            android:text="VOLVER"
+            android:text="RETURN"
+            android:backgroundTint="@color/orange"
             android:textColor="@color/white"
             android:layout_marginRight="5dp"
             android:textStyle="bold"
@@ -284,8 +285,8 @@
             android:id="@+id/btn_borrarusuario"
             android:layout_width="130dp"
             android:layout_height="55dp"
-            android:backgroundTint="@color/red"
-            android:text="BORRAR"
+            android:backgroundTint="@color/orange"
+            android:text="ERASE"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:strokeWidth="3dp" />
