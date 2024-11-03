@@ -14,7 +14,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/coolbackground"
+    android:background="@drawable/texture"
     android:padding="16dp">
 
     <TextView
@@ -61,13 +61,13 @@
         android:id="@+id/button_retorno"
         android:layout_width="250dp"
         android:layout_height="55dp"
-        android:text="VOLVER"
+        android:text="RETURN"
         android:textColor="@color/white"
         android:textStyle="bold"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="20dp"
         android:layout_gravity="center_horizontal"
-        android:backgroundTint="@color/blue"
+        android:backgroundTint="@android:color/system_control_activated_dark"
         app:strokeWidth="3dp"/>
 </LinearLayout>
 </ScrollView>

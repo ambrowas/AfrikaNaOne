@@ -14,7 +14,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Procesando.Abeg, no vex.."
+        android:text="Processing.Abeg, no vex.."
         android:textStyle="bold"
         android:textColor="@color/black"
         android:layout_marginTop="10dp" />

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/coolbackground"
+    android:background="@drawable/texture"
     tools:context=".ResultActivity">
 
 
@@ -21,7 +21,7 @@
         android:shadowDx="4"
         android:shadowDy="4"
         android:shadowRadius="6"
-        android:src="@drawable/guinealogo_mediocre" />
+        android:src="@drawable/beginer" />
 
     <TextView
         android:id="@+id/DisplayNivel"

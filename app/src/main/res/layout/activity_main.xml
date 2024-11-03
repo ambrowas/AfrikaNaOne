@@ -3,29 +3,45 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@drawable/mimosa"
+    android:background="@drawable/purple"
     android:layout_height="match_parent"
     android:id="@+id/main_activity_layout"
     tools:context=".MainActivity">
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="200dp"
-        android:layout_height="300dp"
+        android:layout_width="250dp"
+        android:layout_height="350dp"
         android:contentDescription="logotipoapp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:src="@drawable/logotrivial" />
+        android:layout_marginTop="200dp"
+        android:src="@drawable/afrikanaonelogo" />
 
     <TextView
         android:id="@+id/TextViewClicAqui"
-        android:text="CLIC AQUI PARA COMENZAR"
+        android:text="CLICK HERE TO START"
+        android:fontFamily="@font/cairo_light"
+        android:textColor="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="22sp"
+        android:layout_marginTop="-70dp"
+        android:layout_below="@id/logo"
+        android:visibility="gone"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/TextViewProverb"
+        android:text="AFRICAN PROVERB"
+        android:fontFamily="@font/cairo_light"
+        android:textAlignment="center"
+        android:textColor="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:layout_marginTop="-70dp"
-        android:layout_below="@id/logo"
+        android:layout_below="@id/TextViewClicAqui"
         android:visibility="gone"
         android:gravity="center" />
 

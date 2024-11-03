@@ -7,7 +7,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/coolbackground"
+    android:background="@drawable/texture"
     tools:context=".ClassficationActivity">
 
     <LinearLayout
@@ -92,7 +92,7 @@
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal">
-                <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
+                <com.iniciativaselebi.afrikanaone.ColorFlashingTextview
                     android:id="@+id/textviewaciertos2"
                     android:layout_width="0dp"
                     android:layout_weight="1"
@@ -126,7 +126,7 @@
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal">
-                <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
+                <com.iniciativaselebi.afrikanaone.ColorFlashingTextview
                     android:id="@+id/textviewpuntuacion2"
                     android:layout_width="0dp"
                     android:layout_weight="1"
@@ -143,7 +143,7 @@
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal">
-                <iniciativaselebi.com.guinealogiaediciontrivial.ColorFlashingTextview
+                <com.iniciativaselebi.afrikanaone.ColorFlashingTextview
                     android:id="@+id/textviewganancias"
                     android:layout_width="0dp"
                     android:layout_weight="1"

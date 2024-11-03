@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/radio_button_selector.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- State when the radio button is selected -->
+    <item android:state_checked="true" android:drawable="@color/selected_radio_button_background" />
+    <!-- Default state -->
+    <item android:drawable="@color/default_radio_button_background" />
+</selector>

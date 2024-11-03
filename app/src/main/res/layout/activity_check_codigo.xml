@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:background="@drawable/coolbackground"
+        android:background="@drawable/texture"
         android:padding="16dp">
 
     <LinearLayout
@@ -64,7 +64,7 @@
         android:id="@+id/button_validar"
         android:layout_width="300dp"
         android:layout_height="75dp"
-        android:text="VALIDAR"
+        android:text="VALIDATE"
         android:gravity="center"
         android:backgroundTint="@color/green"
         android:layout_centerHorizontal="true"
@@ -80,7 +80,7 @@
         android:id="@+id/button_regresar"
         android:layout_width="300dp"
         android:layout_height="75dp"
-        android:text="VOLVER"
+        android:text="RETURN"
         android:backgroundTint="@color/red"
         android:gravity="center"
         android:layout_centerHorizontal="true"

@@ -16,7 +16,7 @@
     android:layout_height="match_parent"
 
 
-    android:background="@drawable/coolbackground"
+    android:background="@drawable/texture"
     tools:context=".ProfileActivity">
 
 
