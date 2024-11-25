@@ -40,6 +40,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -144,13 +145,13 @@ public class ProfileActivity extends AppCompatActivity {
                         textViewPuntuacionAcumulada.setText("TOTAL POINTS: " + String.valueOf(user.getAccumulatedPuntuacion() + " POINTS"));
 
                         textViewAciertosAcumulados = findViewById(R.id.textViewAciertosAcumulados);
-                        textViewAciertosAcumulados.setText("TOTAL CORRECT ANS: " + String.valueOf(user.getAccumulatedAciertos()));
+                        textViewAciertosAcumulados.setText("TOTAL CORRECT ANSWERS: " + String.valueOf(user.getAccumulatedAciertos()));
 
                         textViewFallosAcumulados = findViewById(R.id.textViewFallosAcumulados);
                         textViewFallosAcumulados.setText("TOTAL ERRORS: " + String.valueOf(user.getAccumulatedFallos()));
 
                         textViewPastaAcumulada = findViewById(R.id.textViewPastaAcumulada);
-                        textViewPastaAcumulada.setText("TOTAL EARNINGS: " + String.valueOf(user.getAccumulatedPuntuacion() + " $"));
+                        textViewPastaAcumulada.setText("TOTAL EARNINGS: " + String.valueOf(user.getAccumulatedPuntuacion() + " AFROS"));
 
                         profilepic = findViewById(R.id.profilepic);
                         String profilePicUrl = snapshot.child("profilePicture").getValue(String.class);
@@ -304,8 +305,6 @@ public class ProfileActivity extends AppCompatActivity {
             showInformationalAlertDialog("Error", "Usuario not logged in.");
         }
     }
-
-
     private void reauthenticateAndDelete() {
         FirebaseUser user = mAuth.getCurrentUser();
 
@@ -355,7 +354,6 @@ public class ProfileActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
     private void logDeletedUser(String userFullName, String email) {
         DatabaseReference deletedUsersRef = FirebaseDatabase.getInstance().getReference().child("deleted_users");
         DatabaseReference userRef = deletedUsersRef.push();
@@ -381,55 +379,112 @@ public class ProfileActivity extends AppCompatActivity {
            // Toast.makeText(ProfileActivity.this, "Successfully saved user to the database.", Toast.LENGTH_SHORT).show();
         });
     }
+
+    private void getImageInImageView() {
+        Bitmap bitmap;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imagePath);
+            profilepic.setImageBitmap(bitmap);
+            isImageSet = true;  // Set flag to true as image is now set
+        } catch (IOException e) {
+            isImageSet = false; // Reset flag as there was an error loading the image
+            throw new RuntimeException(e);
+        }
+    }
+
     private void uploadImage() {
         // Check if an image has been selected
         if (imagePath == null) {
+            Log.e("UploadImage", "Image path is null, cannot upload");
             showInformationalAlertDialog("Attention", "No image selected");
             return;
         }
 
+        Log.d("UploadImage", "Starting upload process...");
+
         AlertDialog uploadDialog = createUploadDialog();
         uploadDialog.show();
-        // Setup a new progress dialog
-//        ProgressDialog progressDialog = new ProgressDialog(this);
-//        progressDialog.setTitle("Subiendo ...");
-//        progressDialog.show();
 
         // Generate a unique image filename path using UUID
-        String imageFilename = "images/" + UUID.randomUUID().toString();
-        // Start uploading the image to Firebase Storage
-        FirebaseStorage.getInstance().getReference(imageFilename)
-                .putFile(imagePath)
+        String imageFilename = "images/" + UUID.randomUUID().toString() + ".jpg";
+        Log.d("UploadImage", "Generated image filename: " + imageFilename);
+
+        // Use the correct storage bucket URL
+        StorageReference storageRef = FirebaseStorage.getInstance()
+                .getReferenceFromUrl("gs://afrikanaone.firebasestorage.app");  // Make sure this matches exactly
+
+        StorageReference fileRef = storageRef.child(imageFilename);
+
+        fileRef.putFile(imagePath)
+                .addOnSuccessListener(taskSnapshot -> {
+                    Log.d("UploadImage", "Upload completed successfully");
+                    // Get the download URL for the uploaded image
+                    taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(urlTask -> {
+                        if (urlTask.isSuccessful()) {
+                            String imageUrl = urlTask.getResult().toString();
+                            Log.d("UploadImage", "Download URL: " + imageUrl);
+                            updateProfilePicture(imageUrl);
+                            playSwoosh(); // Play a sound effect
+                            // Show a success dialog and navigate back to MenuModoCompeticion on dismiss
+                            showCustomAlertDialogWithDismissListener("Success", "Profile picture set. Looking kinda cool", dialogInterface -> {
+                                navigateToModoCompeticion();
+                            });
+                            // Hide the upload button after a successful upload
+                            btn_upload.setVisibility(View.INVISIBLE);
+                        } else {
+                            Log.e("UploadImage", "Failed to get download URL", urlTask.getException());
+                        }
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("UploadImage", "Upload failed: ", e);
+                    showInformationalAlertDialog("Error", e.getLocalizedMessage());
+                })
                 .addOnCompleteListener(task -> {
-                    // Dismiss the progress dialog upon completion of the upload task
                     uploadDialog.dismiss();
-                    if (task.isSuccessful()) {
-                        // Get the download URL for the uploaded image
-                        task.getResult().getStorage().getDownloadUrl().addOnCompleteListener(urlTask -> {
-                            if (urlTask.isSuccessful()) {
-                                String imageUrl = urlTask.getResult().toString();
-                                // Update the profile picture URL in the user's profile
-                                updateProfilePicture(imageUrl);
-                                playSwoosh(); // Play a sound effect
-                                // Show a success dialog and navigate back to MenuModoCompeticion on dismiss
-                                showCustomAlertDialogWithDismissListener("Success", "Profile picture set. Looking kinda cool", dialogInterface -> {
-                                    navigateToModoCompeticion();
-                                });
-                                // Hide the upload button after a successful upload
-                                btn_upload.setVisibility(View.INVISIBLE);
-                            }
-                        });
-                    } else {
-                        // If the upload task failed, show an error message
-                        showInformationalAlertDialog("Error", task.getException().getLocalizedMessage());
-                    }
+                    Log.d("UploadImage", "Upload task complete. Success: " + task.isSuccessful());
                 })
                 .addOnProgressListener(snapshot -> {
-                    // Update the progress dialog message with the upload progress percentage
                     double progress = 100.0 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount();
+                    Log.d("UploadImage", "Upload progress: " + (int) progress + "%");
                     uploadDialog.setMessage("Uploaded " + (int) progress + "%");
                 });
     }
+
+    private void updateProfilePicture(String url) {
+        FirebaseDatabase.getInstance().getReference("user/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/profilePicture").setValue(url);
+        SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("profilePictureUri", url);
+        editor.apply();
+
+    }
+
+    private AlertDialog createUploadDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // Set up the input
+        final ProgressBar progressBar = new ProgressBar(this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        progressBar.setLayoutParams(lp);
+        builder.setView(progressBar);
+
+        // Set up the buttons
+        builder.setTitle("Uploading ...")
+                .setIcon(R.drawable.afrikanaonelogo);
+
+        AlertDialog dialog = builder.create();
+
+        // Get the Window of the AlertDialog and set the custom background
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+
+        return dialog;
+    }
+
 
     // Simple method to show an informational alert dialog
     private void showInformationalAlertDialog(String title, String message) {
@@ -445,7 +500,7 @@ public class ProfileActivity extends AppCompatActivity {
         // Check if the Window for the AlertDialog is available and set the custom background
         Window window = dialog.getWindow();
         if (window != null) {
-          //  window.setBackgroundDrawableResource(dialog_background); // Set the custom background directly
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
         }
 
         // Show the dialog to the user
@@ -475,37 +530,20 @@ public class ProfileActivity extends AppCompatActivity {
 
         Window window = dialog.getWindow();
         if (window != null) {
-            //window.setBackgroundDrawableResource(dialog_background);
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
         }
 
         dialog.show();
     }
-    // Method to show an alert dialog that runs a task when dismissed
-//    private void showAlertDialogWithTask(String title, String message, Runnable task) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-//                .setTitle(title)
-//                .setMessage(message)
-//                .setPositiveButton("OK", (dialogInterface, i) -> {
-//                    dialogInterface.dismiss();
-//                    if (task != null) {
-//                        task.run();
-//                    }
-//                })
-//                .setIcon(R.drawable.logotrivial);
-//        AlertDialog dialog = builder.create();
-//        setDialogBackground(dialog);
-//        dialog.show();
-//    }
 
-    // Method to show an alert dialog with custom positive and negative actions
     private void showAlertDialogWithActions(String title, String message,
                                             DialogInterface.OnClickListener positiveAction,
                                             DialogInterface.OnClickListener negativeAction) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("YES", positiveAction)
-                .setNegativeButton("NO", negativeAction != null ? negativeAction : (dialogInterface, i) -> dialogInterface.dismiss())
+                .setPositiveButton("YEP", positiveAction)
+                .setNegativeButton("NOPE", negativeAction != null ? negativeAction : (dialogInterface, i) -> dialogInterface.dismiss())
                 .setIcon(R.drawable.afrikanaonelogo);
         AlertDialog dialog = builder.create();
         setDialogBackground(dialog);
@@ -527,7 +565,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         Window window = dialog.getWindow();
         if (window != null) {
-            //window.setBackgroundDrawableResource(dialog_background); // Replace with your drawable resource for the dialog background
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
         }
 
         dialog.show();
@@ -537,44 +575,12 @@ public class ProfileActivity extends AppCompatActivity {
     private void setDialogBackground(AlertDialog dialog) {
         Window window = dialog.getWindow();
         if (window != null) {
-            //window.setBackgroundDrawableResource(dialog_background);
-        }
-    }
-
-    private AlertDialog createUploadDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // Set up the input
-        final ProgressBar progressBar = new ProgressBar(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        progressBar.setLayoutParams(lp);
-        builder.setView(progressBar);
-
-        // Set up the buttons
-        builder.setTitle("Uploading ...")
-                .setIcon(R.drawable.afrikanaonelogo);
-
-        AlertDialog dialog = builder.create();
-
-        // Get the Window of the AlertDialog and set the custom background
-        Window window = dialog.getWindow();
-        if (window != null) {
             window.setBackgroundDrawableResource(R.drawable.dialog_background);
+
         }
-
-        return dialog;
     }
 
 
-    private void updateProfilePicture(String url) {
-        FirebaseDatabase.getInstance().getReference("user/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/profilePicture").setValue(url);
-        SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("profilePictureUri", url);
-        editor.apply();
-
-    }
     private void loadUserHighestScore() {
 
             final AtomicInteger updatedScore = new AtomicInteger(0);
@@ -610,17 +616,7 @@ public class ProfileActivity extends AppCompatActivity {
             getImageInImageView();
         }
     }
-    private void getImageInImageView() {
-        Bitmap bitmap;
-        try {
-            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imagePath);
-            profilepic.setImageBitmap(bitmap);
-            isImageSet = true;  // Set flag to true as image is now set
-        } catch (IOException e) {
-            isImageSet = false; // Reset flag as there was an error loading the image
-            throw new RuntimeException(e);
-        }
-    }
+
     public void getPositionInLeaderboard() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {

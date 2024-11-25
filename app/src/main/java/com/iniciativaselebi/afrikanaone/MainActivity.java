@@ -56,23 +56,32 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        initializeFirebase();
+        checkForAppUpdates();
+        setupFirebaseInAppMessaging();
+        setupDatabaseAndInstallationId();
+        animateLogoAndSetVisibility();
+        setupMediaPlayer();
+        handleMainLayoutClick();
+        fetchRandomProverb();
+    }
+
+    private void initializeFirebase() {
         FirebaseApp.initializeApp(this);
         if (FirebaseApp.getApps(this).isEmpty()) {
             Log.e("FirebaseInit", "Firebase initialization failed.");
         } else {
             Log.d("FirebaseInit", "Firebase initialized successfully.");
         }
+    }
 
-
-
-        appUpdateManager = AppUpdateManagerFactory.create(this);
+    private void checkForAppUpdates() {
+        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
         Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
-
-        // Checks that the platform will allow the specified type of update.
         appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
                     && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-                // Request the update.
                 try {
                     appUpdateManager.startUpdateFlowForResult(
                             appUpdateInfo,
@@ -84,96 +93,81 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
-
+    private void setupFirebaseInAppMessaging() {
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
-        // Listener for Firebase In-App Messaging
-        FirebaseInAppMessaging.getInstance().addClickListener(new FirebaseInAppMessagingClickListener() {
-            @Override
-            public void messageClicked(InAppMessage inAppMessage, Action action) {
-                // Handle in-app message click
-                // You might want to log, show a toast, or redirect to a different activity
-            }
+        FirebaseInAppMessaging.getInstance().addClickListener((inAppMessage, action) -> {
+            // Handle in-app message click here
         });
+    }
 
-        db= FirebaseFirestore.getInstance();
-
+    private void setupDatabaseAndInstallationId() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseInstallations.getInstance().getId().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String installationId = task.getResult();
-                // Log the Installation ID
                 Log.d("MainActivity", "Firebase Installation ID: " + installationId);
-
-                // Save installation ID in shared preferences
                 saveInstallationIdInPreferences(installationId);
             } else {
                 Log.e("MainActivity", "Unable to get Installation ID", task.getException());
             }
         });
+    }
 
-        fetchRandomProverb();
-
-        TextViewClicAqui = findViewById(R.id.TextViewClicAqui);
-// Handler to delay the visibility
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!isFinishing()) { // Check if the activity is still active
-                    TextViewClicAqui.setVisibility(View.VISIBLE);
-                }
+    private void animateLogoAndSetVisibility() {
+        TextView textViewClicAqui = findViewById(R.id.TextViewClicAqui);
+        new Handler().postDelayed(() -> {
+            if (!isFinishing()) {
+                textViewClicAqui.setVisibility(View.VISIBLE);
             }
-        }, 10000); // 2000ms delay
+        }, 10000);
 
-
-        imageView = findViewById(R.id.logo);
+        ImageView imageView = findViewById(R.id.logo);
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.myanim);
-        Animation pulseAnim = AnimationUtils.loadAnimation(this, R.anim.pulse_animation); // Load the pulse animation
-
-
-        mediaPlayer = MediaPlayer.create(this, R.raw.bikutsi);  // Removed re-declaration
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                // Do something when audio completes, if needed
-            }
-        });
-        mediaPlayer.start();
-
+        Animation pulseAnim = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);
         anim.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onAnimationStart(Animation animation) {
-                // Animation started
-            }
+            public void onAnimationStart(Animation animation) {}
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                // Animation ended
-                imageView.startAnimation(pulseAnim); // Start the pulse animation immediately
+                imageView.startAnimation(pulseAnim);
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) {
-                // Animation repeated
-            }
+            public void onAnimationRepeat(Animation animation) {}
         });
         imageView.setAnimation(anim);
         anim.start();
+    }
 
-        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh); // Initializing the swooshPlayer
+    private void setupMediaPlayer() {
+        mediaPlayer = MediaPlayer.create(this, R.raw.bikutsi);
 
-        // Setting OnClickListener to the RelativeLayout
-        RelativeLayout mainLayout = findViewById(R.id.main_activity_layout);
-        mainLayout.setOnClickListener(new View.OnClickListener() {
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
-            public void onClick(View v) {
-                playSwoosh();
-                Intent intent = new Intent(MainActivity.this, Menuprincipal.class);
-                startActivity(intent);
-                finish();
+            public void onCompletion(MediaPlayer mp) {
+                // Log completion if needed
+                Log.d("MediaPlayer", "Playback completed. Looping due to setLooping(true).");
             }
+        });
+
+        mediaPlayer.start();
+    }
+    private void handleMainLayoutClick() {
+        RelativeLayout mainLayout = findViewById(R.id.main_activity_layout);
+        mainLayout.setOnClickListener(v -> {
+            playSwoosh();
+            startActivity(new Intent(MainActivity.this, Menuprincipal.class));
+            finish();
         });
     }
 
+    private void playSwoosh() {
+        MediaPlayer swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
+        swooshPlayer.start();
+    }
 
     private void fetchRandomProverb() {
         // Initialize Firestore and ensure TextViewProverb is correctly found
@@ -227,6 +221,25 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == MY_REQUEST_CODE) {
+            if (resultCode != RESULT_OK) {
+                // The update was cancelled by the user or it failed.
+                // You can prompt the user again to update the app.
+                checkForAppUpdates();
+            }
+        }
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkForAppUpdates();// Check for app update when the app resumes
+    }
+
+    @Override
     protected void onDestroy() {
         if (mediaPlayer != null) {
             mediaPlayer.release();
@@ -239,49 +252,4 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void playSwoosh() {
-        if (swooshPlayer != null) {
-            swooshPlayer.seekTo(0);
-            swooshPlayer.start();
-        }
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == MY_REQUEST_CODE) {
-            if (resultCode != RESULT_OK) {
-                // The update was cancelled by the user or it failed.
-                // You can prompt the user again to update the app.
-                checkForAppUpdate();
-            }
-        }
-    }
-
-    private void checkForAppUpdate() {
-        com.google.android.gms.tasks.Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
-
-        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-                try {
-                    appUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo,
-                            AppUpdateType.IMMEDIATE,
-                            this,
-                            MY_REQUEST_CODE);
-                } catch (IntentSender.SendIntentException e) {
-                    e.printStackTrace();
-                    // Handle the exception here
-                }
-            }
-        });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        checkForAppUpdate(); // Check for app update when the app resumes
-    }
 }

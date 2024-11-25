@@ -31,7 +31,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class Login extends AppCompatActivity {
 
     TextInputEditText editTextEmail, editTextPassword;
-    Button buttonLogIn, btn_crear;
+    Button buttonLogIn, btn_crear, btn_return3;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
     MediaPlayer swooshPlayer;
@@ -62,10 +62,10 @@ public class Login extends AppCompatActivity {
         buttonLogIn = findViewById(R.id.btn_login);
         btn_crear = findViewById(R.id.btn_crear);
         progressBar = findViewById(R.id.progressBar);
-        TextViewVolver3 = findViewById(R.id.TextViewVolver3);
+        btn_return3 = findViewById(R.id.btn_return3);
 
 
-        TextViewVolver3.setOnClickListener(new View.OnClickListener() {
+        btn_return3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 playSwoosh();
@@ -85,8 +85,6 @@ public class Login extends AppCompatActivity {
 
             }
         });
-
-
 
 // Create a blinking animation for the TextView
         AlphaAnimation blinkAnimation = new AlphaAnimation(1, 0);
@@ -170,7 +168,6 @@ public class Login extends AppCompatActivity {
         showAlert(title, message, null);
     }
 
-
     private void showRegistrationPrompt() {
         new AlertDialog.Builder(Login.this)
                 .setTitle("Attention")
@@ -190,7 +187,6 @@ public class Login extends AppCompatActivity {
                 .setIcon(R.drawable.afrikanaonelogo)
                 .show();
     }
-
 
     private void navigateToRegister() {
         Intent intent = new Intent(Login.this, Register.class);

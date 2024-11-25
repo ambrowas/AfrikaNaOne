@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.firebase.FirebaseApp;
 
 
 public class ModoLibre extends AppCompatActivity {
@@ -43,138 +44,214 @@ public class ModoLibre extends AppCompatActivity {
     private Animation pulseAnimation;
     private boolean isGooglePlayServicesAvailable;
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+
+@Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_modo_libre);
 
-       isGooglePlayServicesAvailable();
-
-        editTextNombre = (EditText) findViewById(R.id.editTextNombre);
-        TextViewRecord = (TextView) findViewById(R.id.TextViewRecord);
-        button_save = (Button) findViewById(R.id.button_save);
-        logo = (ImageView) findViewById(R.id.logo);
-        pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);
-        logo.startAnimation(pulseAnimation);
-
-        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
-        sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
-        savedName = sharedPreferences.getString("nombre", "");
-        TextViewSaludo2 = findViewById(R.id.TextViewSaludo2);
-
-        if (!savedName.isEmpty()) {
-            // Display the greeting and record
-            message = "¡Hello there " + savedName + "!";
-            TextViewSaludo2.setText(message);
-            button_save.setText("SWTICH PLAYER");
-            highScore = sharedPreferences.getInt("highscore", 0);
-            highScoreText = "THE CURRENT RECORD IS " + highScore + " POINTS";
-            TextViewRecord.setText(highScoreText);
-            editTextNombre.setVisibility(View.GONE); // Hide the EditText
-        } else {
-            // Display the EditText for name input
-            button_save.setText("SAVE");
-            editTextNombre.setVisibility(View.VISIBLE); // Show the EditText
-        }
-
-        button_save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (button_save.getText().toString().equals("SWITCH PLAYER")) {
-                    // Clear the name from Shared Preferences and update the UI
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.remove("nombre");
-                    editor.apply();
-
-                    TextViewSaludo2.setText("");
-                    TextViewRecord.setText("CURRENT RECORD IS O POINTS");
-                    editTextNombre.setText("");
-                    editTextNombre.setVisibility(View.VISIBLE); // Show the EditText
-
-                    button_save.setText("SAVE");
-                    return;
-                }
-
-                // If button says "GUARDAR", save the name and update the UI
-                String nombre = editTextNombre.getText().toString();
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("nombre", nombre);
-                editor.apply();
-
-                Toast.makeText(getApplicationContext(), "Name saved", Toast.LENGTH_SHORT).show();
-                playSwoosh();
-
-                String message = "¡Hello there " + nombre + " !";
-                TextViewSaludo2.setText(message);
-                editTextNombre.setVisibility(View.GONE); // Hide the EditText
-
-                highScore = sharedPreferences.getInt("highscore", 0);
-                highScoreText = "CURRENT RECORD IS " + highScore + " POINTS";
-                TextViewRecord.setText(highScoreText);
-
-                button_save.setText("SWITCH PLAYER");
-            }
-        });
-
-
-
-        scoretotal = sharedPreferences.getInt("scoretotal", 0);
-        highScore = sharedPreferences.getInt("highscore", 0);
-
-        if (scoretotal > highScore) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putInt("highscore", scoretotal);
-            editor.apply();
-            highScore = scoretotal;
-        }
-
-        TextViewRecord = findViewById(R.id.TextViewRecord);
-        final int[] colors = {Color.RED, Color.GREEN, Color.BLUE}; // array of colors to cycle through
-        animator = ValueAnimator.ofInt(colors); // create value animator with the array of colors
-        animator.setDuration(1000); // set the duration for each color change
-        animator.setEvaluator(new ArgbEvaluator()); // set the evaluator to interpolate between the colors
-        animator.setRepeatCount(ValueAnimator.INFINITE); // set the repeat count to infinite
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animator) {
-                int color = (int) animator.getAnimatedValue(); // get the current color from the animator
-                TextViewRecord.setTextColor(color); // set the text color to the current color
-            }
-        });
-        animator.start(); // start the animator
-        highScoreText = "CURRENT RECORD IS " + highScore + " POINTS";
-        TextViewRecord.setText(highScoreText);
-
-
-        button_jugar = (Button) findViewById(R.id.button_jugar);
-        button_jugar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playSwoosh();
-                Intent intent = new Intent(ModoLibre.this, PreguntasModoLibre2.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-
-
-
-        buttonvolver = (Button) findViewById(R.id.buttonvolver);
-        buttonvolver.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playSwoosh();
-                Intent intent = new Intent(ModoLibre.this, Menuprincipal.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        ;
+        initializeUI();
+        checkGooglePlayServicesAvailability();
+        handleUserSession();
     }
 
-    private boolean isGooglePlayServicesAvailable() {
+    private void initializeUI() {
+        editTextNombre = findViewById(R.id.editTextNombre);
+        TextViewRecord = findViewById(R.id.TextViewRecord);
+        TextViewSaludo2 = findViewById(R.id.TextViewSaludo2);
+        button_save = findViewById(R.id.button_save);
+        button_jugar = findViewById(R.id.button_jugar);
+        buttonvolver = findViewById(R.id.buttonvolver);
+        logo = findViewById(R.id.logo);
+
+        setupListeners();
+        animateLogo();
+        setupColorChangeAnimation();
+        setupMediaPlayer();
+    }
+
+    private void setupMediaPlayer() {
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
+
+    }
+
+    private void setupListeners() {
+        setupSaveButton();
+        setupPlayButton();
+        setupReturnButton();
+    }
+
+    private void handleUserSession() {
+        sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+        savedName = sharedPreferences.getString("nombre", "");
+
+        if (!savedName.isEmpty()) {
+            displayExistingUser(savedName);
+        } else {
+            requestNewUserName();
+            TextViewRecord.setVisibility(View.GONE);  // Directly hide the high score here
+        }
+    }
+
+
+    private void displayExistingUser(String savedName) {
+        // Display the greeting and record
+        String message = "¡Hello there " + savedName + "!";
+        TextViewSaludo2.setText(message);
+        button_save.setText("SWITCH PLAYER");
+        highScore = sharedPreferences.getInt("highscore", 0);
+        String highScoreText = "THE CURRENT RECORD IS " + highScore + " POINTS";
+        TextViewRecord.setText(highScoreText);
+        editTextNombre.setVisibility(View.GONE); // Hide the EditText
+        TextViewRecord.setVisibility(View.VISIBLE); // Show the high score
+    }
+    private void requestNewUserName() {
+        // Display the EditText for name input
+        button_save.setText("SAVE");
+        editTextNombre.setVisibility(View.VISIBLE); // Show the EditText
+        TextViewSaludo2.setText(""); // Clear any previous greeting
+        TextViewRecord.setVisibility(View.GONE); // Hide the high score when no user is logged in
+    }
+
+    private void setupSaveButton() {
+        button_save.setOnClickListener(v -> handleSaveOrSwitch());
+    }
+
+    private void handleSaveOrSwitch() {
+        if (button_save.getText().toString().equals("SWITCH PLAYER")) {
+            clearPreferences();
+        } else {
+            saveNewUser();
+        }
+    }
+    private void saveNewUser() {
+        String nombre = editTextNombre.getText().toString().trim();
+        if (!nombre.isEmpty()) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("nombre", nombre);
+            editor.apply();
+
+            updateUIAfterNameSaved(nombre);  // Call the method here after saving the name
+        } else {
+            Toast.makeText(getApplicationContext(), "Please enter a name", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void clearPreferences() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("nombre");
+        editor.apply();
+        updateUIForNewUser();
+    }
+
+    private void updateUIForNewUser() {
+        TextViewSaludo2.setText("");
+        TextViewRecord.setText("CURRENT RECORD IS 0 POINTS");
+        editTextNombre.setText("");
+        editTextNombre.setVisibility(View.VISIBLE);
+        button_save.setText("SAVE");
+    }
+    private void updateUIAfterNameSaved(String nombre) {
+        String message = "¡Hello there " + nombre + " !";
+        TextViewSaludo2.setText(message);
+        editTextNombre.setVisibility(View.GONE); // Hide the EditText after saving
+        button_save.setText("SWITCH PLAYER");
+        updateScoreDisplay(); // This now also handles visibility
+        Toast.makeText(getApplicationContext(), "Name saved", Toast.LENGTH_SHORT).show();
+        playSwoosh();  // Sound effect on saving
+    }
+
+    private void setupPlayButton() {
+        button_jugar.setOnClickListener(v -> {
+            playSwoosh();  // Play the swoosh sound
+            // Add a delay to allow the sound to play before transitioning
+            button_jugar.postDelayed(() -> {
+                startActivity(new Intent(ModoLibre.this, PreguntasModoLibre2.class));
+                finish();
+            }, 500); // 500ms delay
+        });
+    }
+
+    private void setupReturnButton() {
+        buttonvolver.setOnClickListener(v -> {
+            playSwoosh();  // Play the swoosh sound
+            // Add a small delay to allow the sound to play before transitioning
+            buttonvolver.postDelayed(() -> {
+                startActivity(new Intent(ModoLibre.this, Menuprincipal.class));
+                finish();
+            }, 500); // 500ms delay
+        });
+    }
+
+
+    private void animateLogo() {
+        Animation pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);
+        logo.startAnimation(pulseAnimation);
+    }
+
+    private void setupColorChangeAnimation() {
+        final int[] colors = {Color.RED, Color.GREEN, Color.BLUE};
+        animator = ValueAnimator.ofInt(colors);
+        animator.setEvaluator(new ArgbEvaluator());
+        animator.setRepeatCount(ValueAnimator.INFINITE);
+        animator.addUpdateListener(animation -> TextViewRecord.setTextColor((int) animation.getAnimatedValue()));
+        animator.start();
+    }
+
+    private void playSwoosh() {
+        // Stop and release any existing instance
+        stopSwoosh();
+
+        // Create a new MediaPlayer instance
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
+
+        if (swooshPlayer != null) {
+            // Set listener to release the MediaPlayer after completion
+            swooshPlayer.setOnCompletionListener(mp -> {
+                mp.release(); // Release resources
+                swooshPlayer = null; // Prevent invalid references
+                Log.d("MediaPlayer", "MediaPlayer released after playback");
+            });
+
+            // Start playback and log the event
+            try {
+                swooshPlayer.start();
+                Log.d("MediaPlayer", "Swoosh sound started");
+            } catch (IllegalStateException e) {
+                Log.e("MediaPlayer", "Failed to start playback: " + e.getMessage());
+            }
+        } else {
+            Log.e("MediaPlayer", "Failed to create MediaPlayer instance");
+        }
+    }
+
+
+    private void stopSwoosh() {
+        if (swooshPlayer != null) {
+            try {
+                if (swooshPlayer.isPlaying()) {
+                    swooshPlayer.stop(); // Stop playback if it's running
+                }
+            } catch (IllegalStateException e) {
+                Log.e("MediaPlayer", "Error stopping MediaPlayer: " + e.getMessage());
+            } finally {
+                swooshPlayer.release(); // Release resources
+                swooshPlayer = null; // Avoid memory leaks
+                Log.d("MediaPlayer", "MediaPlayer stopped and released");
+            }
+        }
+    }
+
+    private void updateScoreDisplay() {
+        highScore = sharedPreferences.getInt("highscore", 0);
+        if (highScore > 0) {
+            String highScoreText = "CURRENT RECORD IS " + highScore + " POINTS";
+            TextViewRecord.setText(highScoreText);
+            TextViewRecord.setVisibility(View.VISIBLE); // Only show if there's a high score
+        } else {
+            TextViewRecord.setVisibility(View.GONE); // No high score to display
+        }
+    }
+    private void checkGooglePlayServicesAvailability() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
@@ -183,40 +260,27 @@ public class ModoLibre extends AppCompatActivity {
             } else {
                 Log.e("GooglePlayServices", "This device does not support Google Play Services.");
             }
-            return false;
-        }
-        return true;
-    }
-
-
-
-    private void playSwoosh() {
-        if (swooshPlayer != null) {
-            swooshPlayer.seekTo(0);
-            swooshPlayer.start();
         }
     }
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         if (swooshPlayer != null) {
             swooshPlayer.release();
             swooshPlayer = null;
         }
-        super.onDestroy();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        if (logo != null && pulseAnimation != null) {
+        stopSwoosh();
+        if (logo != null) {
             logo.clearAnimation();
         }
-
         if (animator != null) {
             animator.cancel();
         }
     }
-
 }

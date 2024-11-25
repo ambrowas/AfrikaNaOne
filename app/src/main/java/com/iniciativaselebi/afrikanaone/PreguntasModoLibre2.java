@@ -1,8 +1,10 @@
 package com.iniciativaselebi.afrikanaone;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
@@ -11,6 +13,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -70,8 +73,7 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
 
     private List<Integer> shuffledBatchOrder = new ArrayList<>();
 
-
-
+    private Dialog progressDialog;
 
 
     @Override
@@ -113,6 +115,23 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
         buttonconfirmar = findViewById(R.id.buttonconfirmar);
     }
 
+    private void showProgressDialog() {
+        // Inflate and set up the custom progress dialog layout
+        progressDialog = new Dialog(this);
+        progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE); // Hide the title bar
+        progressDialog.setContentView(R.layout.progress_dialog);      // Set the custom layout
+        progressDialog.setCancelable(false);                          // Prevent dismissing by tapping outside
+
+        // Show the dialog
+        progressDialog.show();
+    }
+
+    private void dismissProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+    }
+
     private void checkForLocalQuestions() {
         List<JsonQuestion> savedQuestions = prefHelper.getQuestions();
 
@@ -133,6 +152,7 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
     }
 
     private void fetchQuestionsFromFirestore() {
+        showProgressDialog();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("SINGLEMODEQUESTIONS").get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
@@ -148,11 +168,14 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
                 prefHelper.saveQuestions(questionList);
 
                 if (batchManager.getTotalBatches() == 0) {
+                    dismissProgressDialog();
                     prepareBatches(this::presentInitialBatch);
                 } else {
+                    dismissProgressDialog();
                     presentInitialBatch();
                 }
             } else {
+                dismissProgressDialog();
                 Log.e("batchFlow", "Failed to fetch questions: ", task.getException());
                 Toast.makeText(this, "Error loading questions or no questions available.", Toast.LENGTH_LONG).show();
             }
@@ -185,22 +208,10 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
         Log.d("batchFlow", "Batches prepared. Total number of batches: " + totalBatches);
 
         // Log the shuffled batches
-        logShuffledBatches(questionBatches);
+      //  logShuffledBatches(questionBatches);
 
         if (completionCallback != null) {
             completionCallback.run();
-        }
-    }
-
-    private void logShuffledBatches(Map<Integer, List<JsonQuestion>> questionBatches) {
-        for (int batchIndex : shuffledBatchOrder) {
-            List<JsonQuestion> batch = questionBatches.get(batchIndex);
-            StringBuilder batchLog = new StringBuilder("Batch " + (batchIndex + 1) + ": ");
-            for (JsonQuestion question : batch) {
-                batchLog.append("Question Number: ").append(question.getNumber())
-                        .append(" - ").append(question.getQuestion()).append("; ");
-            }
-            Log.d("batchFlow", batchLog.toString());
         }
     }
 
@@ -287,8 +298,17 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
     private void setupRadioButtonListeners() {
         radio_group.setOnCheckedChangeListener((group, checkedId) -> {
             for (int i = 0; i < group.getChildCount(); i++) {
-                RadioButton radioButton = (RadioButton) group.getChildAt(i);
-                radioButton.setBackgroundResource(radioButton.getId() == checkedId ? R.drawable.radio_selected : R.drawable.blackbackground);
+                View child = group.getChildAt(i);
+                if (child instanceof RadioButton) {
+                    RadioButton radioButton = (RadioButton) child;
+                    if (radioButton.getId() == checkedId) {
+                        // Apply the selected state
+                        radioButton.setBackgroundResource(R.drawable.radio_normal2);
+                    } else {
+                        // Reset to default state
+                        radioButton.setBackgroundResource(R.drawable.radio_selector);
+                    }
+                }
             }
         });
     }
@@ -416,10 +436,13 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
     }
 
     private void resetRadioButtonColors() {
-        radio_button1.setBackgroundResource(R.drawable.blackbackground);
-        radio_button2.setBackgroundResource(R.drawable.blackbackground);
-        radio_button3.setBackgroundResource(R.drawable.blackbackground);
+        // Set the background resource to your drawable for all radio buttons
+        radio_button1.setButtonDrawable(R.drawable.radio_selector);
+        radio_button2.setButtonDrawable(R.drawable.radio_selector);
+        radio_button3.setButtonDrawable(R.drawable.radio_selector);
+
     }
+
 
     private void finishQuiz() {
         // Mark the current batch as completed only after all questions in it have been answered

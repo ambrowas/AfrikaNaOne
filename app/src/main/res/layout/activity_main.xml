@@ -20,8 +20,8 @@
     <TextView
         android:id="@+id/TextViewClicAqui"
         android:text="CLICK HERE TO START"
-        android:fontFamily="@font/cairo_light"
-        android:textColor="@color/white"
+        android:fontFamily="@font/bahiana"
+        android:textColor="@color/black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
@@ -34,7 +34,7 @@
     <TextView
         android:id="@+id/TextViewProverb"
         android:text="AFRICAN PROVERB"
-        android:fontFamily="@font/cairo_light"
+        android:fontFamily="@font/bahiana"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:layout_width="match_parent"

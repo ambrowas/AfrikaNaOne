@@ -39,9 +39,9 @@ public class Modocompeticion extends AppCompatActivity {
         private static final String TAG = "Modocompeticion";
 
         FirebaseAuth auth;
-        Button button_jugar2, button_perfil, button_login, button_register, button_clasificacion, buttoncodigo;
+        Button button_jugar2, button_perfil, button_login, button_register, button_clasificacion, buttoncodigo, button_return;
 
-        TextView TextViewSaludo2, TextViewRecord, TextViewVolver, TextViewMarcar;
+        TextView TextViewSaludo2, TextViewRecord, TextViewMarcar;
         FirebaseUser user;
         private FirebaseAuth.AuthStateListener authStateListener;
         private int newScore;
@@ -100,10 +100,10 @@ public class Modocompeticion extends AppCompatActivity {
 
             TextViewSaludo2 = findViewById(R.id.TextViewSaludo2);
             TextViewRecord = findViewById(R.id.TextViewRecord);
-            TextViewVolver = findViewById(R.id.TextViewVolver);
+            button_return = findViewById(R.id.button_return);
 
 
-            TextViewVolver.setOnClickListener(new View.OnClickListener() {
+            button_return.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     playSwoosh();
@@ -137,7 +137,7 @@ public class Modocompeticion extends AppCompatActivity {
                     if (user != null) {
                         button_login.setText("LOG OUT");
                     } else {
-                        button_login.setText("LOG IN");
+                        button_login.setText("LOG IN/SIGN UP");
                     }
                 }
             };

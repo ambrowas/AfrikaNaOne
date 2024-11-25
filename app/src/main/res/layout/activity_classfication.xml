@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/texture"
     android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@drawable/texture"
         tools:context=".ClassficationActivity">
 
     <FrameLayout
@@ -19,16 +19,17 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="40dp">
 
-        <ImageView
-            android:id="@+id/profilepicture"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:src="@drawable/baseline_account_circle_24" />
-
-        <View
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:background="@drawable/rectangulo" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profilepic"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="35dp"
+            android:background="@drawable/oval"
+            android:scaleType="centerCrop"
+            android:src="@drawable/baseline_account_circle_24"
+            app:civ_border_color="#000000"
+            app:civ_border_width="5dp" />
 
     </FrameLayout>
 
@@ -202,7 +203,8 @@
             android:layout_width="300dp"
             android:layout_height="75dp"
             android:freezesText="true"
-            android:text="PROCESS PAYMENT"
+            android:text="CHECK OUT"
+            android:backgroundTint="@color/green"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:strokeWidth="3dp"

@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "964624085160",
     "project_id": "afrikanaone",
-    "storage_bucket": "afrikanaone.appspot.com"
+    "storage_bucket": "afrikanaone.firebasestorage.app"
   },
   "client": [
     {

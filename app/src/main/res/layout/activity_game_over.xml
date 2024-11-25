@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/mimosa"
+    android:background="@drawable/purple"
     android:orientation="vertical"
     tools:context=".GameOverActivity">
 
@@ -14,7 +14,7 @@
         android:id="@+id/gameOverText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/red"
+        android:backgroundTint="@color/blue"
         android:text="Game Over"
         android:layout_gravity="center_horizontal"
         android:textColor="@color/white"
@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/gameOverText"
-        android:text="CLIC AQUI PARA TERMINAR"
+        android:text="CLICK TO EXIT"
         android:layout_gravity="center_horizontal"
         android:textSize="18sp"
         android:textStyle="bold"

@@ -9,6 +9,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +20,7 @@ public class ContactanosActivity extends AppCompatActivity {
 
     Button buttonvolver3;
 
+    TextView textview_contactanos;
     MediaPlayer swooshPlayer;
     private Animation pulseAnimation;
 
@@ -28,6 +30,10 @@ public class ContactanosActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contactanos);
+
+        TextView textview_contactanos = (TextView) findViewById(R.id.textview_contactanos);
+        Typewriter typewriter = new Typewriter(textview_contactanos);
+        typewriter.animateText("For questions, comments, suggestions, proposals, corrections, complaints, insults, intimidations and/or grievances kindly press the icon below to contact us via whatsapp.We will try to fix it. Thanks for the support");
 
         swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
         buttonvolver3 = (Button) findViewById(R.id.buttonvolver3);
@@ -50,6 +56,9 @@ public class ContactanosActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
 
     private void openWhatsapp() {
         playSwoosh();

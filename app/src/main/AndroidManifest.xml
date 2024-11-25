@@ -25,9 +25,6 @@
                 android:name=".CheckCodigoActivity"
                 android:exported="false" />
             <activity
-                android:name=".BecomingNumberOneActivity"
-                android:exported="false" />
-            <activity
                 android:name=".GameOverActivity"
                 android:exported="false" />
             <activity
@@ -41,10 +38,6 @@
                 android:exported="false" />
             <activity
                 android:name=".ClassficationActivity"
-                android:exported="false" />
-            <activity
-                android:name=".PreguntasModoCompeticion"
-                android:launchMode="singleTask"
                 android:exported="false" />
             <activity
                 android:name=".Preguntas"

@@ -5,7 +5,7 @@ import android.widget.TextView;
 public class Typewriter {
     private String sText = new String();
     private int index;
-    private long mDelay = 100;
+    private long mDelay = 25;
 
     TextView textView;
 

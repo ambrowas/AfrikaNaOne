@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/coolbackground"
+    android:background="@drawable/texture"
     tools:context=".ProfileActivity">
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -14,7 +14,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/texture"
     android:padding="16dp">
 
     <TextView
@@ -24,7 +23,7 @@
         android:layout_gravity="center_horizontal"
         android:text="CLASIFICACION GLOBAL DE SABELOTODOS"
         android:textSize="12sp"
-        android:background="@drawable/blackbackground"
+        android:backgroundTint="@color/blue"
         android:textStyle="bold"
         android:textColor="@color/white"
         android:paddingLeft="5dp"
@@ -67,7 +66,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginTop="20dp"
         android:layout_gravity="center_horizontal"
-        android:backgroundTint="@android:color/system_control_activated_dark"
+        android:backgroundTint="@color/red"
         app:strokeWidth="3dp"/>
 </LinearLayout>
 </ScrollView>

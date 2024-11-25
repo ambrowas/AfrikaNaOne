@@ -497,15 +497,6 @@ public class Preguntas extends AppCompatActivity {
             resetTextView();
         }
 
-    private void stopImageAnimation() {
-        ImageView resultImage = findViewById(R.id.resultImage);
-        resultImage.animate().cancel();
-
-        resultImage.setScaleX(1f); // reset the scale
-        resultImage.setScaleY(1f); // reset the scale
-
-        resultImage.setVisibility(View.INVISIBLE);
-    }
 
     private void initializeUIElements() {
         quizImage = findViewById(R.id.quizImage);
@@ -603,7 +594,6 @@ public class Preguntas extends AppCompatActivity {
             }
         });
     }
-
     private void resetImageAndAnimation() {
         ImageView resultImage = findViewById(R.id.resultImage);
         resultImage.setImageResource(0); // remove the previous image
@@ -691,9 +681,8 @@ public class Preguntas extends AppCompatActivity {
         gameStats.put("currentGameFallos", fallos);
         gameStats.put("currentGamePuntuacion", puntuacion);
 
-        // Create a timestamp for the current time
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
-        String currentDateAndTime = sdf.format(new Date());
+        // Create a timestamp for the current time in milliseconds since the Unix epoch
+        long currentDateAndTime = System.currentTimeMillis();
 
         // Add the LastPlay timestamp to the map
         gameStats.put("LastPlay", currentDateAndTime);

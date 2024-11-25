@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="@drawable/texture"
     tools:context=".Login">
 
     <LinearLayout
@@ -12,12 +13,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:background="@drawable/texture">
+        >
 
     <TextView
     android:text="LOGIN"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+        android:textColor="@color/black"
     android:textStyle="bold"
     android:textSize="24sp"
     android:gravity="center"
@@ -34,19 +36,16 @@
         android:layout_width="280dp"
         android:layout_height="wrap_content"/>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="280dp"
-        android:layout_height="wrap_content" >
-
-    <com.google.android.material.textfield.TextInputEditText
-    android:id="@+id/password"
-    android:hint="Password"
-        android:inputType="textPassword"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"/>
-
- </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/password"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"/>
 
 
     <ProgressBar
@@ -59,9 +58,9 @@
         android:id="@+id/btn_login"
         android:layout_width="280dp"
         android:layout_height="75dp"
-        android:text="LOGIN"
+        android:text="LOG IN"
         android:gravity="center"
-        android:backgroundTint="@color/green"
+        android:backgroundTint="@color/blue"
         android:textColor="@color/white"
         android:layout_marginTop="30dp"
         android:layout_gravity="center_horizontal"
@@ -76,6 +75,7 @@
         android:layout_width="280dp"
         android:layout_height="75dp"
         android:text="REGISTRATION"
+        android:backgroundTint="@color/green"
         android:gravity="center"
         android:textStyle="bold"
         android:shadowDx="4"
@@ -86,24 +86,22 @@
         app:strokeWidth="3dp"
         />
 
-    <TextView
-        android:id="@+id/TextViewVolver3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/button_login"
-        android:layout_marginTop="30dp"
-        android:shadowColor="@color/white"
-        android:shadowDx="4"
-        android:shadowDy="4"
-        android:shadowRadius="6"
-        android:text="RETURN"
-        android:letterSpacing=".20"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="@color/black"
-        android:textSize="20dp"
-        android:textStyle="bold" />
+        <Button
+            android:id="@+id/btn_return3"
+            android:layout_width="280dp"
+            android:layout_height="75dp"
+            android:text="RETURN"
+            android:backgroundTint="@color/red"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:shadowDx="4"
+            android:shadowDy="4"
+            android:layout_marginTop="20dp"
+            android:shadowRadius="6"
+            android:layout_gravity="center_horizontal"
+            app:strokeWidth="3dp"
+            />
+
 
 
 

@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="@drawable/texture"
     tools:context=".QRcodeActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@drawable/texture">
+       >
 
 
 
@@ -53,7 +54,7 @@
         android:freezesText="true"
         android:layout_gravity="center_horizontal"
         android:text="SAVE"
-        android:backgroundTint="#80412A"
+        android:backgroundTint="@color/green"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="50dp"
         android:textColor="@color/white"
@@ -64,7 +65,7 @@
         android:id="@+id/buttonvolver"
         android:layout_width="300dp"
         android:layout_height="75dp"
-        android:backgroundTint="#80412A"
+        android:backgroundTint="@color/red"
         android:freezesText="true"
         android:layout_gravity="center_horizontal"
         android:text="RETURN"

@@ -132,7 +132,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
         private void fetchQuestionsFromShuffledOrder(List<String> shuffledOrder, final QuestionsFetchCallback callback) {
             FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-            CollectionReference preguntasCollection = firestore.collection("PREGUNTAS");
+            CollectionReference preguntasCollection = firestore.collection("QUESTIONS");
 
             Log.d(TAG, "[MyApp] FetchAndSaveFlow: Starting to fetch questions for shuffledOrder: " + shuffledOrder);
 
@@ -159,37 +159,6 @@ import java.util.concurrent.atomic.AtomicInteger;
         }
 
 
-        private void fetchQuestionsByOrder(List<String> shuffledOrder, final QuestionsFetchCallback callback) {
-            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-            CollectionReference preguntasCollection = firestore.collection("PREGUNTAS");
-
-            // Assuming the shuffled order contains the document IDs of the questions
-            List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
-            for (String docId : shuffledOrder) {
-                tasks.add(preguntasCollection.document(docId).get());
-            }
-
-            Task<List<DocumentSnapshot>> combinedTask = Tasks.whenAllSuccess(tasks);
-            combinedTask.addOnSuccessListener(new OnSuccessListener<List<DocumentSnapshot>>() {
-                @Override
-                public void onSuccess(List<DocumentSnapshot> documentSnapshots) {
-                    List<QuestionModoCompeticion> questions = new ArrayList<>();
-                    for (DocumentSnapshot snapshot : documentSnapshots) {
-                        // Assuming the document can be directly converted to QuestionModoCompeticion
-                        questions.add(snapshot.toObject(QuestionModoCompeticion.class));
-                    }
-                    callback.onQuestionsFetched(questions);
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.e(TAG, "[MyApp]Error fetching questions by order: " + e.getMessage());
-                    callback.onQuestionsFetched(new ArrayList<>()); // return an empty list to indicate a failure
-                }
-            });
-        }
-
-
         void setCurrentBatchForUser(String userId, int nextBatch) {
             if (userId != null) {
                 DatabaseReference userRef = database.getReference("user").child(userId);
@@ -213,47 +182,6 @@ import java.util.concurrent.atomic.AtomicInteger;
             }
         }
 
-        public interface CurrentBatchCallback {
-            void onBatchRetrieved(int currentBatch);
-            void onError(Exception e);
-        }
-
-        public void getCurrentBatchForUser(CurrentBatchCallback callback) {
-                if (currentUser != null) {
-                    DatabaseReference userRef = database.getReference("user").child(currentUser.getUid());
-                    Log.d("FetchAndSaveFlow", "Fetching current batch for user: " + currentUser.getUid());
-                    userRef.child("currentBatch").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.exists()) {
-                                Integer batchNumber = dataSnapshot.getValue(Integer.class);
-                                if (batchNumber != null) {
-                                    Log.d("FetchAndSaveFlow", "Current batch retrieved: " + batchNumber);
-                                    callback.onBatchRetrieved(batchNumber);
-                                } else {
-                                    Log.e("FetchAndSaveFlow", "Batch number is not valid.");
-                                    callback.onError(new Exception("Batch number is not valid."));
-                                }
-                            } else {
-                                // Batch not found for the user, handle accordingly (but do not assign a new batch here)
-                                Log.e("FetchAndSaveFlow", "No current batch found for user.");
-                                callback.onError(new Exception("No current batch found for user."));
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Log.e("FetchAndSaveFlow", "Failed to fetch current batch for user.", databaseError.toException());
-                            callback.onError(databaseError.toException());
-                        }
-                    });
-                } else {
-                    Log.e("FetchAndSaveFlow", "User is not authenticated.");
-                    callback.onError(new Exception("User is not authenticated."));
-                }
-            }
-
-
         public void assignBatchForNewUser(BatchAssignmentCallback callback) {
             FirebaseUser currentUser = mAuth.getCurrentUser();
             if (currentUser != null) {
@@ -268,11 +196,16 @@ import java.util.concurrent.atomic.AtomicInteger;
                             getTotalBatches(new BatchCountCallback() {
                                 @Override
                                 public void onBatchCountRetrieved(int totalCount) {
-                                    int randomBatch = new Random().nextInt(totalCount) + 1;
-                                    Log.d("[MyApp]FetchAndSaveFlow", "New batch assigned for user: " + userId + " - Batch: " + randomBatch);
-                                    setCurrentBatchForUser(userId, randomBatch);
-                                    // Notify the callback that the batch has been assigned
-                                    callback.onBatchAssigned(randomBatch);
+                                    if (totalCount > 0) { // Ensure totalCount is positive
+                                        int randomBatch = new Random().nextInt(totalCount) + 1;
+                                        Log.d("[MyApp]FetchAndSaveFlow", "New batch assigned for user: " + userId + " - Batch: " + randomBatch);
+                                        setCurrentBatchForUser(userId, randomBatch);
+                                        // Notify the callback that the batch has been assigned
+                                        callback.onBatchAssigned(randomBatch);
+                                    } else {
+                                        Log.e("[MyApp]FetchAndSaveFlow", "No available batches to assign.");
+                                        callback.onError(new Exception("No available batches to assign."));
+                                    }
                                 }
 
                                 @Override
@@ -283,9 +216,8 @@ import java.util.concurrent.atomic.AtomicInteger;
                                 }
                             });
                         } else {
-                            // Batch already exists for the user, perhaps call onBatchAssigned with the existing batch number
-                            // You will need to fetch the existing batch number from dataSnapshot if needed.
-                            int existingBatch = dataSnapshot.getValue(Integer.class); // assuming it's stored as an Integer
+                            // Batch already exists for the user, use existing batch number
+                            int existingBatch = dataSnapshot.getValue(Integer.class);
                             callback.onBatchAssigned(existingBatch);
                         }
                     }
@@ -298,7 +230,7 @@ import java.util.concurrent.atomic.AtomicInteger;
                     }
                 });
             } else {
-                // No current user found, handle this case, perhaps with an error callback
+                // No current user found, handle this case with an error callback
                 callback.onError(new Exception("No current user found."));
             }
         }
@@ -390,54 +322,10 @@ import java.util.concurrent.atomic.AtomicInteger;
             });
         }
 
-
         interface BatchPreparationCallback {
                 void onBatchPreparationComplete();
                 void onBatchPreparationFailed(Exception e);
             }
-
-        private void fetchShuffledQuestions(List<String> questionIds, QuestionsFetchCallback callback) {
-            Log.d("[MyApp]FetchAndSaveFlow", "Fetching shuffled questions.");
-            List<QuestionModoCompeticion> questions = new ArrayList<>();
-            List<String> questionsToFetch = new ArrayList<>(questionIds);
-
-            fetchQuestionsInChunks(questionsToFetch, questions, callback);
-        }
-
-        private void fetchQuestionsInChunks(List<String> questionsToFetch, List<QuestionModoCompeticion> questions, QuestionsFetchCallback callback) {
-            Log.d("[MyApp]FetchAndSaveFlow", "Fetching questions in chunks.");
-
-            if (questionsToFetch.isEmpty()) {
-                Log.d("[MyApp]FetchAndSaveFlow", "All chunks have been fetched.");
-                callback.onQuestionsFetched(questions);
-                return;
-            }
-
-            int endIndex = Math.min(questionsToFetch.size(), MAX_EXCLUSION_CHUNK_SIZE);
-            List<String> currentChunk = questionsToFetch.subList(0, endIndex);
-
-            firestore.collection("PREGUNTAS")
-                    .whereIn("NUMBER", currentChunk)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                QuestionModoCompeticion question = parseFirestoreDocument(document);
-                                if (question != null) {
-                                    questions.add(question);
-                                }
-                            }
-
-                            Log.d("[MyApp]FetchAndSaveFlow", "Fetched chunk of questions. Remaining: " + questionsToFetch.size());
-
-                            questionsToFetch.removeAll(currentChunk);
-                            fetchQuestionsInChunks(questionsToFetch, questions, callback);
-                        } else {
-                            Log.e("[MyApp]FetchAndSaveFlow", "Failed to fetch questions chunk.", task.getException());
-                            callback.onError(new Exception("Failed to fetch questions from Firestore."));
-                        }
-                    });
-        }
 
         public void updateLocalDatabaseWithNewQuestions(List<QuestionModoCompeticion> newQuestions, int completedBatchId, QuestionsFetchCallback callback) {
             Log.d("[MyApp]FetchAndSaveFlow", "Starting update of local database with new questions.");
@@ -516,29 +404,6 @@ import java.util.concurrent.atomic.AtomicInteger;
             return lastFiveQuestions;
         }
 
-        public interface MoveToNextBatchCallback {
-            void onShouldMove();
-
-            void onShouldNotMove();
-        }
-
-        private QuestionModoCompeticion parseFirestoreDocument(QueryDocumentSnapshot document) {
-            String question = document.getString("QUESTION");
-            String optionA = document.getString("OPTION A");
-            String optionB = document.getString("OPTION B");
-            String optionC = document.getString("OPTION C");
-            String answer = document.getString("ANSWER");
-            String category = document.getString("CATEGORY");
-            String imageUrl = document.getString("IMAGE");
-            String number = document.getString("NUMBER");
-
-            if (question == null || optionA == null || optionB == null || optionC == null || answer == null || category == null || imageUrl == null || number == null) {
-                return null;
-            }
-
-            // Parsing and creating the QuestionModoCompeticion object
-            return new QuestionModoCompeticion(question, optionA, optionB, optionC, answer, category, imageUrl, number);
-        }
 
         public void logCompletedBatch(String userId, int completedBatch) {
             DatabaseReference userRef = database.getReference("user").child(userId).child("CompletedBatch");

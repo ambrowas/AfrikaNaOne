@@ -3,6 +3,7 @@ package com.iniciativaselebi.afrikanaone;
 
 import static com.iniciativaselebi.afrikanaone.SharedPreferenceHelper.PREFS_NAME;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,8 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -41,6 +44,7 @@ public class ResultActivity extends AppCompatActivity {
     private static final String SHARED_PREFS = "quiz_prefs";
     private static final String KEY_HIGHSCORE = "highscore";
     private static final int QUESTIONS_PER_BATCH = 10;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,7 +170,7 @@ public class ResultActivity extends AppCompatActivity {
     private void playBeginnerSound() {
         if (beginnerMediaPlayer == null) {
             beginnerMediaPlayer = MediaPlayer.create(this, R.raw.beginner);
-            beginnerMediaPlayer.setLooping(true); // Set to loop
+
         }
         beginnerMediaPlayer.start();
     }
@@ -174,7 +178,6 @@ public class ResultActivity extends AppCompatActivity {
     private void playAverageSound() {
         if (averageMediaPlayer == null) {
             averageMediaPlayer = MediaPlayer.create(this, R.raw.average);
-            averageMediaPlayer.setLooping(true); // Set to loop
         }
         averageMediaPlayer.start();
     }
@@ -182,7 +185,6 @@ public class ResultActivity extends AppCompatActivity {
     private void playExpertSound() {
         if (expertMediaPlayer == null) {
             expertMediaPlayer = MediaPlayer.create(this, R.raw.expert);
-            expertMediaPlayer.setLooping(true); // Set to loop
         }
         expertMediaPlayer.start();
     }
@@ -198,7 +200,6 @@ public class ResultActivity extends AppCompatActivity {
         navigateToMainMenu();
     }
 
-
     private void navigateToMainMenu() {
         Intent intent = new Intent(ResultActivity.this, Menuprincipal.class);
         playSwoosh();
@@ -206,21 +207,37 @@ public class ResultActivity extends AppCompatActivity {
         finish();
     }
 
-    private void showCompletionDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("All Batches Completed")
-                .setMessage("You have completed the Single Mode. You should try Competition Mode.")
-                .setPositiveButton("OK", (dialog, which) -> restartGame())
-                .setOnDismissListener(dialog -> restartGame())
-                .show();
-    }
-
     private void restartQuiz() {
         Intent intent = new Intent(ResultActivity.this, PreguntasModoLibre2.class);
+        playSwoosh();
         intent.putExtra("loadNewBatch", true);
         startActivity(intent);
         finish();
     }
+
+
+    private void showCompletionDialog() {
+        // Inflate the custom dialog layout
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_custom_layout, null);
+
+        // Create the dialog with the custom view
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setOnDismissListener(dialog1 -> restartGame())
+                .create();
+
+        // Set click listener for OK button
+        Button okButton = dialogView.findViewById(R.id.dialog_ok_button);
+        okButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            restartGame();
+        });
+
+        // Show the dialog
+        dialog.show();
+    }
+
 
     @Override
     protected void onDestroy() {

@@ -46,20 +46,6 @@ public class JsonQuestionManager {
                 });
     }
 
-    public JsonQuestion getNextQuestion(PreguntasModoLibre preguntasModoLibre) {
-        List<JsonQuestion> availableQuestions = new ArrayList<>();
-        for (JsonQuestion question : allQuestions) {
-            if (!shownQuestionIds.contains(question.getNumber())) {
-                availableQuestions.add(question);
-            }
-        }
-        if (!availableQuestions.isEmpty()) {
-            JsonQuestion nextQuestion = availableQuestions.get(new Random().nextInt(availableQuestions.size()));
-            shownQuestionIds.add(nextQuestion.getNumber());
-            return nextQuestion;
-        }
-        return null;
-    }
 
     public int getQuestionCount() {
         return allQuestions.size();

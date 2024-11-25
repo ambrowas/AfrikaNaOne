@@ -40,13 +40,14 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import Model.User;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ClassficationActivity extends AppCompatActivity {
 
         FirebaseFirestore firestore;
         TextView textviewrecord, textiviewganancias, textviewaciertos2, textviewpuntuacion2, textviewhola, textviewclasificacion, TextViewFallos,
         textviewgrandtotal;
-        ImageView profilepicture;
+        CircleImageView profilepic;
         Button  buttonmenuprincipal, buttoncodigocobro;
 
         String profilePictureUri;
@@ -63,62 +64,67 @@ public class ClassficationActivity extends AppCompatActivity {
 
 
     @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_classfication);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_classfication);
+
+        initializeUIElements();
+        retrieveGameStatsFromIntent();
+        initializeColorAnimator();
+        fetchFirebaseUserInfo();
+        setupButtonListeners();
+        loadProfilePicture();
+        updateHighestScore(puntuacion);
+    }
 
 
-
+    private void initializeUIElements() {
         swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
+        textviewrecord = findViewById(R.id.textviewrecord);
+        textiviewganancias = findViewById(R.id.textviewganancias);
+        textviewaciertos2 = findViewById(R.id.textviewaciertos2);
+        textviewpuntuacion2 = findViewById(R.id.textviewpuntuacion2);
+        textviewhola = findViewById(R.id.textviewhola);
+        profilepic = findViewById(R.id.profilepic);
+        textviewclasificacion = findViewById(R.id.textviewclasificacion);
+        TextViewFallos = findViewById(R.id.TextViewFallos);
+        textviewgrandtotal = findViewById(R.id.textviewgrandtotal);
+        buttonmenuprincipal = findViewById(R.id.buttonmenuprincipal);
+        buttoncodigocobro = findViewById(R.id.buttoncodigocobro);
+    }
+
+    private void retrieveGameStatsFromIntent() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             aciertos = extras.getInt("aciertos", 0);
             puntuacion = extras.getInt("puntuacion", 0);
             errores = extras.getInt("errores", 0);
-
-            // Log values from intent
-            Log.d("DEBUG_TAG", "Aciertos from intent: " + aciertos);
-            Log.d("DEBUG_TAG", "Puntuacion from intent: " + puntuacion);
-            Log.d("DEBUG_TAG", "Errores from intent: " + errores);
-
-            // Since you mentioned ganancias and highestScore, ensure you're getting those values either from intent or SharedPreferences.
-
-        } else {
-            SharedPreferences sharedPreferences = getSharedPreferences("GameStats", Context.MODE_PRIVATE);
-
-            aciertos = sharedPreferences.getInt("aciertos", 0);
-            puntuacion = sharedPreferences.getInt("puntuacion", 0);
-            errores = sharedPreferences.getInt("errores", 0);
-
-            // Log values from SharedPreferences
-            Log.d("DEBUG_TAG", "Aciertos from SharedPreferences: " + aciertos);
-            Log.d("DEBUG_TAG", "Puntuacion from SharedPreferences: " + puntuacion);
-            Log.d("DEBUG_TAG", "Errores from SharedPreferences: " + errores);
-
-            // If ganancias and highestScore are important, make sure to retrieve and log them here too.
         }
 
+        Log.d("DEBUG_TAG", "Aciertos: " + aciertos);
+        Log.d("DEBUG_TAG", "Puntuacion: " + puntuacion);
+        Log.d("DEBUG_TAG", "Errores: " + errores);
 
-        redColor = Color.parseColor("#FF0000");
-        blueColor = Color.parseColor("#0000FF");
+        textviewaciertos2.setText("YOU GOT " + aciertos + " CORRECT ANSWERS");
+        TextViewFallos.setText("YOU MADE " + errores + " ERRORS");
+        textviewpuntuacion2.setText("YOUR SCORE IS " + puntuacion + " POINTS");
+        textiviewganancias.setText("YOUR EARNED " + puntuacion + " AFROS");
+    }
 
-        textviewclasificacion = (TextView)findViewById(R.id.textviewclasificacion);
-        final int[] colors = {Color.RED, Color.GREEN, Color.BLUE}; // array of colors to cycle through
-        animator = ValueAnimator.ofInt(colors); // create value animator with the array of colors
-        animator.setDuration(1000); // set the duration for each color change
-        animator.setEvaluator(new ArgbEvaluator()); // set the evaluator to interpolate between the colors
-        animator.setRepeatCount(ValueAnimator.INFINITE); // set the repeat count to infinite
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animator) {
-                int color = (int) animator.getAnimatedValue(); // get the current color from the animator
-                textviewclasificacion.setTextColor(color); // set the text color to the current color
-            }
+    private void initializeColorAnimator() {
+        final int[] colors = {Color.RED, Color.GREEN, Color.BLUE};
+        animator = ValueAnimator.ofInt(colors);
+        animator.setDuration(1000);
+        animator.setEvaluator(new ArgbEvaluator());
+        animator.setRepeatCount(ValueAnimator.INFINITE);
+        animator.addUpdateListener(animator -> {
+            int color = (int) animator.getAnimatedValue();
+            textviewclasificacion.setTextColor(color);
         });
-        animator.start(); // start the animator
-        TextViewFallos = (TextView)findViewById(R.id.TextViewFallos);
-        textviewgrandtotal = (TextView) findViewById(R.id.textviewgrandtotal);
+        animator.start();
+    }
 
+    private void fetchFirebaseUserInfo() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             String userId = user.getUid();
@@ -130,10 +136,9 @@ public class ClassficationActivity extends AppCompatActivity {
                     User userData = dataSnapshot.getValue(User.class);
                     if (userData != null) {
                         position = userData.getPositionInLeaderboard();
-                        textviewclasificacion.setText( String.valueOf(position));
+                        textviewclasificacion.setText(String.valueOf(position));
                         grandtotal = userData.getAccumulatedPuntuacion();
-                        textviewgrandtotal.setText("TOTAL EARNINGS: " + String.valueOf(grandtotal) + " FCFA");
-
+                        textviewgrandtotal.setText("TOTAL EARNINGS: " + grandtotal + " AFROS");
                     }
                 }
 
@@ -142,123 +147,90 @@ public class ClassficationActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Error retrieving ranking position", Toast.LENGTH_SHORT).show();
                 }
             });
+
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User userData = dataSnapshot.getValue(User.class);
+                    if (userData != null) {
+                        name = userData.getFullname();
+                        textviewhola.setText("@ " + name);
+
+                        String profilePicUrl = dataSnapshot.child("profilePicture").getValue(String.class);
+
+                        if (profilePicUrl != null && !profilePicUrl.isEmpty()) {
+                            // Load the URL into the CircleImageView
+                            Glide.with(ClassficationActivity.this)
+                                    .load(profilePicUrl)
+                                    .into(profilepic);
+                        } else {
+                            // Set a default placeholder or error image when the URL is null or empty
+                            profilepic.setImageResource(R.drawable.baseline_account_circle_24);
+
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Handle error
+                }
+            });
         }
+    }
 
-            firestore = FirebaseFirestore.getInstance();
-            textviewrecord = (TextView) findViewById(R.id.textviewrecord);
-            textiviewganancias = (TextView) findViewById(R.id.textviewganancias);
-            textviewaciertos2 = (TextView) findViewById(R.id.textviewaciertos2);
-            textviewpuntuacion2 = (TextView) findViewById(R.id.textviewpuntuacion2);
-            textviewhola = (TextView) findViewById(R.id.textviewhola);
-            profilepicture = (ImageView) findViewById(R.id.profilepicture);
-         SharedPreferences sharedPreferences = getSharedPreferences("GameStats", Context.MODE_PRIVATE);
+    private void setupButtonListeners() {
+        buttonmenuprincipal.setOnClickListener(v -> showTerminationDialog());
+
+        buttoncodigocobro.setOnClickListener(v -> {
+            if (isWithinCoolDownPeriod()) {
+                showCooldownAlertDialog();
+                return;
+            }
+
+            if (puntuacion < 2500) {
+                showMinimumCobroDialog();
+            } else {
+                String code = generateRandomAlphanumericCode(12);
+                Intent intent = new Intent(ClassficationActivity.this, QRcodeActivity.class);
+                intent.putExtra("aciertos", aciertos);
+                intent.putExtra("puntuacion", puntuacion);
+                intent.putExtra("name", name);
+                intent.putExtra("code", code);
+                saveLastSavedTimestamp();
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void loadProfilePicture() {
         profilePictureUri = getIntent().getStringExtra("profilePictureUri");
-
-        buttonmenuprincipal = (Button) findViewById(R.id.buttonmenuprincipal);
-        buttonmenuprincipal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTerminationDialog();
-            }
-        });
-
-        String code = generateRandomAlphanumericCode(12);
-
-
-        buttoncodigocobro = (Button) findViewById(R.id.buttoncodigocobro);
-        buttoncodigocobro = (Button) findViewById(R.id.buttoncodigocobro);
-        buttoncodigocobro.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                // Check if the user is within the cooldown period
-                if (isWithinCoolDownPeriod()) {
-                    showCooldownAlertDialog();
-                    return;
-                }
-
-                // Check if puntuacion is less than 2500
-                if (puntuacion < 2500) {
-                    showMinimumCobroDialog();
-
-                } else {
-                    // If puntuacion is 2500 or more, proceed with the current logic
-
-                    Intent intent = new Intent(ClassficationActivity.this, QRcodeActivity.class);
-                    intent.putExtra("aciertos", aciertos);
-                    intent.putExtra("puntuacion", puntuacion);
-                    intent.putExtra("name", name);
-                    intent.putExtra("code", code);
-                    saveLastSavedTimestamp();
-                    startActivity(intent);
-                }
-            }
-        });
-
-
-
-        Glide.with(this)
+        if (profilePictureUri != null) {
+            Glide.with(this)
                     .load(profilePictureUri)
                     .placeholder(R.drawable.baseline_account_circle_24)
                     .into(new CustomTarget<Drawable>() {
                         @Override
                         public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                            profilepicture.setBackground(resource);
+                            profilepic.setBackground(resource);
                         }
 
                         @Override
                         public void onLoadCleared(@Nullable Drawable placeholder) {
-                            profilepicture.setBackground(placeholder);
+                            profilepic.setBackground(placeholder);
                         }
                     });
-
-
-
-            TextView textviewaciertos2 = findViewById(R.id.textviewaciertos2);
-            TextView textviewpuntuacion2 = findViewById(R.id.textviewpuntuacion2);
-            TextView textiviewganancias = findViewById(R.id.textviewganancias);
-            textviewaciertos2.setText("YOU GOT " + aciertos + " CORRECT ANS");
-            textviewpuntuacion2.setText("YOUR SCORE IS  " + puntuacion + " POINTS");
-            textiviewganancias.setText("YOUR EARNINGS ARE " + puntuacion + " $");
-            TextViewFallos.setText("YOU MADE " + errores + " ERRORS");
-
-
-
-        if (user != null) {
-                String userId = user.getUid();
-                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(userId);
-
-                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        User userData = dataSnapshot.getValue(User.class);
-                        if (userData != null) {
-                            name = userData.getFullname();
-                            textviewhola.setText("@ " + name);
-
-                            String profilePicUrl = dataSnapshot.child("profilePicture").getValue(String.class);
-                            if (profilePicUrl != null && !profilePicUrl.isEmpty()) {
-                                Glide.with(ClassficationActivity.this).load(profilePicUrl).into(profilepicture);
-                            }
-
-                            saveClassificationData(aciertos, puntuacion, ganancias, uui, name);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        // Handle error
-                    }
-
-                    private void saveClassificationData(int aciertos, int puntuacion, int ganancias, String uui, String username) {
-
-                    }
-
-                });
-                updateHighestScore(puntuacion);
-            }
         }
+    }
+
+    private void saveGameStats(int aciertos, int puntuacion, int errores) {
+        SharedPreferences sharedPreferences = getSharedPreferences("GameStats", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("aciertos", aciertos);
+        editor.putInt("puntuacion", puntuacion);
+        editor.putInt("errores", errores);
+        editor.apply();
+    }
 
     private boolean isWithinCoolDownPeriod() {
         long currentTimeMillis = System.currentTimeMillis();
@@ -271,8 +243,8 @@ public class ClassficationActivity extends AppCompatActivity {
     private void showTerminationDialog() {
         AlertDialog dialog = new AlertDialog.Builder(ClassficationActivity.this)
                 .setTitle("EXIT")
-                .setMessage("you sure you want to exit?")
-                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                .setMessage("You sure you out?")
+                .setPositiveButton("YEP", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         playSwoosh();
                         Intent intent = new Intent(ClassficationActivity.this, Modocompeticion.class);
@@ -280,7 +252,7 @@ public class ClassficationActivity extends AppCompatActivity {
                         finish();
                     }
                 })
-                .setNegativeButton("NO", null)
+                .setNegativeButton("NOPE", null)
                 .setIcon(R.drawable.afrikanaonelogo)
                 .create();
 
@@ -295,7 +267,7 @@ public class ClassficationActivity extends AppCompatActivity {
     private void showMinimumCobroDialog() {
         AlertDialog dialog = new AlertDialog.Builder(ClassficationActivity.this)
                 .setTitle("Minimum Checkout")
-                .setMessage("You've got to make at least $10 to check out.")
+                .setMessage("You've got to make at least 3000 AFROS to check out.")
                 .setPositiveButton(android.R.string.ok, null)
                 .setIcon(R.drawable.afrikanaonelogo)
                 .create();
@@ -391,29 +363,20 @@ public class ClassficationActivity extends AppCompatActivity {
         }
 
     }
+
     @Override
     protected void onResume() {
         super.onResume();
 
-        // Initialize SharedPreferences
-        SharedPreferences sharedPreferences = getSharedPreferences("GameStats", Context.MODE_PRIVATE);
+        // Update text views with the values retrieved from the intent during onCreate()
+        updateTextViewsFromIntent();
+    }
 
-        // Fetch values from SharedPreferences
-        int aciertos = sharedPreferences.getInt("correct ans.", 0);
-        int puntuacion = sharedPreferences.getInt("score", 0);
-        int errores = sharedPreferences.getInt("errors", 0);
-        // ... fetch other values ...
-
-        // Now, update your UI elements with these values
-
-        TextView textviewaciertos2 = findViewById(R.id.textviewaciertos2);
-        TextView textviewpuntuacion2 = findViewById(R.id.textviewpuntuacion2);
-        TextView textiviewganancias = findViewById(R.id.textviewganancias);
-        TextViewFallos = (TextView)findViewById(R.id.TextViewFallos);
-        textviewaciertos2.setText("YOU GOT " + aciertos + " CORRECT ANS");
-        textviewpuntuacion2.setText("YOUR SCORE IS  " + puntuacion + " POINTS");
-        textiviewganancias.setText("YOUR EARNINGS ARE  " + puntuacion + " $");
+    private void updateTextViewsFromIntent() {
+        textviewaciertos2.setText("YOU GOT " + aciertos + " CORRECT ANSWERS");
         TextViewFallos.setText("YOU MADE " + errores + " ERRORS");
+        textviewpuntuacion2.setText("YOUR SCORE IS " + puntuacion + " POINTS");
+        textiviewganancias.setText("YOUR EARNINGS ARE " + puntuacion + " AFROS");
     }
 
 

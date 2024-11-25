@@ -137,8 +137,8 @@ public class LeadersProfileActivity extends AppCompatActivity {
                 textViewPais.setText("Country: " + user.getPais());
                 textViewRecord.setText("Personal Record: " + String.valueOf(user.getHighestScore() + " POINTS"));
                 textViewPuntuacionAcumulada.setText("Total earnings: " + String.valueOf(user.getAccumulatedPuntuacion()+ " POINTS"));
-                textViewPastaAcumulada.setText(" Earned money: " + String.valueOf(user.getAccumulatedPuntuacion() + " $"));
-                textViewAciertosAcumulados.setText("Total correct ans.: " + String.valueOf(user.getAccumulatedAciertos()));
+                textViewPastaAcumulada.setText(" Earned money: " + String.valueOf(user.getAccumulatedPuntuacion() + " AFROS"));
+                textViewAciertosAcumulados.setText("Total correct answers.: " + String.valueOf(user.getAccumulatedAciertos()));
                 textViewFallosAcumulados.setText("Total mistakes: " + String.valueOf(user.getAccumulatedFallos()));
             }
 

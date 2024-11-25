@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/texture"
     android:fillViewport="true"
     tools:context=".ProfileActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/texture"
         android:orientation="vertical">
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profilepic"
         android:layout_width="180dp"
@@ -59,7 +60,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="30dp"
-            android:backgroundTint="#80412A"
+            android:backgroundTint="@color/green"
             android:shadowDx="4"
             android:shadowDy="4"
             android:shadowRadius="6"
@@ -75,7 +76,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="-20dp"
-        android:background="@drawable/table_border"
         android:stretchColumns="*">
 
         <TableRow
@@ -275,7 +275,7 @@
             android:layout_width="130dp"
             android:layout_height="55dp"
             android:text="RETURN"
-            android:backgroundTint="@color/orange"
+            android:backgroundTint="@color/blue"
             android:textColor="@color/white"
             android:layout_marginRight="5dp"
             android:textStyle="bold"
@@ -285,7 +285,7 @@
             android:id="@+id/btn_borrarusuario"
             android:layout_width="130dp"
             android:layout_height="55dp"
-            android:backgroundTint="@color/orange"
+            android:backgroundTint="@color/red"
             android:text="ERASE"
             android:textColor="@color/white"
             android:textStyle="bold"

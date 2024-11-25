@@ -4,17 +4,11 @@
     <item>
         <shape android:shape="rectangle">
             <!-- Solid background color for the table -->
-            <solid android:color="@color/white" />
+
             <!-- Border color and width for the table -->
-            <stroke
-                android:color="@color/black"
-                android:width="6dp" />
+
             <!-- Optional padding for the border, adjust as needed -->
-            <padding
-                android:left="2dp"
-                android:top="2dp"
-                android:right="2dp"
-                android:bottom="2dp" />
+
         </shape>
     </item>
 

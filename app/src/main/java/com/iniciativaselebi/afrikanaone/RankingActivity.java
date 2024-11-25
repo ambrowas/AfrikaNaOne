@@ -155,8 +155,7 @@ public class RankingActivity extends AppCompatActivity {
                     row.addView(tvName);
 
 
-// Score TextView
-                    // Score TextView
+
                     TextView tvScore = new TextView(RankingActivity.this);
                     tvScore.setText(String.valueOf(user.getAccumulatedPuntuacion()));
                     TableRow.LayoutParams scoreParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
@@ -227,23 +226,5 @@ public class RankingActivity extends AppCompatActivity {
         // Save the animator on the map
         flashingAnimators.put(userId, colorAnimator);
     }
-    private void checkAndLaunchNumberOneActivity(User user, int rank) {
-        String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        if (rank == 1 && currentUserUid.equals(user.getUid())) {
-            LayoutInflater inflater = getLayoutInflater();
-            View toastLayout = inflater.inflate(R.layout.toast_custom, findViewById(R.id.toast_layout));
 
-            ImageView toastImage = toastLayout.findViewById(R.id.toast_image);
-            TextView toastText = toastLayout.findViewById(R.id.toast_text);
-
-            toastImage.setImageResource(R.drawable.afrikanaonelogo);
-            toastText.setText("Congratulations, you're No.1 in the Ranking");
-            toastText.setGravity(Gravity.CENTER);
-
-            Toast toast = new Toast(getApplicationContext());
-            toast.setDuration(Toast.LENGTH_SHORT);
-            toast.setView(toastLayout);
-            toast.show();
-        }
-    }
 }

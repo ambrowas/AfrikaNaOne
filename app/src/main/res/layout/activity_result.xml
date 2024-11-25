@@ -5,12 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="@drawable/texture"
     tools:context=".ResultActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/texture">
+        >
 
 
     <ImageView
@@ -44,7 +45,6 @@
         android:textColor="@color/black"
         android:textSize="14sp"
         android:textStyle="bold"
-        android:shadowColor="@color/white"
         android:shadowDx="4"
         android:shadowDy="4"
         android:shadowRadius="6"/>
