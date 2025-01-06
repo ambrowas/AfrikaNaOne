@@ -1,0 +1,56 @@
+[debug] [2023-10-30T21:11:31.893Z] ----------------------------------------------------------------------
+[debug] [2023-10-30T21:11:31.895Z] Command:       /usr/local/bin/node /usr/local/bin/firebase init
+[debug] [2023-10-30T21:11:31.895Z] CLI Version:   12.0.0
+[debug] [2023-10-30T21:11:31.895Z] Platform:      darwin
+[debug] [2023-10-30T21:11:31.896Z] Node Version:  v18.16.0
+[debug] [2023-10-30T21:11:31.898Z] Time:          Mon Oct 30 2023 17:11:31 GMT-0400 (Eastern Daylight Time)
+[debug] [2023-10-30T21:11:31.898Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-10-30T21:11:31.902Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2023-10-30T21:11:32.023Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-10-30T21:11:32.024Z] > authorizing via signed-in user (eleelavm@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/elebi
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[warn] ⚠  Unable to fetch the CLI MOTD and remote config. 
+[debug] [2023-10-30T21:11:32.044Z] Failed to fetch MOTD FirebaseError: Failed to make request to https://firebase-public.firebaseio.com/cli.json
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2023-10-30T21:11:55.323Z] Using project from CLI flag: trivial-guineologia
+[debug] [2023-10-30T21:11:55.324Z] > refreshing access token with scopes: []
+[debug] [2023-10-30T21:11:55.325Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2023-10-30T21:11:55.325Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2023-10-30T21:11:55.332Z] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2023-10-30T21:11:55.344Z] FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+    at invalidCredentialError (/usr/local/lib/node_modules/firebase-tools/lib/auth.js:144:12)
+    at refreshTokens (/usr/local/lib/node_modules/firebase-tools/lib/auth.js:508:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Client.getAccessToken (/usr/local/lib/node_modules/firebase-tools/lib/apiv2.js:149:23)
+    at async Client.addAuthHeader (/usr/local/lib/node_modules/firebase-tools/lib/apiv2.js:140:21)
+    at async Client.request (/usr/local/lib/node_modules/firebase-tools/lib/apiv2.js:96:34)
+    at async getFirebaseProject (/usr/local/lib/node_modules/firebase-tools/lib/management/projects.js:295:21)
+    at async doSetup (/usr/local/lib/node_modules/firebase-tools/lib/init/features/project.js:85:27)
+    at async init (/usr/local/lib/node_modules/firebase-tools/lib/init/index.js:37:9)
+[error] 
+[error] Error: Failed to get Firebase project trivial-guineologia. Please make sure the project exists and your account has permission to access it.

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "964624085160",
+    "project_id": "afrikanaone",
+    "storage_bucket": "afrikanaone.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964624085160:android:f8026594345dde858dd29d",
+        "android_client_info": {
+          "package_name": "com.iniciativaselebi.afrikanaone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD44KMjPoWV-slfZQCHQ8-MraTED-pHKGw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Focused state -->
+    <item android:state_focused="true" android:color="@android:color/black" />
+    <!-- Hovered state -->
+    <item android:state_hovered="true" android:color="@android:color/black" />
+    <!-- Default state -->
+    <item android:color="@android:color/black" />
+</selector>

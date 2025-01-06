@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@drawable/libre"
+    tools:context=".PreguntasModoLibre">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        tools:ignore="ExtraText">
+        <TextView
+            android:id="@+id/textviewaciertos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CORRECT ANSWERS : 0 "
+            android:textColor="@color/black"
+            android:layout_marginTop="60dp"
+            android:layout_marginLeft="30dp"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textviewpuntuacion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textviewaciertos"
+            android:layout_marginLeft="30dp"
+            android:textSize="18sp"
+            android:text="SCORE : 0 "
+            android:textColor="@color/black"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/textviewcontadorpreguntas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textviewpuntuacion"
+            android:layout_marginLeft="30dp"
+            android:text="QUESTION : 1/X"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
+
+
+    <TextView
+        android:id="@+id/textviewtiempo"
+        android:layout_width="90dp"
+        android:layout_height="80dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="10dp"
+        android:fontFamily="?android:attr/fontFamily"
+        android:paddingRight="10dp"
+        android:shadowColor="@color/black"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="4"
+        android:textColor="@color/black"
+        android:textSize="50sp"
+        android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/quizImageLibre"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/afrikanaonelogo"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="160dp"
+            />
+
+
+        <TextView
+    android:id="@+id/textviewpregunta"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/textviewtiempo"
+    android:layout_marginTop="80dp"
+    android:layout_marginBottom="50dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:text="¿Quien descubrió America el 12 de Octubre de 1492?"
+    android:gravity="center_horizontal"
+    android:fontFamily="@font/buddychampion"
+    android:textStyle="bold"
+    android:layout_centerHorizontal="true"
+    android:textColor="@color/black"
+    android:textSize="18sp" />
+
+    <RadioGroup
+            android:id="@+id/radio_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/textviewpregunta"
+
+           >
+
+        <RadioButton
+            android:id="@+id/radio_button1"
+            android:layout_width="300dp"
+            android:layout_height="75dp"
+            android:text="OPTION 1"
+            android:textAllCaps="true"
+            android:button="@android:color/transparent"
+            android:background="@drawable/radio_selector"
+            android:textColor="@color/white"
+            android:elevation="4dp"
+            android:gravity="center"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="12sp"
+            android:autoSizeMaxTextSize="18sp"
+            android:autoSizeStepGranularity="2sp"
+
+            />
+
+            <RadioButton
+            android:id="@+id/radio_button2"
+                android:layout_width="300dp"
+                android:layout_height="75dp"
+                android:text="Option 2"
+                android:textAllCaps="true"
+                android:layout_marginTop="20dp"
+                android:button="@android:color/transparent"
+                android:background="@drawable/radio_selector"
+                android:textColor="@color/white"
+                android:elevation="4dp"
+                android:gravity="center"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="12sp"
+                android:autoSizeMaxTextSize="18sp"
+                android:autoSizeStepGranularity="2sp"
+                />
+
+            <RadioButton
+                android:id="@+id/radio_button3"
+                android:layout_width="300dp"
+                android:layout_height="75dp"
+                android:layout_marginTop="20dp"
+                android:button="@android:color/transparent"
+                android:background="@drawable/radio_selector"
+                android:elevation="4dp"
+                android:textAllCaps="true"
+                android:gravity="center"
+                android:text="Option 3"
+                android:textColor="@color/white"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="12sp"
+                android:autoSizeMaxTextSize="18sp"
+                android:autoSizeStepGranularity="2sp"
+                />
+        </RadioGroup>
+
+            />
+        <Button
+            android:id="@+id/buttonconfirmar"
+            android:layout_width="300dp"
+            android:layout_height="75dp"
+            android:layout_marginTop="50dp"
+            android:elevation="4dp"
+            android:background="@drawable/radio_normal3"
+            app:backgroundTint="@null"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:gravity="center"
+            android:text="CONFIRM"
+            android:textColor="@color/black"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/radio_group"/>
+
+
+</RelativeLayout>
+</ScrollView>

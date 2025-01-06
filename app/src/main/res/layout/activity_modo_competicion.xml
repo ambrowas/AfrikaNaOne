@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@drawable/neon"
+    tools:context=".Modocompeticion">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+       >
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/afrikanaonelogo"
+            android:layout_marginTop="100dp"
+            />
+
+        <TextView
+        android:id="@+id/TextViewSaludo2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="260dp"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:text="LOG IN OR SIGN UP"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/TextViewRecord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/TextViewSaludo2"
+        android:text=""
+        android:layout_marginBottom="10dp"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"/>
+
+    <Button
+        android:id="@+id/button_jugar2"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/TextViewRecord"
+        android:backgroundTint="@color/green"
+        android:text="PLAY"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+    <Button
+        android:id="@+id/buttoncodigo"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/red"
+        android:layout_below="@+id/button_jugar2"
+        android:text="ENTER GAMECODE"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/button_clasificacion"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/red"
+        android:layout_below="@+id/buttoncodigo"
+        android:text="SCOREBOARD"
+        android:textColor="@color/white"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+    <Button
+        android:id="@+id/button_perfil"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/white"
+        android:layout_below="@+id/button_clasificacion"
+        android:text="PROFILE"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+    <Button
+        android:id="@+id/button_login"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/button_perfil"
+        android:backgroundTint="@color/blue"
+        android:text="LOG IN/SIGN UP"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:layout_marginTop="10dp"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+    <Button
+        android:id="@+id/button_register"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/blue"
+        android:layout_below="@+id/button_login"
+        android:text="SIGN UP"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp"
+        android:visibility="gone" />
+
+        <Button
+            android:id="@+id/button_return"
+            android:layout_width="300dp"
+            android:layout_height="75dp"
+            android:layout_centerHorizontal="true"
+            android:backgroundTint="@color/red"
+            android:layout_below="@+id/button_register"
+            android:text="RETURN"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:shadowDx="4"
+            android:shadowDy="4"
+            android:shadowRadius="6"
+            app:strokeWidth="3dp"
+            />
+
+
+
+
+</RelativeLayout>
+</ScrollView>

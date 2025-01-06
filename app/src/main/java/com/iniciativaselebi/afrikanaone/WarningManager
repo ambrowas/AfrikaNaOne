@@ -1,0 +1,76 @@
+package com.iniciativaselebi.afrikanaone;
+
+import android.content.Context;
+
+import androidx.appcompat.app.AlertDialog;
+
+import java.util.Comparator;
+import java.util.PriorityQueue;
+
+public class WarningManager {
+    private final PriorityQueue<Warning> warningQueue = new PriorityQueue<>(Comparator.comparingInt(Warning::getPriority));
+    private boolean isDialogVisible = false;
+
+    public void addWarning(Warning warning) {
+        warningQueue.offer(warning);
+        showNextWarning();
+    }
+
+    private void showNextWarning() {
+        if (isDialogVisible || warningQueue.isEmpty()) return;
+
+        Warning nextWarning = warningQueue.poll();
+        if (nextWarning != null) {
+            isDialogVisible = true;
+            nextWarning.showDialog(() -> {
+                isDialogVisible = false;
+                showNextWarning(); // Show the next warning after the current one is dismissed
+            });
+        }
+    }
+
+    public void clearWarnings() {
+        warningQueue.clear();
+    }
+}
+
+class Warning {
+    private final int priority;
+    private final String title;
+    private final String message;
+    private final Context context;
+
+    public interface DismissCallback {
+        void onDismiss();
+    }
+
+    public Warning(Context context, int priority, String title, String message) {
+        this.context = context;
+        this.priority = priority;
+        this.title = title;
+        this.message = message;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void showDialog(DismissCallback callback) {
+        AlertDialog dialog = new AlertDialog.Builder(context)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (d, which) -> {
+                    d.dismiss();
+                    if (callback != null) callback.onDismiss();
+                })
+                .setCancelable(false)
+                .create();
+
+        // Customize dialog appearance if needed
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+
+        dialog.show();
+    }
+}

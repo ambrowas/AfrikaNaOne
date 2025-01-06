@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/neon"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context=".ContactanosActivity">
+
+
+        <TextView
+            android:id="@+id/textview_contactanos"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="200dp"
+            android:fontFamily="@font/buddychampion"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="For questions, comments, suggestions, proposals, corrections, complaints, insults, intimidations and/or grievances kindly press the icon below to contact us via whatsapp.We will try to fix it. Thanks for the support"
+            android:textAlignment="gravity"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+
+        <ImageButton
+            android:id="@+id/imagebuttonwhatsap"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/whatsapp"
+            android:scaleType="fitCenter"
+            android:background="@android:color/transparent"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+
+        <Button
+        android:id="@+id/buttonvolver3"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:text="RETURN"
+        android:backgroundTint="@color/red"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center_horizontal"
+        app:strokeWidth="3dp"/>
+
+
+</LinearLayout>
+</ScrollView>

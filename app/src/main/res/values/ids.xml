@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="textViewRecord" type="id" />
+    <item name="textViewSaludo2" type="id" />
+    <item name="button_desconectar" type="id" />
+    <item name="button_salir2" type="id" />
+</resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/neon"
+    android:orientation="vertical"
+    tools:context=".GameOverActivity">
+
+
+    <Button
+        android:id="@+id/gameOverText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Game Over"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:backgroundTint="@color/fui_transparent"
+        android:layout_marginTop="250dp"
+        />
+
+    <TextView
+        android:id="@+id/TextViewClicAca"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gameOverText"
+        android:text="CLICK TO EXIT"
+        android:textColor="@color/white"
+        android:layout_gravity="center_horizontal"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        />
+
+</LinearLayout>
+

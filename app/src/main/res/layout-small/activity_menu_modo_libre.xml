@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/texture"
+    tools:context=".ModoLibre">
+
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="250dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="250dp"
+        android:src="@drawable/afrikanaonelogo"
+         />
+
+
+    <EditText
+        android:id="@+id/editTextNombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:hint="INTRODUCE TU NOMBRE"
+        android:textColor="@color/black"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@id/logo"
+        android:textSize="14sp"
+
+        android:inputType="textPersonName"/>
+
+    <TextView
+        android:id="@+id/TextViewSaludo2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:text="HOLA POR AQUI"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/TextViewRecord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/TextViewSaludo2"
+        android:layout_centerInParent="true"
+        android:text="HIGH SCORE"
+        android:layout_gravity="center_horizontal"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+    android:textStyle="bold"
+    android:shadowColor="@color/white"
+    android:shadowDx="4"
+    android:shadowDy="4"
+    android:shadowRadius="6"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"/>
+
+
+    <Button
+        android:id="@+id/button_save"
+        android:layout_width="250dp"
+        android:layout_height="55dp"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@color/blue"
+        android:gravity="center"
+        android:text="GUARDAR"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+
+    <Button
+        android:id="@+id/button_jugar"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@color/green"
+        android:layout_below="@id/TextViewRecord"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:text="JUGAR"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:layout_marginTop="20dp"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+    <Button
+        android:id="@+id/buttonvolver"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:text="VOLVER"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@color/red"
+        app:strokeWidth="3dp"/>
+
+
+
+
+
+
+
+</LinearLayout>

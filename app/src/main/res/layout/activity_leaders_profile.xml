@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/neon"
+    tools:context=".LeadersProfileActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profilepic"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="80dp"
+                android:src="@drawable/baseline_account_circle_24"
+                android:background="@drawable/oval"
+                app:civ_border_width="5dp"
+                app:civ_border_color="#000000"
+                android:scaleType="centerCrop" />
+
+            <ImageView
+                android:id="@+id/imageviewFlag"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:adjustViewBounds="true"
+               android:scaleType="fitCenter"
+                android:src="@drawable/other"
+                android:layout_marginLeft="-60dp"
+                android:layout_marginTop="-30dp"
+                android:layout_above="@+id/btn_upload"
+                android:button="@android:color/transparent"
+                android:elevation="4dp"
+                android:freezesText="true"
+                android:layout_gravity="center"
+                android:hint="8"
+                android:padding="4dp"
+                android:shadowColor="@color/white"
+                android:shadowDx="4"
+                android:shadowDy="4"
+                android:shadowRadius="6"
+                android:textColor="@color/black"
+                android:textColorHighlight="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:strokeWidth="3dp" />
+
+            <TextView
+                android:id="@+id/textviewNoRanking"
+                android:layout_width="50dp"
+                android:layout_height="70dp"
+                android:layout_marginLeft="250dp"
+                android:layout_marginTop="-50dp"
+                android:layout_marginBottom="10dp"
+                android:layout_above="@+id/btn_upload"
+                android:background="@drawable/radio_normal3"
+                android:button="@android:color/transparent"
+                android:elevation="4dp"
+                android:freezesText="true"
+                android:gravity="center"
+                android:hint="8"
+                android:shadowDx="4"
+                android:shadowDy="4"
+                android:shadowRadius="6"
+                android:textColor="@color/black"
+                android:textColorHighlight="@color/black"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:strokeWidth="3dp" />
+
+            <TableLayout
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="1dp"
+                android:stretchColumns="*">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+                    <TextView
+                        android:id="@+id/nameTitle"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textAllCaps="true"
+                        android:padding="10dp"
+                        android:hint="Full Name"
+                        android:textSize="17sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:freezesText="true"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"
+                        android:button="@android:color/transparent"
+                        android:background="@drawable/table_border"/>/>
+                </TableRow>
+
+                <!-- Ciudad text -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewCiudad"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:hint="City"
+                        android:textColor="@color/black"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:freezesText="true"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"
+                        android:button="@android:color/transparent"
+                        android:background="@drawable/table_border"/>/>
+                </TableRow>
+
+                <!-- Pais text -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewPais"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:hint="Country"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        android:freezesText="true"
+                        android:shadowDx="4"
+                        android:textStyle="bold"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"
+                        android:button="@android:color/transparent"
+                        android:background="@drawable/table_border"/>/>
+                </TableRow>
+
+                <!-- Record text -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewPuntuacionAcumulada"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:textColor="@color/white"
+                        android:hint="Total Score"
+                        android:textSize="17sp"
+                        android:freezesText="true"
+                        android:textStyle="bold"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"
+                        android:button="@android:color/transparent"
+                        android:background="@drawable/table_border"/>/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewAciertosAcumulados"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:textColor="@color/white"
+                        android:hint="Total Correct Answers"
+                        android:textSize="17sp"
+                        android:freezesText="true"
+                        android:shadowDx="4"
+                        android:textStyle="bold"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"
+                        android:button="@android:color/transparent"
+                        android:background="@drawable/table_border"/>/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewFallosAcumulados"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:hint="Total Mistakes"
+                        android:textSize="17sp"
+                        android:freezesText="true"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"
+                        android:button="@android:color/transparent"
+                        android:background="@drawable/table_border"/>/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewPastaAcumulada"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:textStyle="bold"
+                        android:hint="Total Earnings"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        android:freezesText="true"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"
+                        android:button="@android:color/transparent"
+                        android:background="@drawable/table_border"/>/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewRecord"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:hint="Record"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        android:freezesText="true"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:textStyle="bold"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"
+                        android:button="@android:color/transparent"
+                        android:background="@drawable/table_border"/>/>
+                </TableRow>
+
+            </TableLayout>
+
+            <Button
+                android:id="@+id/buttonatras"
+                android:layout_width="300dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:shadowDx="4"
+                android:shadowDy="4"
+                android:shadowRadius="6"
+                android:text="RETURN"
+                android:textColor="@color/white"
+                app:strokeWidth="3dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

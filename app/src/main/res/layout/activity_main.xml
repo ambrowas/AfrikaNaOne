@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@drawable/neon"
+    android:layout_height="match_parent"
+    android:id="@+id/main_activity_layout"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="250dp"
+        android:layout_height="350dp"
+        android:contentDescription="logotipoapp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="200dp"
+        android:src="@drawable/afrikanaonelogo" />
+
+    <TextView
+        android:id="@+id/TextViewClicAqui"
+        android:text="CLICK HERE TO START"
+        android:fontFamily="@font/buddychampion"
+        android:textColor="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        android:layout_marginTop="-70dp"
+        android:layout_below="@id/logo"
+        android:visibility="gone"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/TextViewProverb"
+        android:text="AFRICAN PROVERB"
+        android:fontFamily="@font/buddychampion"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_below="@id/TextViewClicAqui"
+        android:visibility="gone"
+        android:gravity="center" />
+
+
+
+</RelativeLayout>

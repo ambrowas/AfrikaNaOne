@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/texture"
+    tools:context=".Modocompeticion">
+
+    <TextView
+        android:id="@+id/TextViewSaludo2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:text="INICIA SESION O REGISTRATE"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/TextViewRecord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/TextViewSaludo2"
+        android:text=""
+        android:layout_marginBottom="10dp"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"/>
+
+    <Button
+        android:id="@+id/button_jugar2"
+        android:layout_width="300dp"
+        android:layout_height="85dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/TextViewRecord"
+        android:backgroundTint="@color/red"
+        android:text="JUGAR"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+    <Button
+        android:id="@+id/buttoncodigo"
+        android:layout_width="300dp"
+        android:layout_height="85dp"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/red"
+        android:layout_below="@+id/button_jugar2"
+        android:text="INTRUDUCIR CODIGO"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/button_clasificacion"
+        android:layout_width="300dp"
+        android:layout_height="85dp"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/white"
+        android:layout_below="@+id/buttoncodigo"
+        android:text="CLASIFICACION"
+        android:textColor="@color/black"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+    <Button
+        android:id="@+id/button_perfil"
+        android:layout_width="300dp"
+        android:layout_height="85dp"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/green"
+        android:layout_below="@+id/button_clasificacion"
+        android:text="PERFIL"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+    <Button
+        android:id="@+id/button_login"
+        android:layout_width="300dp"
+        android:layout_height="85dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/button_perfil"
+        android:text="INICIAR SESION"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:layout_marginTop="10dp"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp" />
+
+    <Button
+        android:id="@+id/button_register"
+        android:layout_width="300dp"
+        android:layout_height="85dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/radio_normal"
+        android:layout_below="@+id/button_login"
+        android:text="REGISTRAR"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        app:strokeWidth="3dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/TextViewVolver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/button_login"
+        android:layout_marginTop="30dp"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:text="VOLVER"
+        android:letterSpacing=".20"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+<!--    <TextView-->
+<!--        android:id="@+id/TextViewMarcar"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:layout_below="@+id/button_login"-->
+<!--        android:layout_marginTop="90dp"-->
+<!--        android:shadowColor="@color/white"-->
+<!--        android:shadowDx="4"-->
+<!--        android:shadowDy="4"-->
+<!--        android:shadowRadius="6"-->
+<!--        android:text="MARCAR"-->
+<!--        android:letterSpacing=".20"-->
+<!--        android:textAlignment="center"-->
+<!--        android:textAppearance="@style/TextAppearance.AppCompat.Body1"-->
+<!--        android:textColor="@color/black"-->
+<!--        android:textSize="16sp"-->
+<!--        android:textStyle="bold" />-->
+
+
+</RelativeLayout>

@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/texture"
+    tools:context=".LeadersProfileActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profilepic"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="60dp"
+                android:src="@drawable/baseline_account_circle_24"
+                android:background="@drawable/oval"
+                app:civ_border_width="5dp"
+                app:civ_border_color="#000000"
+                android:scaleType="centerCrop" />
+            <TextView
+                android:id="@+id/textviewNoRanking"
+                android:layout_width="50dp"
+                android:layout_height="70dp"
+                android:layout_marginLeft="300dp"
+                android:layout_marginTop="-50dp"
+                android:layout_marginBottom="10dp"
+                android:layout_above="@+id/btn_upload"
+                android:background="@drawable/radio_normal3"
+                android:button="@android:color/transparent"
+                android:elevation="4dp"
+                android:freezesText="true"
+                android:gravity="center"
+                android:hint="8"
+                android:shadowColor="@color/white"
+                android:shadowDx="4"
+                android:shadowDy="4"
+                android:shadowRadius="6"
+                android:textColor="@color/black"
+                android:textColorHighlight="@color/black"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:strokeWidth="3dp" />
+
+            <TableLayout
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="1dp"
+                android:background="@drawable/table_border"
+                android:stretchColumns="*">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/nameTitle"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textAllCaps="true"
+                        android:padding="10dp"
+                        android:hint="Nombre Completo"
+                        android:background="@drawable/table_border"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:freezesText="true"
+                        android:shadowColor="@color/white"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"/>
+                </TableRow>
+
+                <!-- Barrio text -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewBarrio"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:background="@drawable/table_border"
+                        android:textSize="14sp"
+                        android:freezesText="true"
+                        android:textColor="@color/black"
+                        android:shadowColor="@color/white"
+                        android:hint="Barrio"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"/>
+                </TableRow>
+
+                <!-- Ciudad text -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewCiudad"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:hint="Ciudad"
+                        android:textColor="@color/black"
+                        android:background="@drawable/table_border"
+                        android:textSize="14sp"
+                        android:freezesText="true"
+                        android:shadowColor="@color/white"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"/>
+                </TableRow>
+
+                <!-- Pais text -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewPais"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:hint="País"
+                        android:background="@drawable/table_border"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:freezesText="true"
+                        android:shadowColor="@color/white"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"/>
+                </TableRow>
+
+                <!-- Record text -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewPuntuacionAcumulada"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:textColor="@color/black"
+                        android:hint="Puntuacion Acumulada"
+                        android:background="@drawable/table_border"
+                        android:textSize="14sp"
+                        android:freezesText="true"
+                        android:shadowColor="@color/white"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewAciertosAcumulados"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:textColor="@color/black"
+                        android:hint="Aciertos Acumulados"
+                        android:background="@drawable/table_border"
+                        android:textSize="14sp"
+                        android:freezesText="true"
+                        android:shadowColor="@color/white"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewFallosAcumulados"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:hint="Fallos Acumulados"
+                        android:background="@drawable/table_border"
+                        android:textSize="14sp"
+                        android:freezesText="true"
+                        android:shadowColor="@color/white"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:textColor="@color/black"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewPastaAcumulada"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:hint="Pasta Acumulada"
+                        android:background="@drawable/table_border"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:freezesText="true"
+                        android:shadowColor="@color/white"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textViewRecord"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:padding="10dp"
+                        android:hint="Record"
+                        android:background="@drawable/table_border"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:freezesText="true"
+                        android:shadowColor="@color/white"
+                        android:shadowDx="4"
+                        android:shadowDy="4"
+                        android:shadowRadius="6"
+                        android:paddingLeft="20dp"/>
+                </TableRow>
+
+            </TableLayout>
+
+            <Button
+                android:id="@+id/buttonatras"
+                android:layout_width="300dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:shadowDx="4"
+                android:shadowDy="4"
+                android:shadowRadius="6"
+                android:text="VOLVER"
+                android:textColor="@color/white"
+                app:strokeWidth="3dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

@@ -1,0 +1,115 @@
+<resources>
+    <string name="Afrika_Na_One">Afrika Na One</string>
+    <string name="ingresar">INGRESAR</string>
+    <string name="contrase_a">Contraseña</string>
+    <string name="email">Email</string>
+    <string name="registrar">REGISTRAR</string>
+    <string name="login">login</string>
+    <string name="conectar">conectar</string>
+    <string name="click_para_ingresar">Click para ingresar</string>
+    <string name="click_para_registrar">CLICK PARA REGISTRAR</string>
+    <string name="desconectar">DESCONECTAR</string>
+    <string name="facebook_application_id" translatable="false">YOUR_APP_ID</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fbYOUR_APP_ID</string>
+    <string name="nombre">Nombre</string>
+    <string name="edad">Edad</string>
+    <string name="foto">Foto</string>
+    <string name="telefono">Telefono</string>
+    <string name="ciudad">Ciudad</string>
+    <string name="pa_s">País</string>
+    <string name="correct_answer">RESPUESTA CORRECTA: %1$s</string>
+    <string name="tiempo">tiempo</string>
+    <string name="aciertos">Aciertos: %1$d</string>
+    <string name="fallos">Fallos: %1$d</string>
+    <string name="puntuacion">Puntuación: %1$d</string>
+    <string name="tipo_dispositivo">Tipo de Dispositivo</string>
+    <string name="Dispositivo"> Dispositivo</string>
+    <string-array name="tipo_dispositivo_options">
+        <item>Apple</item>
+        <item>Android</item>
+    </string-array>
+    <string-array name="countries_array">
+        <!-- African Countries -->
+        <item>Algeria</item>
+        <item>Angola</item>
+        <item>Benin</item>
+        <item>Botswana</item>
+        <item>Burkina Faso</item>
+        <item>Burundi</item>
+        <item>Cabo Verde</item>
+        <item>Cameroon</item>
+        <item>Central African Republic</item>
+        <item>Chad</item>
+        <item>Comoros</item>
+        <item>Democratic Republic of Congo</item>
+        <item>Republic of the Congo</item>
+        <item>Côte d\'Ivoire</item>
+        <item>Djibouti</item>
+        <item>Egypt</item>
+        <item>Equatorial Guinea</item>
+        <item>Eritrea</item>
+        <item>Eswatini</item>
+        <item>Ethiopia</item>
+        <item>Gabon</item>
+        <item>Gambia</item>
+        <item>Ghana</item>
+        <item>Guinea</item>
+        <item>Guinea-Bissau</item>
+        <item>Kenya</item>
+        <item>Lesotho</item>
+        <item>Liberia</item>
+        <item>Libya</item>
+        <item>Madagascar</item>
+        <item>Malawi</item>
+        <item>Mali</item>
+        <item>Mauritania</item>
+        <item>Mauritius</item>
+        <item>Morocco</item>
+        <item>Mozambique</item>
+        <item>Namibia</item>
+        <item>Niger</item>
+        <item>Nigeria</item>
+        <item>Rwanda</item>
+        <item>Sao Tome and Principe</item>
+        <item>Senegal</item>
+        <item>Seychelles</item>
+        <item>Sierra Leone</item>
+        <item>Somalia</item>
+        <item>South Africa</item>
+        <item>South Sudan</item>
+        <item>Sudan</item>
+        <item>Tanzania</item>
+        <item>Togo</item>
+        <item>Tunisia</item>
+        <item>Uganda</item>
+        <item>Zambia</item>
+        <item>Zimbabwe</item>
+
+        <!-- Selected Non-African Countries -->
+        <item>United States</item>
+        <item>Canada</item>
+        <item>Brazil</item>
+        <item>China</item>
+        <item>India</item>
+        <item>United Kingdom</item>
+        <item>Germany</item>
+        <item>France</item>
+        <item>Japan</item>
+        <item>Australia</item>
+        <item>European Union</item>
+        <item>Haiti</item>
+        <item>Jamaica</item>
+        <item>Cuba</item>
+        <item>Trinidad and Tobago</item>
+        <item>Barbados</item>
+        <item>Bahamas</item>
+        <item>Guyana</item>
+        <item>Suriname</item>
+        <item>Dominican Republic</item>
+        <item>Antigua and Barbuda</item>
+        <item>Other</item>
+    </string-array>
+
+
+
+</resources>

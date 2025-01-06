@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/competicion"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context=".ClassficationActivity">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profilepic"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="35dp"
+                android:background="@drawable/oval"
+                android:scaleType="centerCrop"
+                android:src="@drawable/baseline_account_circle_24"
+                app:civ_border_color="#000000"
+                app:civ_border_width="5dp" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/textviewclasificacion"
+            android:layout_width="50dp"
+            android:layout_height="70dp"
+            android:layout_marginLeft="250sp"
+            android:layout_marginTop="-50sp"
+            android:layout_above="@+id/btn_upload"
+            android:background="@drawable/radio_normal3"
+            android:button="@android:color/transparent"
+            android:elevation="4dp"
+            android:freezesText="true"
+            android:gravity="center"
+            android:hint="8"
+            android:shadowColor="@color/white"
+            android:shadowDx="4"
+            android:shadowDy="4"
+            android:shadowRadius="6"
+            android:textColor="@color/black"
+            android:textColorHighlight="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:strokeWidth="3dp" />
+
+        <TextView
+            android:id="@+id/textviewhola"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="GREETING:"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/radio_normal3"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="0dp">
+
+            <TableLayout
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/table_border"
+                android:stretchColumns="*">
+
+                <!-- Correct Answers -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:background="@color/black"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textviewaciertos2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="CORRECT ANSWERS: 10"
+                        android:textColor="@color/black"
+                        android:textSize="15dp"
+                        android:textStyle="bold"
+                        android:background="@drawable/table_border"
+                        android:padding="10dp" />
+                </TableRow>
+
+                <!-- Mistakes -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:background="@color/black"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/TextViewFallos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="MISTAKES: 5"
+                        android:textColor="@color/black"
+                        android:textSize="15dp"
+                        android:textStyle="bold"
+                        android:background="@drawable/table_border"
+                        android:padding="10dp" />
+                </TableRow>
+
+                <!-- Score -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:background="@color/black"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textviewpuntuacion2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="SCORE: 500 POINTS"
+                        android:textColor="@color/black"
+                        android:textSize="15dp"
+                        android:textStyle="bold"
+                        android:background="@drawable/table_border"
+                        android:padding="10dp" />
+                </TableRow>
+
+                <!-- Earnings -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:background="@color/black"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textviewganancias"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="EARNINGS: 500 AFROS"
+                        android:textColor="@color/black"
+                        android:textSize="15dp"
+                        android:textStyle="bold"
+                        android:background="@drawable/table_border"
+                        android:padding="10dp" />
+                </TableRow>
+
+                <!-- Record -->
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:background="@color/black"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/textviewrecord"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="RECORD: 1200 POINTS"
+                        android:textColor="@color/black"
+                        android:textSize="15dp"
+                        android:textStyle="bold"
+                        android:background="@drawable/table_border"
+                        android:padding="10dp" />
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
+
+        <!-- Buttons -->
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp">
+
+            <Button
+                android:id="@+id/buttoncodigocobro"
+                android:layout_width="300dp"
+                android:layout_height="75dp"
+                android:freezesText="true"
+                android:text="CASH OUT"
+                android:backgroundTint="@color/green"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:strokeWidth="3dp" />
+
+            <Button
+                android:id="@+id/buttonleaderboard"
+                android:layout_width="300dp"
+                android:layout_height="75dp"
+                android:freezesText="true"
+                android:text="LEADERBOARD"
+                android:backgroundTint="@color/blue"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:strokeWidth="3dp" />
+
+            <Button
+                android:id="@+id/buttonmenuprincipal"
+                android:layout_width="300dp"
+                android:layout_height="75dp"
+                android:backgroundTint="@color/red"
+                android:freezesText="true"
+                android:text="MAIN MENU"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:strokeWidth="3dp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

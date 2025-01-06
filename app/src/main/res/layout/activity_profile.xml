@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/competicion"
+    android:fillViewport="true"
+    tools:context=".ProfileActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profilepic"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/oval"
+        android:scaleType="centerCrop"
+        android:src="@drawable/baseline_account_circle_24"
+        app:civ_border_color="#000000"
+        app:civ_border_width="5dp" />
+
+    <TextView
+        android:id="@+id/textviewNoRanking"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_marginLeft="270dp"
+        android:layout_marginTop="-80dp"
+        android:layout_above="@+id/btn_upload"
+        android:background="@drawable/radio_normal3"
+        android:button="@android:color/transparent"
+        android:elevation="4dp"
+        android:freezesText="true"
+        android:gravity="center"
+        android:hint="8"
+        android:shadowColor="@color/white"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:textColor="@color/black"
+        android:textColorHighlight="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:strokeWidth="3dp" />
+
+        <ImageView
+            android:id="@+id/imageviewFlag"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/other"
+            android:layout_marginLeft="120dp"
+            android:layout_marginTop="-30dp"
+            android:layout_above="@+id/btn_upload"
+            android:button="@android:color/transparent"
+            android:elevation="4dp"
+            android:freezesText="true"
+            android:gravity="fill"
+            android:hint="8"
+            android:padding="4dp"
+            android:shadowColor="@color/white"
+            android:shadowDx="4"
+            android:shadowDy="4"
+            android:shadowRadius="6"
+            android:textColor="@color/black"
+            android:textColorHighlight="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:strokeWidth="3dp" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+
+        <Button
+            android:id="@+id/btn_upload"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="30dp"
+            android:backgroundTint="@color/green"
+            android:shadowDx="4"
+            android:shadowDy="4"
+            android:shadowRadius="6"
+            android:text="SAVE PROFILE PIC"
+            android:textColor="@color/white"
+            app:strokeWidth="3dp" />
+
+
+    </RelativeLayout>
+
+    <TableLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="-20dp"
+        android:stretchColumns="*">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black">
+
+            <TextView
+                android:id="@+id/nameTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="Full Name"
+                android:textAllCaps="true"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:button="@android:color/transparent"
+                android:background="@drawable/table_border"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black">
+
+            <TextView
+                android:id="@+id/textViewEmail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:padding="8dp"
+                android:text="Email"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:button="@android:color/transparent"
+                android:background="@drawable/table_border"/>
+        </TableRow>
+
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black">
+
+            <TextView
+                android:id="@+id/textViewTelefono"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:textSize="18sp"
+                android:padding="8dp"
+                android:text="Telephone"
+                android:textColor="@color/black"
+                android:button="@android:color/transparent"
+                android:background="@drawable/table_border"/>
+        </TableRow>
+
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black">
+
+            <TextView
+                android:id="@+id/textViewCiudad"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:gravity="left"
+                android:hint="City"
+                android:padding="8dp"
+                android:textColor="@color/black"
+                android:button="@android:color/transparent"
+                android:background="@drawable/table_border"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black">
+
+            <TextView
+                android:id="@+id/textViewPais"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:gravity="left"
+                android:hint="Country"
+                android:textColor="@color/black"
+                android:padding="8dp"
+                android:button="@android:color/transparent"
+                android:background="@drawable/table_border"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black">
+
+            <TextView
+                android:id="@+id/textViewRecord"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:hint="Record"
+                android:padding="8dp"
+                android:button="@android:color/transparent"
+                android:background="@drawable/table_border"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black">
+
+            <TextView
+                android:id="@+id/textViewPuntuacionAcumulada"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:gravity="left"
+                android:textColor="@color/black"
+                android:hint="2500 "
+                android:padding="8dp"
+                android:button="@android:color/transparent"
+                android:background="@drawable/table_border"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black">
+
+            <TextView
+                android:id="@+id/textViewAciertosAcumulados"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:hint="30"
+                android:padding="8dp"
+                android:button="@android:color/transparent"
+                android:background="@drawable/table_border"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black">
+
+            <TextView
+                android:id="@+id/textViewFallosAcumulados"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:hint="23"
+                android:padding="8dp"
+                android:button="@android:color/transparent"
+                android:background="@drawable/table_border"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black">
+
+            <TextView
+                android:id="@+id/textViewPastaAcumulada"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:hint="23"
+                android:padding="8dp"
+                android:button="@android:color/transparent"
+                android:background="@drawable/table_border"/>
+        </TableRow>
+
+
+    </TableLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp">
+
+        <Button
+            android:id="@+id/buttonatras"
+            android:layout_width="150dp"
+            android:layout_height="70dp"
+            android:text="RETURN"
+            android:backgroundTint="@color/blue"
+            android:textColor="@color/white"
+            android:layout_marginRight="5dp"
+            android:textStyle="bold"
+            app:strokeWidth="3dp" />
+
+        <Button
+            android:id="@+id/btn_borrarusuario"
+            android:layout_width="150dp"
+            android:layout_height="70dp"
+            android:backgroundTint="@color/red"
+            android:text="DELETE USER"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:strokeWidth="3dp" />
+    </LinearLayout>
+
+
+
+
+</LinearLayout>
+</ScrollView>
