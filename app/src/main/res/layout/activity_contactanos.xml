@@ -22,10 +22,11 @@
             android:layout_marginTop="200dp"
             android:fontFamily="@font/buddychampion"
             android:paddingLeft="10dp"
-            android:paddingTop="10dp"
+            android:paddingTop="30dp"
             android:paddingBottom="10dp"
-            android:text="For questions, comments, suggestions, proposals, corrections, complaints, insults, intimidations and/or grievances kindly press the icon below to contact us via whatsapp.We will try to fix it. Thanks for the support"
-            android:textAlignment="gravity"
+            android:text="For questions, comments and/or suggestions, kindly press the icon below to contact us via WhatsApp. We will try to fix it. Thanks for the support."
+            android:gravity="center"
+            android:justificationMode="inter_word"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
@@ -47,7 +48,6 @@
         android:layout_width="300dp"
         android:layout_height="75dp"
         android:text="RETURN"
-        android:backgroundTint="@color/red"
         android:textColor="@color/white"
         android:textStyle="bold"
         android:layout_marginTop="15dp"

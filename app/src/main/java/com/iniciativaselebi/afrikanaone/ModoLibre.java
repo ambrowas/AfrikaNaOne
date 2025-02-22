@@ -168,7 +168,7 @@ public class ModoLibre extends AppCompatActivity {
 
     private void displayExistingUser(String savedName) {
         // Display the greeting and record
-        String message = "¡Hello there " + savedName + "!";
+        String message = "¡Ambolan " + savedName + "!";
         TextViewSaludo2.setText(message);
         button_save.setText("SWITCH PLAYER");
         highScore = sharedPreferences.getInt("highscore", 0);

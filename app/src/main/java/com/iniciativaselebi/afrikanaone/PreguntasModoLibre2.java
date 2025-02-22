@@ -16,6 +16,8 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -87,6 +89,9 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
 
     private Dialog progressDialog;
 
+    private Handler vibrationHandler = new Handler(Looper.getMainLooper());
+    private Runnable vibrationRunnable;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +117,59 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
         } else {
             checkForLocalQuestions();
         }
+    }
+
+    private void startVibrationReminder() {
+        vibrationRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!answered) { // Only vibrate if the user hasn't answered
+                    Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                    if (vibrator != null) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE));
+                    }
+                    buttonconfirmar.animate().scaleX(1.1f).scaleY(1.1f).setDuration(300).withEndAction(() ->
+                            buttonconfirmar.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300)
+                    );
+                    vibrationHandler.postDelayed(this, 3000); // Repeat every 3 seconds
+                }
+            }
+        };
+        vibrationHandler.postDelayed(vibrationRunnable, 3000); // Initial delay of 3 seconds
+    }
+
+    // Function to stop the vibration reminder
+    private void stopVibrationReminder() {
+        vibrationHandler.removeCallbacks(vibrationRunnable);
+    }
+
+    // Modify `setupButtonListeners` to integrate the vibration feature
+    private void setupButtonListeners() {
+        startVibrationReminder(); // Start vibrating the button when the question is displayed
+
+        buttonconfirmar.setOnClickListener(view -> {
+            if (!answered) {
+                if (radio_button1.isChecked() || radio_button2.isChecked() || radio_button3.isChecked()) {
+                    countDownTimer.cancel();
+                    checkAnswer();
+                    stopVibrationReminder(); // Stop vibrating once the user confirms
+                    buttonconfirmar.setText(questionCounter < QUESTIONS_PER_BATCH ? "NEXT" : "FINISH");
+                } else {
+                    Sounds.playWarningSound(getApplicationContext());
+                    Toast.makeText(PreguntasModoLibre2.this, "FEAR NOT. MAKE A CHOICE.", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                if (questionCounter < QUESTIONS_PER_BATCH) {
+                    buttonconfirmar.setText("CONFIRM");
+                    Sounds.playSwooshSound(getApplicationContext());
+                    showNextQuestion();
+                    startVibrationReminder(); // Restart vibration for the next question
+                } else {
+                    Sounds.playSwooshSound(getApplicationContext());
+                    finishQuiz();
+                }
+            }
+        });
     }
 
     private void initViews() {
@@ -287,30 +345,6 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
         finish();
     }
 
-    private void setupButtonListeners() {
-        buttonconfirmar.setOnClickListener(view -> {
-            if (!answered) {
-                if (radio_button1.isChecked() || radio_button2.isChecked() || radio_button3.isChecked()) {
-                    countDownTimer.cancel();
-                    checkAnswer();
-                    buttonconfirmar.setText(questionCounter < QUESTIONS_PER_BATCH ? "NEXT" : "FINISH");
-
-                } else {
-                    Sounds.playWarningSound(getApplicationContext());
-                    Toast.makeText(PreguntasModoLibre2.this, "FEAR NOT. MAKE A CHOICE.", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                if (questionCounter < QUESTIONS_PER_BATCH) {
-                    buttonconfirmar.setText("CONFIRM");
-                    Sounds.playSwooshSound(getApplicationContext());
-                    showNextQuestion();
-                } else {
-                    Sounds.playSwooshSound(getApplicationContext());
-                    finishQuiz();
-                }
-            }
-        });
-    }
 
     private void setupRadioButtonListeners() {
         radio_group.setOnCheckedChangeListener((group, checkedId) -> {

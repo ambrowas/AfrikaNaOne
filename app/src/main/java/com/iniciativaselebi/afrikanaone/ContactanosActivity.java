@@ -1,6 +1,8 @@
 package com.iniciativaselebi.afrikanaone;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 
 public class ContactanosActivity extends AppCompatActivity {
@@ -25,19 +28,36 @@ public class ContactanosActivity extends AppCompatActivity {
     private Animation pulseAnimation;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contactanos);
 
         TextView textview_contactanos = (TextView) findViewById(R.id.textview_contactanos);
         Typewriter typewriter = new Typewriter(textview_contactanos);
-        typewriter.animateText("For questions, comments, suggestions, proposals, corrections, complaints, insults, intimidations and/or grievances kindly press the icon below to contact us via whatsapp.We will try to fix it. Thanks for the support");
+        typewriter.animateText("For questions, comments and/or suggestions,  kindly press the icon below to contact us via whatsapp.We will try to fix it. " +
+                "Thanks for the support");
 
         swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
         buttonvolver3 = (Button) findViewById(R.id.buttonvolver3);
         pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.pulse_animation);
+
+
+        // 🔹 Reset the button completely
+        buttonvolver3.setBackground(null); // Removes any previous styling
+        buttonvolver3.setBackgroundColor(Color.TRANSPARENT); // Ensures no default color
+
+// 🔹 Apply Rounded Borders to the Return Button
+        GradientDrawable border = new GradientDrawable();
+        border.setShape(GradientDrawable.RECTANGLE);
+        border.setCornerRadius(25); // Rounded corners
+        border.setStroke(5, Color.WHITE); // White border with 5dp thickness
+        border.setColor(ContextCompat.getColor(this, R.color.black)); // Correct Red Background
+
+        buttonvolver3.setBackground(border);
+
         buttonvolver3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,9 +76,6 @@ public class ContactanosActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
 
     private void openWhatsapp() {
         playSwoosh();

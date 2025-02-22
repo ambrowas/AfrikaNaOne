@@ -1,6 +1,8 @@
 package com.iniciativaselebi.afrikanaone;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 
 public class Menuprincipal extends AppCompatActivity {
@@ -65,6 +68,16 @@ public class Menuprincipal extends AppCompatActivity {
             });
         }
 
+    // Method to apply rounded border
+    private void applyRoundedBorder(Button button) {
+        GradientDrawable border = new GradientDrawable();
+        border.setShape(GradientDrawable.RECTANGLE);
+        border.setCornerRadius(25); // Rounded corners
+        border.setStroke(5, Color.WHITE); // White border
+        border.setColor(ContextCompat.getColor(this, R.color.green)); // Background color
+
+        button.setBackground(border);
+    }
     private void playSwoosh() {
         if (swooshPlayer != null) {
             swooshPlayer.seekTo(0);
