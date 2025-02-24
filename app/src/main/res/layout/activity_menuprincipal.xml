@@ -29,12 +29,10 @@
             android:layout_height="75dp"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
-            android:backgroundTint="@color/green"
             android:shadowDx="4"
             android:shadowDy="4"
             android:shadowRadius="6"
             android:text="SINGLE MODE"
-            android:textColor="@color/white"
             app:strokeWidth="3dp" />
 
         <Button
@@ -44,13 +42,11 @@
             android:layout_below="@+id/button_modolibre"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:backgroundTint="@color/blue"
             android:gravity="center"
             android:shadowDx="4"
             android:shadowDy="4"
             android:shadowRadius="6"
             android:text="COMPETITION MODE"
-            android:textColor="@color/white"
             android:textStyle="bold"
             app:strokeWidth="3dp" />
 
@@ -61,13 +57,11 @@
             android:layout_below="@+id/button_modocompeticion"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:backgroundTint="@color/red"
             android:gravity="center"
             android:shadowDx="4"
             android:shadowDy="4"
             android:shadowRadius="6"
             android:text="CONTACT US"
-            android:textColor="@color/white"
             android:textStyle="bold"
             app:strokeWidth="3dp" />
 

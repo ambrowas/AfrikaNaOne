@@ -104,9 +104,9 @@ public class ResultActivity extends AppCompatActivity {
 
         Log.d("ResultActivity", "scorePercentage: " + scorePercentage);
 
-        DisplayPuntos.setText("You nailed " + score + " correct answers");
-        DisplayErrores.setText("You made " + errores + " mistakes");
-        DisplayScore.setText("Your total score is " + scoreTotal + " points");
+        DisplayPuntos.setText("YOU GOT " + score + " CORRECT ANSWERS");
+        DisplayErrores.setText("YOU MADE " + errores + " MISTAKES");
+        DisplayScore.setText("YOUR TOTAL SCORE IS " + scoreTotal + " POINTS");
 
         updateLevelDisplay(scorePercentage);
         saveHighScore();
@@ -130,23 +130,22 @@ public class ResultActivity extends AppCompatActivity {
 
     private void updateLevelDisplay(int scorePercentage) {
         if (scorePercentage <= 50) {
-            DisplayNivel.setText("IT'S PEOPLE LIKE YOU HOLDING AFRICA BACK");
+            DisplayNivel.setText(LevelMessages.getRandomFailureMessage());
             trofeo.setImageResource(R.drawable.beginer);
             applyFadeInBlinkingEffect(trofeo);
             playBeginnerSound();
         } else if (scorePercentage < 90) {
-            DisplayNivel.setText("NOT BAD, BUT YOU COULD DO MORE FOR THE CONTINENT");
+            DisplayNivel.setText(LevelMessages.getRandomAverageMessage());
             trofeo.setImageResource(R.drawable.average);
             applyFadeInBlinkingEffect(trofeo);
             playAverageSound();
         } else {
-            DisplayNivel.setText("FANTASTIC. WE NEED MORE AFRICANS LIKE YOU");
+            DisplayNivel.setText(LevelMessages.getRandomSuccessMessage());
             trofeo.setImageResource(R.drawable.expert);
             applyFadeInBlinkingEffect(trofeo);
             playExpertSound();
         }
     }
-
     private void applyFadeInBlinkingEffect(ImageView imageView) {
         // Load the animations
         Animation pulseAnim = AnimationUtils.loadAnimation(this, R.anim.pulse_animation); // Load the pulse animation

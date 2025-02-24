@@ -38,7 +38,9 @@ public class Menuprincipal extends AppCompatActivity {
             button_modolibre = findViewById(R.id.button_modolibre);
             button_modocompeticion = findViewById(R.id.button_modocompeticion);
             button_contactanos = findViewById(R.id.button_contactanos);
-            button_contactanos.setOnClickListener(new View.OnClickListener() {
+
+
+        button_contactanos.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     playSwoosh();
@@ -65,19 +67,11 @@ public class Menuprincipal extends AppCompatActivity {
                     Intent intent = new Intent(Menuprincipal.this, ModoLibre.class);
                     startActivity(intent);
                 }
+
             });
         }
 
-    // Method to apply rounded border
-    private void applyRoundedBorder(Button button) {
-        GradientDrawable border = new GradientDrawable();
-        border.setShape(GradientDrawable.RECTANGLE);
-        border.setCornerRadius(25); // Rounded corners
-        border.setStroke(5, Color.WHITE); // White border
-        border.setColor(ContextCompat.getColor(this, R.color.green)); // Background color
 
-        button.setBackground(border);
-    }
     private void playSwoosh() {
         if (swooshPlayer != null) {
             swooshPlayer.seekTo(0);

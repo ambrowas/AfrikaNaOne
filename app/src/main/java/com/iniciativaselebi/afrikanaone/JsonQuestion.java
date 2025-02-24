@@ -11,6 +11,7 @@ public class JsonQuestion {
     private String answer;  // Corresponds to the 'answer' field in Firestore
     private Map<String, String> options;  // To store the options 'a', 'b', 'c'
     private Date createdAt;  // To store timestamp from Firestore
+    private String explanation;  // New field to store explanations
 
     // No-argument constructor (required for Firebase)
     public JsonQuestion() {
@@ -49,8 +50,6 @@ public class JsonQuestion {
         this.question = question;
     }
 
-
-
     public String getAnswer() {
         return answer;
     }
@@ -73,6 +72,14 @@ public class JsonQuestion {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getExplanation() {
+        return explanation;
+    }
+
+    public void setExplanation(String explanation) {
+        this.explanation = explanation;
     }
 
     // Helper methods to get options A, B, C

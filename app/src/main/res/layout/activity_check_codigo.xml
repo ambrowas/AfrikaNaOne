@@ -67,7 +67,6 @@
         android:layout_height="75dp"
         android:text="VALIDATE"
         android:gravity="center"
-        android:backgroundTint="@color/green"
         android:layout_centerHorizontal="true"
         app:strokeWidth="3dp"
         android:textColor="@color/white"
@@ -82,7 +81,7 @@
         android:layout_width="300dp"
         android:layout_height="75dp"
         android:text="RETURN"
-        android:backgroundTint="@color/red"
+
         android:gravity="center"
         android:layout_centerHorizontal="true"
         app:strokeWidth="3dp"

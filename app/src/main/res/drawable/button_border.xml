@@ -6,7 +6,7 @@
     <solid android:color="@color/red"/>
 
     <!-- Border color and thickness -->
-    <stroke android:width="3dp" android:color="@android:color/white"/>
+    <stroke android:width="5dp" android:color="@android:color/white"/>
 
     <!-- Rounded corners -->
     <corners android:radius="25dp"/>

@@ -23,16 +23,21 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.google.common.reflect.TypeToken;
@@ -70,7 +75,7 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
     private static final long COUNTDOWN_IN_MILLIS = 15000; // Countdown time in milliseconds
 
     // UI elements
-    private TextView textviewpuntuacion, textviewcontadorpreguntas, textviewaciertos, textviewtiempo, textviewpregunta;
+    private TextView textviewpuntuacion, textviewcontadorpreguntas, textviewaciertos, textviewtiempo, textviewpregunta, textViewExplanation;
 
     private ImageView quizImageLibre;
     private RadioGroup radio_group;
@@ -118,23 +123,35 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
             checkForLocalQuestions();
         }
     }
-
     private void startVibrationReminder() {
         vibrationRunnable = new Runnable() {
+            private boolean hasVibrated = false; // Flag to track if vibration has occurred
+            private int elapsedTime = 0; // Track elapsed time in milliseconds
+
             @Override
             public void run() {
-                if (!answered) { // Only vibrate if the user hasn't answered
-                    Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-                    if (vibrator != null) {
-                        vibrator.vibrate(VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE));
+                if (!answered) { // Only animate if the user hasn't answered
+                    // Animate button (scale effect)
+                    buttonconfirmar.animate()
+                            .scaleX(1.1f).scaleY(1.1f).setDuration(300)
+                            .withEndAction(() -> buttonconfirmar.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300));
+
+                    elapsedTime += 3000; // Increase elapsed time by 3 seconds
+
+                    if (!hasVibrated && elapsedTime >= 10000) { // Vibrate only after 10 seconds
+                        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                        if (vibrator != null) {
+                            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                        }
+                        hasVibrated = true; // Prevent further vibrations
                     }
-                    buttonconfirmar.animate().scaleX(1.1f).scaleY(1.1f).setDuration(300).withEndAction(() ->
-                            buttonconfirmar.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300)
-                    );
-                    vibrationHandler.postDelayed(this, 3000); // Repeat every 3 seconds
+
+                    // Continue animating every 3 seconds
+                    vibrationHandler.postDelayed(this, 3000);
                 }
             }
         };
+
         vibrationHandler.postDelayed(vibrationRunnable, 3000); // Initial delay of 3 seconds
     }
 
@@ -156,7 +173,7 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
                     buttonconfirmar.setText(questionCounter < QUESTIONS_PER_BATCH ? "NEXT" : "FINISH");
                 } else {
                     Sounds.playWarningSound(getApplicationContext());
-                    Toast.makeText(PreguntasModoLibre2.this, "FEAR NOT. MAKE A CHOICE.", Toast.LENGTH_SHORT).show();
+                    showCustomToast("FEAR NOT.MAKE A CHOICE");
                 }
             } else {
                 if (questionCounter < QUESTIONS_PER_BATCH) {
@@ -172,6 +189,19 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
         });
     }
 
+    private void showCustomToast(String message) {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.toast_custom, findViewById(R.id.toast_layout));
+
+        TextView text = layout.findViewById(R.id.toast_text);
+        text.setText(message);
+
+        Toast toast = new Toast(getApplicationContext());
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(layout);
+        toast.show();
+    }
+
     private void initViews() {
         quizImageLibre = findViewById(R.id.quizImageLibre);
         textviewpuntuacion = findViewById(R.id.textviewpuntuacion);
@@ -184,6 +214,7 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
         radio_button2 = findViewById(R.id.radio_button2);
         radio_button3 = findViewById(R.id.radio_button3);
         buttonconfirmar = findViewById(R.id.buttonconfirmar);
+        textViewExplanation = findViewById(R.id.textViewExplanation);
     }
 
     private void showProgressDialog() {
@@ -229,6 +260,9 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
             if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     JsonQuestion question = document.toObject(JsonQuestion.class);
+                    //  LOG QUESTION DATA (including explanation)
+                    Log.d("Firestore", "Question: " + question.getQuestion() +
+                            " | Explanation: " + question.getExplanation());
                     questionList.add(question);
                 }
 
@@ -345,7 +379,6 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
         finish();
     }
 
-
     private void setupRadioButtonListeners() {
         radio_group.setOnCheckedChangeListener((group, checkedId) -> {
             for (int i = 0; i < group.getChildCount(); i++) {
@@ -353,10 +386,10 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
                 if (child instanceof RadioButton) {
                     RadioButton radioButton = (RadioButton) child;
                     if (radioButton.getId() == checkedId) {
-                        // Apply the selected state
+                        // Apply the selected background
                         radioButton.setBackgroundResource(R.drawable.radio_normal2);
                     } else {
-                        // Reset to default state
+                        // Reset to default background
                         radioButton.setBackgroundResource(R.drawable.radio_selector);
                     }
                 }
@@ -394,7 +427,7 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
                 timeoutText.setSpan(new StyleSpan(Typeface.BOLD), 0, timeoutText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 // Apply red color to the text
-                int redColor = getResources().getColor(R.color.red); // Replace customRed with your defined red color in colors.xml
+                int redColor = getResources().getColor(R.color.incorrect_answer_background); // Replace customRed with your defined red color in colors.xml
                 timeoutText.setSpan(new ForegroundColorSpan(redColor), 0, timeoutText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 // Set the formatted text to textviewpregunta
@@ -441,33 +474,9 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
     private void updateCountdownText() {
         int seconds = (int) (timeLeftInMillis / 1000);
         textviewtiempo.setText(String.format(Locale.getDefault(), "%02d", seconds));
-        textviewtiempo.setTextColor(seconds <= 5 ? ContextCompat.getColor(this, R.color.red) : ContextCompat.getColor(this, R.color.white));
+        textviewtiempo.setTextColor(seconds <= 5 ? ContextCompat.getColor(this, R.color.incorrect_answer_background) : ContextCompat.getColor(this, R.color.white));
     }
 
-    private void showNextQuestion() {
-        if (questionCounter < QUESTIONS_PER_BATCH) {  // Since questionCounter starts at 0, use < instead of <=
-            currentQuestion = currentBatch.get(questionCounter);  // Directly use questionCounter as the index
-            Log.d("batchFlow", "Presenting question number: " + currentQuestion.getNumber() + " from batch number: " + (batchIndex + 1));
-            Log.d("questionFlow", "Current QuestionCounter: " + (questionCounter + 1) + " / Total Batch Questions: " + QUESTIONS_PER_BATCH);
-            // Log.d("batchFlow", "Presenting question " + (questionCounter + 1) + " of batch " + (batchIndex + 1) + ": " + currentQuestion.getQuestion());
-
-            resetFeedbackTextColor(); // Reset text color to black before showing the next question
-
-            updateUIWithCurrentQuestion();
-            updateQuestionCounterUI();
-            resetRadioButtonColors();
-            startCountDown();
-            flipImage(quizImageLibre);
-            answered = false;
-
-            questionCounter++;  // Increment only after showing the question
-        } else {
-            Log.d("batchFlow", "Completed current batch. Moving to the next batch.");
-            finishQuiz();  // Complete the quiz for the batch and proceed
-        }
-    }
-
-    // Add a helper method to reset the text color
     private void resetFeedbackTextColor() {
         textviewpregunta.setTextColor(ContextCompat.getColor(this, R.color.black)); // Resets to default black
     }
@@ -514,6 +523,59 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
         radio_group.clearCheck();
     }
 
+    private void showNextQuestion() {
+        RadioGroup radioGroup = findViewById(R.id.radio_group);
+        TextView textViewExplanation = findViewById(R.id.textViewExplanation);
+        Button buttonConfirmar = findViewById(R.id.buttonconfirmar);
+
+        // Ensure smooth removal of explanation
+        if (textViewExplanation.getVisibility() == View.VISIBLE) {
+            Animation fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out);
+            fadeOut.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    textViewExplanation.setVisibility(View.GONE);
+
+                    // ✅ Move button immediately back under radioGroup
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) buttonConfirmar.getLayoutParams();
+                    params.addRule(RelativeLayout.BELOW, R.id.radio_group);
+                    buttonConfirmar.setLayoutParams(params);
+
+                    // ✅ Restore radio group with a fade-in effect
+                    radioGroup.setVisibility(View.VISIBLE);
+                    Animation fadeIn = AnimationUtils.loadAnimation(PreguntasModoLibre2.this, R.anim.fade_in);
+                    radioGroup.startAnimation(fadeIn);
+                }
+
+                @Override public void onAnimationStart(Animation animation) {}
+                @Override public void onAnimationRepeat(Animation animation) {}
+            });
+
+            textViewExplanation.startAnimation(fadeOut);
+        } else {
+            // If no explanation was shown, directly reposition button and show radio buttons
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) buttonConfirmar.getLayoutParams();
+            params.addRule(RelativeLayout.BELOW, R.id.radio_group);
+            buttonConfirmar.setLayoutParams(params);
+            radioGroup.setVisibility(View.VISIBLE);
+        }
+
+        // Proceed to the next question
+        if (questionCounter < QUESTIONS_PER_BATCH) {
+            currentQuestion = currentBatch.get(questionCounter);
+            updateUIWithCurrentQuestion();
+            updateQuestionCounterUI();
+            resetFeedbackTextColor();
+            resetRadioButtonColors();
+            startCountDown();
+            flipImage(quizImageLibre);
+            answered = false;
+            questionCounter++;
+        } else {
+            finishQuiz();
+        }
+    }
+
     private void checkAnswer() {
         answered = true;
         RadioButton selectedRadioButton = findViewById(radio_group.getCheckedRadioButtonId());
@@ -539,7 +601,7 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
             feedbackText = new SpannableString("NOPE. THAT'S NOT IT");
             feedbackText.setSpan(new StyleSpan(Typeface.BOLD), 0, feedbackText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-            feedbackColor = ContextCompat.getColor(this, R.color.red); // Use red color for incorrect answers
+            feedbackColor = ContextCompat.getColor(this, R.color.incorrect_answer_background); // Use red color for incorrect answers
             textviewpregunta.setText(feedbackText);
             playIncorrectAnswerSound();
         }
@@ -550,8 +612,46 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
         // Update score and correct answers
         textviewpuntuacion.setText("SCORE: " + scoretotal);
         textviewaciertos.setText("CORRECT ANSWERS: " + score);
+
+        showExplanation();
     }
 
+    private void showExplanation() {
+        TextView textViewExplanation = findViewById(R.id.textViewExplanation);
+        Button buttonConfirmar = findViewById(R.id.buttonconfirmar);
+        RadioGroup radioGroup = findViewById(R.id.radio_group);
+
+        if (currentQuestion.getExplanation() != null && !currentQuestion.getExplanation().isEmpty()) {
+            // Fade out radio buttons smoothly
+            Animation fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out);
+            fadeOut.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    radioGroup.setVisibility(View.GONE);
+                    textViewExplanation.setText(currentQuestion.getExplanation());
+
+                    // Now fade in the explanation
+                    textViewExplanation.setVisibility(View.VISIBLE);
+                    Animation fadeIn = AnimationUtils.loadAnimation(PreguntasModoLibre2.this, R.anim.fade_in);
+                    textViewExplanation.startAnimation(fadeIn);
+
+                    // ✅ Delay repositioning button slightly to avoid overlap
+                    new Handler().postDelayed(() -> {
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) buttonConfirmar.getLayoutParams();
+                        params.addRule(RelativeLayout.BELOW, R.id.textViewExplanation);
+                        buttonConfirmar.setLayoutParams(params);
+                    }, 150); // 150ms delay
+                }
+
+                @Override
+                public void onAnimationStart(Animation animation) {}
+                @Override
+                public void onAnimationRepeat(Animation animation) {}
+            });
+
+            radioGroup.startAnimation(fadeOut);
+        }
+    }
     private void playCorrectAnswerSound() {
         if (mediaPlayerRight == null) {
             mediaPlayerRight = MediaPlayer.create(this, R.raw.right);

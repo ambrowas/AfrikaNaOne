@@ -79,9 +79,9 @@
         android:layout_width="250dp"
         android:layout_height="55dp"
         android:layout_gravity="center_horizontal"
-        android:backgroundTint="@color/blue"
         android:gravity="center"
         android:text="SAVE"
+        android:textColor="@color/white"
         android:shadowDx="4"
         android:shadowDy="4"
         android:shadowRadius="6"
@@ -93,7 +93,6 @@
         android:layout_width="300dp"
         android:layout_height="75dp"
         android:layout_gravity="center_horizontal"
-        android:backgroundTint="@color/green"
         android:layout_below="@id/TextViewRecord"
         android:gravity="center"
         android:textColor="@color/white"
@@ -114,7 +113,6 @@
         android:layout_marginTop="15dp"
         android:layout_marginBottom="10dp"
         android:layout_gravity="center_horizontal"
-        android:backgroundTint="@color/red"
         app:strokeWidth="3dp"/>
 
 

@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/table_border"
+    android:background="@drawable/radio_selector"
     android:padding="16dp"
     android:orientation="vertical">
 
@@ -13,6 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="All Batches Completed"
+        android:textColor="@color/white"
         android:textSize="18sp"
         android:textStyle="bold"
         android:gravity="center"
@@ -24,6 +25,7 @@
         android:layout_height="wrap_content"
         android:text="You have completed the Single Mode.
                        You should try Competition Mode."
+        android:textColor="@color/white"
         android:textSize="16sp"
         android:layout_marginTop="8dp"
         android:gravity="center" />

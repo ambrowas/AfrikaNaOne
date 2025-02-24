@@ -20,7 +20,32 @@
     <color name="selected_radio_button_background">#073718</color>
     <color name="correct_answer_background">#064509</color>
     <color name="incorrect_answer_background">#750F07</color>
+    <!-- Soft Green (Primary) -->
+    <color name="primaryColor">#CCD5AE</color>
+
+    <!-- Pale Green (Variant) -->
+    <color name="primaryVariant">#E9EDC9</color>
+
+    <!-- Soft Yellow (Accent) -->
+    <color name="accentColor">#FEFAE0</color>
+
+    <!-- Cream (Background) -->
+    <color name="backgroundColor">#FAEDCD</color>
+
+        <!-- Warm Brown (Button Background) -->
+        <color name="buttonColor">#797D62</color>
+
+    <!-- Ocre (ButtonOption Background) -->
+    <color name="OptionColor">#585123</color>
+
+    <!-- Reddish (SelectedOption Background) -->
+    <color name="SelectedOptionColor">#540804</color>
 
 
+    <!-- White for Borders -->
+    <color name="buttonBorder">#FFFFFF</color>
 
+    <!-- Text Colors -->
+    <color name="textPrimary">#4A4A4A</color> <!-- Dark Gray for contrast -->
+    <color name="textSecondary">#6B6B6B</color>
 </resources>

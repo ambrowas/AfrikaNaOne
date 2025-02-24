@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="true">
-        <shape android:shape="rectangle">
-            <solid android:color="#073718" />
-            <corners android:radius="8dp" />
-        </shape>
-    </item>
-    <item>
-        <shape android:shape="rectangle">
-            <stroke android:width="2dp" android:color="#007BFF" />
-            <corners android:radius="8dp" />
-        </shape>
-    </item>
-</selector>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Default Background -->
+    <solid android:color="@color/OptionColor"/> <!-- Default Ocre Background -->
+
+    <!-- Rounded Corners -->
+    <corners android:radius="20dp"/>
+
+    <!-- Border -->
+    <stroke android:width="2dp" android:color="@color/white"/>
+
+</shape>

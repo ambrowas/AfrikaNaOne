@@ -93,6 +93,22 @@
     android:textColor="@color/black"
     android:textSize="18sp" />
 
+
+        <TextView
+            android:id="@+id/textViewExplanation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:layout_below="@id/textviewpregunta"
+            android:fontFamily="@font/buddychampion"
+            android:text="Atracó en la Española con tres naves, la Pinta, la Niña y la Santa María"
+            android:textSize="16sp"
+            android:visibility="gone"
+            android:paddingTop="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:gravity="start"
+            android:textAlignment="viewStart" />
     <RadioGroup
             android:id="@+id/radio_group"
             android:layout_width="wrap_content"
@@ -165,13 +181,14 @@
             android:layout_height="75dp"
             android:layout_marginTop="50dp"
             android:elevation="4dp"
-            android:background="@drawable/radio_normal3"
             app:backgroundTint="@null"
             android:textStyle="bold"
             android:textAllCaps="true"
             android:gravity="center"
             android:text="CONFIRM"
-            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/radio_group"/>
 

@@ -21,7 +21,8 @@
         android:id="@+id/TextViewClicAqui"
         android:text="CLICK HERE TO START"
         android:fontFamily="@font/buddychampion"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
+        android:textStyle="bold"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="22sp"
@@ -33,7 +34,7 @@
     <TextView
         android:id="@+id/TextViewProverb"
         android:text="AFRICAN PROVERB"
-        android:fontFamily="@font/buddychampion"
+        android:fontFamily="@font/permanentmarkerregular"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:layout_width="match_parent"

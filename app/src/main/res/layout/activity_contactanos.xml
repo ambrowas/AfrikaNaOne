@@ -42,19 +42,17 @@
             android:background="@android:color/transparent"
         tools:ignore="SpeakableTextPresentCheck" />
 
-
         <Button
-        android:id="@+id/buttonvolver3"
-        android:layout_width="300dp"
-        android:layout_height="75dp"
-        android:text="RETURN"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="10dp"
-        android:layout_gravity="center_horizontal"
-        app:strokeWidth="3dp"/>
+            android:id="@+id/buttonvolver3"
+            android:layout_width="300dp"
+            android:layout_height="75dp"
+            android:text="RETURN"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:background="@drawable/button_rounded"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="center_horizontal"/>
 
-
-</LinearLayout>
+    </LinearLayout>
 </ScrollView>

@@ -232,7 +232,6 @@
         android:layout_marginTop="100dp"
         android:freezesText="true"
         android:gravity="center"
-        android:backgroundTint="@color/red"
         android:text="END GAME"
         android:textColor="@color/white"
         android:textStyle="bold"
