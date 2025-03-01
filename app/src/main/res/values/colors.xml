@@ -41,6 +41,8 @@
     <!-- Reddish (SelectedOption Background) -->
     <color name="SelectedOptionColor">#540804</color>
 
+    <color name="toastBackgroundColor">#540804</color>
+
 
     <!-- White for Borders -->
     <color name="buttonBorder">#FFFFFF</color>

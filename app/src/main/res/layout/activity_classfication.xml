@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="40dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/profilepic"
@@ -181,9 +181,9 @@
                 android:id="@+id/buttoncodigocobro"
                 android:layout_width="300dp"
                 android:layout_height="75dp"
+                android:layout_marginTop="10dp"
                 android:freezesText="true"
                 android:text="CASH OUT"
-                android:backgroundTint="@color/green"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 app:strokeWidth="3dp" />
@@ -192,24 +192,26 @@
                 android:id="@+id/buttonleaderboard"
                 android:layout_width="300dp"
                 android:layout_height="75dp"
+                android:layout_marginTop="10dp"
                 android:freezesText="true"
                 android:text="LEADERBOARD"
-                android:backgroundTint="@color/blue"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 app:strokeWidth="3dp" />
 
             <Button
                 android:id="@+id/buttonmenuprincipal"
+                android:layout_marginTop="10dp"
                 android:layout_width="300dp"
                 android:layout_height="75dp"
-                android:backgroundTint="@color/red"
                 android:freezesText="true"
                 android:text="MAIN MENU"
                 android:layout_gravity="center_horizontal"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 app:strokeWidth="3dp" />
+
+
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

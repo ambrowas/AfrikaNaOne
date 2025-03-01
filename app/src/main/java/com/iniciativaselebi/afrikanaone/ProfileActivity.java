@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -68,8 +69,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     
     private Uri imagePath;
-    private CircleImageView profilepic;
-
 
     Button btn_jugar, buttonatras, btn_upload, btn_borrarusuario;
     FirebaseAuth mAuth;
@@ -86,7 +85,7 @@ public class ProfileActivity extends AppCompatActivity {
     Long positionInLeaderboard;
     private boolean isImageSet = false;
 
-    private ImageView imageviewFlag;
+    private ImageView imageviewFlag, profilepic;
 
     TextView textViewRecord, textViewEmail, nameTitle, textViewTelefono, textViewCiudad, textViewPais, textviewNoRanking,
     textViewPuntuacionAcumulada,textViewAciertosAcumulados, textViewFallosAcumulados, textViewPastaAcumulada ;
@@ -99,132 +98,50 @@ public class ProfileActivity extends AppCompatActivity {
 
     private ValueAnimator growAndShrinkAnimator;
 
+    private ValueAnimator flashingAnimator;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // Initialize views
-        profilepic = findViewById(R.id.profilepic);
-        textviewNoRanking = findViewById(R.id.textviewNoRanking);
-        textViewRecord = findViewById(R.id.textViewRecord);
-        imageviewFlag = findViewById(R.id.imageviewFlag);
-        buttonatras = findViewById(R.id.buttonatras);
-        btn_upload = findViewById(R.id.btn_upload);
-        btn_borrarusuario = findViewById(R.id.btn_borrarusuario);
+        // ✅ Step 1: Initialize UI elements
+        initializeViews();
 
-        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
 
-        // Initialize placeholder drawable for profile picture
+        // ✅ Step 2: Ensure profile picture always exists
+        ensureProfilePictureExists();
         placeholderDrawable = ContextCompat.getDrawable(this, R.drawable.baseline_account_circle_24);
-        if (profilepic.getDrawable() == null) {
-            profilepic.setImageDrawable(placeholderDrawable);
-            profilepic.setTag("placeholder");
+
+        // ✅ Step 3: Firebase references
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        // Firebase user and database reference
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(user.getUid());
 
-        // Set animated color cycling for textviewNoRanking
-        final int[] colors = {Color.RED, Color.GREEN, Color.BLUE};
-        animator = ValueAnimator.ofInt(colors);
-        animator.setDuration(1000);
-        animator.setEvaluator(new ArgbEvaluator());
-        animator.setRepeatCount(ValueAnimator.INFINITE);
-        animator.addUpdateListener(animation -> {
-            int color = (int) animation.getAnimatedValue();
-            textviewNoRanking.setTextColor(color);
-        });
-        animator.start();
-
-        // Fetch user data from Firebase
+        // ✅ Step 4: Fetch user data & update UI
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     User user = snapshot.getValue(User.class);
                     if (user != null) {
-                        // Populate user data into UI
-                        nameTitle = findViewById(R.id.nameTitle);
-                        nameTitle.setText(user.getFullname());
+                        updateUserUI(user); // ✅ Populate UI with user data
 
-                        textViewTelefono = findViewById(R.id.textViewTelefono);
-                        textViewTelefono.setText("TELEPHONE: " + user.getTelefono());
+                        // ✅ Fetch profile picture separately
+                        fetchProfilePicture(snapshot.child("profilePicture").getValue(String.class));
 
-                        textViewEmail= findViewById(R.id.textViewEmail);
-                        textViewEmail.setText("EMAIL: " +  user.getEmail());
+                        // ✅ Fetch country flag separately
+                        fetchCountryFlag(snapshot.child("flagUrl").getValue(String.class));
 
-                        textViewCiudad = findViewById(R.id.textViewCiudad);
-                        textViewCiudad.setText(("CITY: " + user.getCiudad()).toUpperCase());
 
-                        textViewPais = findViewById(R.id.textViewPais);
-                        textViewPais.setText(("COUNTRY: " + user.getPais()).toUpperCase());
-
-                        textViewPuntuacionAcumulada = findViewById(R.id.textViewPuntuacionAcumulada);
-                        textViewPuntuacionAcumulada.setText("TOTAL SCORE: " + user.getAccumulatedPuntuacion() + " POINTS");
-
-                        textViewAciertosAcumulados = findViewById(R.id.textViewAciertosAcumulados);
-                        textViewAciertosAcumulados.setText("TOTAL CORRECT ANSWERS: " + user.getAccumulatedAciertos());
-
-                        textViewFallosAcumulados = findViewById(R.id.textViewFallosAcumulados);
-                        textViewFallosAcumulados.setText("TOTAL INCORRECT ANSWERS: " + user.getAccumulatedFallos());
-
-                        textViewPastaAcumulada = findViewById(R.id.textViewPastaAcumulada);
-                        textViewPastaAcumulada.setText("TOTAL CASH: " + user.getAccumulatedPuntuacion() + " AFROS");
-
+                        // ✅ Ensure FCM Token & Installation ID are updated
                         updateFcmTokenIfNeeded(userRef, snapshot);
                         updateInstallationIdIfNeeded(userRef, snapshot);
-
-                        // Fetch profile picture
-                        String profilePicUrl = snapshot.child("profilePicture").getValue(String.class);
-                        if (profilePicUrl != null && !profilePicUrl.isEmpty()) {
-                            Picasso.get().load(profilePicUrl).into(profilepic, new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    isImageSet = true;
-                                    profilepic.setTag("userImage");
-                                    stopGrowAndShrinkEffect(); // Stop the animation if the image is successfully loaded
-                                }
-
-                                @Override
-                                public void onError(Exception e) {
-                                    isImageSet = false;
-                                    profilepic.setImageDrawable(placeholderDrawable);
-                                    profilepic.setTag("placeholder");
-                                    startProfilePictureAnimationIfNotSet(); // Start animation for placeholder
-                                }
-                            });
-                        } else {
-                            isImageSet = false;
-                            profilepic.setImageDrawable(placeholderDrawable);
-                            profilepic.setTag("placeholder");
-                            startProfilePictureAnimationIfNotSet(); // Start animation for placeholder
-                        }
-                        // Fetch and display flag
-                        String flagUrl = snapshot.child("flagUrl").getValue(String.class);
-                        if (flagUrl != null && !flagUrl.isEmpty()) {
-                            Picasso.get()
-                                    .load(flagUrl)
-                                    .placeholder(R.drawable.other)
-                                    .error(R.drawable.other)
-                                    .into(imageviewFlag, new Callback() {
-                                        @Override
-                                        public void onSuccess() {
-                                            addBlackBorderToImageView(imageviewFlag, dpToPx(2, getApplicationContext()));
-                                        }
-
-                                        @Override
-                                        public void onError(Exception e) {
-                                            imageviewFlag.setImageResource(R.drawable.other);
-                                            addBlackBorderToImageView(imageviewFlag, dpToPx(2, getApplicationContext()));
-                                        }
-                                    });
-                        } else {
-                            imageviewFlag.setImageResource(R.drawable.other);
-                            addBlackBorderToImageView(imageviewFlag, dpToPx(2, getApplicationContext()));
-                        }
                     }
                 }
             }
@@ -235,19 +152,154 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        // Button click handlers
+        // ✅ Step 5: Load leaderboard position & highest score
+        getPositionInLeaderboard();
+        loadUserHighestScore();
+
+        // ✅ Step 6: Setup buttons
+        setupButtonListeners();
+        checkProfilePictureStatus();
+    }
+
+    private void checkProfilePictureStatus() {
+        if (!isImageSet || isUsingPlaceholder(profilepic.getDrawable())) {
+            startFlashingEffect(); // ✅ Start flashing if no profile picture
+        } else {
+            stopFlashingEffect(); // ✅ Stop flashing when the picture is set
+        }
+    }
+
+    private void startFlashingEffect() {
+        if (profilepic.getTag() == null || !(boolean) profilepic.getTag()) {
+            flashingAnimator = ValueAnimator.ofFloat(1f, 0.5f, 1f);
+            flashingAnimator.setDuration(1000); // ✅ Slow down flashing
+            flashingAnimator.setRepeatCount(ValueAnimator.INFINITE);
+            flashingAnimator.setRepeatMode(ValueAnimator.REVERSE);
+
+            flashingAnimator.addUpdateListener(animation -> {
+                float alpha = (float) animation.getAnimatedValue();
+                profilepic.setAlpha(alpha);
+            });
+
+            flashingAnimator.start();
+
+            // ✅ Change background to "SelectedOptionColor"
+            profilepic.setBackgroundColor(ContextCompat.getColor(this, R.color.SelectedOptionColor));
+            profilepic.setTag(true); // Mark flashing as active
+        }
+    }
+
+    private void stopFlashingEffect() {
+        if (flashingAnimator != null && flashingAnimator.isRunning()) {
+            flashingAnimator.cancel();
+            profilepic.setAlpha(1f); // ✅ Restore full visibility
+
+            // ✅ Reset background color to "black"
+            profilepic.setBackgroundColor(ContextCompat.getColor(this, R.color.black));
+
+            profilepic.setTag(false); // Mark flashing as inactive
+        }
+    }
+    private void initializeViews() {
+        profilepic = findViewById(R.id.profilepic);
+        textviewNoRanking = findViewById(R.id.textviewNoRanking);
+        textViewRecord = findViewById(R.id.textViewRecord);
+        imageviewFlag = findViewById(R.id.imageviewFlag);
+        buttonatras = findViewById(R.id.buttonatras);
+        btn_upload = findViewById(R.id.btn_upload);
+        btn_borrarusuario = findViewById(R.id.btn_borrarusuario);
+        swooshPlayer = MediaPlayer.create(this, R.raw.swoosh);
+
+        // Add border to the flag image
+        addBlackBorderToImageView(imageviewFlag, dpToPx(3, getApplicationContext()));
+
+        // Ensure profilePic settings
+        if (profilepic != null) {
+            profilepic.setScaleType(ImageView.ScaleType.FIT_XY);
+            profilepic.setClipToOutline(true);
+            profilepic.setAdjustViewBounds(false);
+        }
+    }
+    private void ensureProfilePictureExists() {
+        if (profilepic == null) {
+            Log.e("ProfileActivity", "profilepic ImageView is null!");
+            return;
+        }
+
+        if (profilepic.getDrawable() == null) {
+            profilepic.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.baseline_account_circle_24));
+        }
+    }
+    private void updateUserUI(User user) {
+        ((TextView) findViewById(R.id.nameTitle)).setText(user.getFullname());
+        ((TextView) findViewById(R.id.textViewTelefono)).setText("TELEPHONE: " + user.getTelefono());
+        ((TextView) findViewById(R.id.textViewEmail)).setText("EMAIL: " + user.getEmail());
+        ((TextView) findViewById(R.id.textViewCiudad)).setText(("CITY: " + user.getCiudad()).toUpperCase());
+        ((TextView) findViewById(R.id.textViewPais)).setText(("COUNTRY: " + user.getPais()).toUpperCase());
+        ((TextView) findViewById(R.id.textViewPuntuacionAcumulada)).setText("TOTAL SCORE: " + user.getAccumulatedPuntuacion() + " POINTS");
+        ((TextView) findViewById(R.id.textViewAciertosAcumulados)).setText("TOTAL CORRECT ANSWERS: " + user.getAccumulatedAciertos());
+        ((TextView) findViewById(R.id.textViewFallosAcumulados)).setText("TOTAL INCORRECT ANSWERS: " + user.getAccumulatedFallos());
+        ((TextView) findViewById(R.id.textViewPastaAcumulada)).setText("TOTAL CASH: " + user.getAccumulatedPuntuacion() + " AFROS");
+    }
+    private void fetchProfilePicture(String profilePicUrl) {
+        if (profilePicUrl != null && !profilePicUrl.isEmpty()) {
+            Picasso.get().load(profilePicUrl).into(profilepic, new Callback() {
+                @Override
+                public void onSuccess() {
+                    isImageSet = true;
+                    profilepic.setTag("userImage");
+                    stopFlashingEffect(); // ✅ Stop flashing when the picture is set
+                    checkProfilePictureStatus(); // ✅ Ensure status is updated
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    setProfilePicturePlaceholder();
+                }
+            });
+        } else {
+            setProfilePicturePlaceholder();
+        }
+    }
+    private void setProfilePicturePlaceholder() {
+        isImageSet = false;
+        profilepic.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.baseline_account_circle_24));
+        profilepic.setTag("placeholder");
+        startProfilePictureAnimationIfNotSet();
+    }
+    private void fetchCountryFlag(String flagUrl) {
+        if (flagUrl != null && !flagUrl.isEmpty()) {
+            Picasso.get()
+                    .load(flagUrl)
+                    .placeholder(R.drawable.other)
+                    .error(R.drawable.other)
+                    .into(imageviewFlag, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            addBlackBorderToImageView(imageviewFlag, dpToPx(3, getApplicationContext()));
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            imageviewFlag.setImageResource(R.drawable.other);
+                            addBlackBorderToImageView(imageviewFlag, dpToPx(3, getApplicationContext()));
+                        }
+                    });
+        } else {
+            imageviewFlag.setImageResource(R.drawable.other);
+            addBlackBorderToImageView(imageviewFlag, dpToPx(3, getApplicationContext()));
+        }
+    }
+    private void setupButtonListeners() {
         buttonatras.setOnClickListener(v -> {
-            if (!isImageSet) {
-                showExitConfirmation();
-            } else {
-                navigateToModoCompeticion();
-            }
+            if (!isImageSet) showExitConfirmation();
+            else navigateToModoCompeticion();
         });
 
         btn_upload.setVisibility(View.INVISIBLE);
         btn_upload.setOnClickListener(v -> {
             uploadImage();
-            btn_upload.setVisibility(View.INVISIBLE); // Hide button after upload
+            btn_upload.setVisibility(View.INVISIBLE);
         });
 
         btn_borrarusuario.setOnClickListener(v -> borrarUsuario());
@@ -258,15 +310,14 @@ public class ProfileActivity extends AppCompatActivity {
             startActivityForResult(photoIntent, 1);
             btn_upload.setVisibility(View.VISIBLE);
         });
-
-        // Load leaderboard position
-        getPositionInLeaderboard();
-        loadUserHighestScore();
     }
 
-
     private void startProfilePictureAnimationIfNotSet() {
-        if (!isImageSet && isUsingPlaceholder(profilepic.getDrawable())) {
+        ensureProfilePictureExists(); // ✅ Ensure the image is set before using it
+
+        Drawable currentDrawable = profilepic.getDrawable();
+
+        if (!isImageSet && isUsingPlaceholder(currentDrawable)) {
             if (growAndShrinkAnimator == null) {
                 growAndShrinkAnimator = ValueAnimator.ofFloat(1.0f, 1.2f);
                 growAndShrinkAnimator.setDuration(500);
@@ -274,9 +325,11 @@ public class ProfileActivity extends AppCompatActivity {
                 growAndShrinkAnimator.setRepeatMode(ValueAnimator.REVERSE);
 
                 growAndShrinkAnimator.addUpdateListener(animation -> {
-                    float scale = (float) animation.getAnimatedValue();
-                    profilepic.setScaleX(scale);
-                    profilepic.setScaleY(scale);
+                    if (profilepic != null) {
+                        float scale = (float) animation.getAnimatedValue();
+                        profilepic.setScaleX(scale);
+                        profilepic.setScaleY(scale);
+                    }
                 });
             }
             growAndShrinkAnimator.start();
@@ -286,17 +339,23 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private boolean isUsingPlaceholder(Drawable drawable) {
-        if (profilepic.getDrawable() == null) {
-            return true; // No image is set
+        ensureProfilePictureExists(); // ✅ Ensure the image is set before checking
+
+        // ✅ Ensure placeholderDrawable is initialized
+        if (placeholderDrawable == null) {
+            placeholderDrawable = ContextCompat.getDrawable(this, R.drawable.baseline_account_circle_24);
         }
 
-        // Compare the current drawable with the placeholder
+        // ✅ Ensure profilepic has a drawable before checking
         Drawable currentDrawable = profilepic.getDrawable();
+        if (currentDrawable == null || placeholderDrawable == null) {
+            return true; // No image is set, return true
+        }
+
         return currentDrawable.getConstantState() != null &&
                 placeholderDrawable.getConstantState() != null &&
                 currentDrawable.getConstantState().equals(placeholderDrawable.getConstantState());
     }
-
     private void stopGrowAndShrinkEffect() {
         if (growAndShrinkAnimator != null && growAndShrinkAnimator.isRunning()) {
             growAndShrinkAnimator.cancel();
@@ -305,15 +364,28 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    // Add a border to an ImageView
     private void addBlackBorderToImageView(ImageView imageView, int borderWidth) {
+        // Create a black border drawable
         GradientDrawable borderDrawable = new GradientDrawable();
-        borderDrawable.setColor(Color.TRANSPARENT); // Transparent background
-        borderDrawable.setStroke(borderWidth, Color.BLACK); // Black border with specified width
-        imageView.setBackground(borderDrawable);
-        imageView.setPadding(borderWidth, borderWidth, borderWidth, borderWidth); // Add padding for border visibility
-    }
+        borderDrawable.setColor(Color.TRANSPARENT); // Keep background transparent
+        borderDrawable.setStroke(borderWidth, Color.BLACK); // Black border
 
+        // Get the current image as a drawable
+        Drawable originalDrawable = imageView.getDrawable();
+        if (originalDrawable == null) {
+            originalDrawable = ContextCompat.getDrawable(this, R.drawable.baseline_account_circle_24);
+        }
+
+        // Combine image and border into a LayerDrawable
+        Drawable[] layers = new Drawable[]{borderDrawable, originalDrawable};
+        LayerDrawable layerDrawable = new LayerDrawable(layers);
+
+        // Ensure the border surrounds the image
+        layerDrawable.setLayerInset(1, borderWidth, borderWidth, borderWidth, borderWidth);
+
+        // Apply the border
+        imageView.setImageDrawable(layerDrawable);
+    }
     public static int dpToPx(int dp, Context context) {
         return (int) (dp * context.getResources().getDisplayMetrics().density);
     }
@@ -321,8 +393,9 @@ public class ProfileActivity extends AppCompatActivity {
     private void showExitConfirmation() {
         DialogInterface.OnClickListener positiveAction = (dialog, which) -> navigateToModoCompeticion();
         DialogInterface.OnClickListener negativeAction = (dialog, which) -> dialog.dismiss();
-        Sounds.playWarningSound(getApplicationContext());
-        showAlertDialogWithActions("Confirm exit", "Don't u want to set a profile pic?", positiveAction, negativeAction);
+
+        // ✅ Pass 'false' to indicate this is a warning message
+        showAlertDialogWithActions("Confirm Exit", "Don't you want to set a profile pic?", positiveAction, negativeAction, false);
     }
     private void navigateToModoCompeticion() {
         playSwoosh();
@@ -349,118 +422,141 @@ public class ProfileActivity extends AppCompatActivity {
             mAuth = FirebaseAuth.getInstance(); // Ensure mAuth is initialized
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        builder.setTitle("Delete Account Confirmation")
+        AlertDialog dialog = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme) // Apply custom theme
+                .setTitle("Delete Account Confirmation")
                 .setMessage("Are you sure you want to delete your account? This action cannot be undone.")
-                .setPositiveButton("DELETE", (dialog, which) -> {
+                .setPositiveButton("DELETE", (dialogInterface, which) -> {
                     playSwoosh(); // Play swoosh sound on confirmation
                     reauthenticateAndDelete(); // Proceed with deletion
                 })
-                .setNegativeButton("CANCEL", (dialog, which) -> {
+                .setNegativeButton("CANCEL", (dialogInterface, which) -> {
                     playSwoosh(); // Play swoosh sound on cancellation
-                    dialog.dismiss();
+                    dialogInterface.dismiss();
                 })
-                .setIcon(R.drawable.afrikanaonelogo); // Add your logo if desired
+                .setIcon(R.drawable.afrikanaonelogo) // Add logo if needed
+                .create();
 
-        AlertDialog dialog = builder.create();
-        setDialogBackground(dialog); // Apply custom border styling
-        dialog.show();
+        // Apply custom background
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
 
         Sounds.playWarningSound(getApplicationContext()); // Warning sound when dialog is shown
+        dialog.show();
+
+        // Ensure both buttons have white text
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        if (positiveButton != null) {
+            positiveButton.setTextColor(Color.WHITE);
+        }
+        if (negativeButton != null) {
+            negativeButton.setTextColor(Color.WHITE);
+        }
     }
 
     private void reauthenticateAndDelete() {
         if (mAuth == null) {
-            mAuth = FirebaseAuth.getInstance(); // Ensure mAuth is initialized
+            mAuth = FirebaseAuth.getInstance(); // Ensure Firebase Auth is initialized
         }
 
         FirebaseUser user = mAuth.getCurrentUser();
-
-        if (user != null) {
-            // Prompt the user to re-enter their password
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Re-enter your password");
-
-            final EditText passwordField = new EditText(this);
-
-            // Set input type to password to hide password entries
-            passwordField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            builder.setView(passwordField);
-
-            builder.setPositiveButton("CONTINUE", (dialog, which) -> {
-                playSwoosh(); // Play swoosh on pressing CONTINUE
-                String password = passwordField.getText().toString();
-
-                if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(ProfileActivity.this, "You must provide your password.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
-                user.reauthenticate(credential).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d("Reauthentication", "User reauthenticated successfully.");
-                        deleteUserProcess();
-                    } else {
-                        Log.e("ReauthenticationError", "Error: " + task.getException().getMessage());
-                        Toast.makeText(ProfileActivity.this, "Reauthentication failed: " + task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            });
-
-            builder.setNegativeButton("CANCEL", (dialog, which) -> {
-                playSwoosh();
-                dialog.dismiss();
-            });
-
-            AlertDialog passwordDialog = builder.create();
-            setDialogBackground(passwordDialog);
-            passwordDialog.show();
-            playSwoosh();
-        } else {
+        if (user == null) {
             Log.e("ReauthenticationError", "User not logged in.");
-            showInformationalAlertDialog("Error", "User not logged in.");
+            showInformationalAlertDialog("Error", "User not logged in.", false); // ✅ Fixed call
+            return;
         }
+
+        // 🔊 Play warning sound
+        Sounds.playWarningSound(getApplicationContext());
+
+        // Prompt user for password
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme)
+                .setTitle("Re-enter your password");
+
+        final EditText passwordField = new EditText(this);
+        passwordField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(passwordField);
+
+        builder.setPositiveButton("CONTINUE", (dialog, which) -> {
+            Sounds.playSwooshSound(getApplicationContext()); // 🔊 Play swoosh sound
+            String password = passwordField.getText().toString().trim();
+
+            if (TextUtils.isEmpty(password)) {
+                Toast.makeText(ProfileActivity.this, "You must provide your password.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Authenticate user before proceeding with deletion
+            AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
+            user.reauthenticate(credential).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Log.d("Reauthentication", "User reauthenticated successfully.");
+                    deleteUserProcess();
+                } else {
+                    Log.e("ReauthenticationError", "Error: " + task.getException().getMessage());
+                    showInformationalAlertDialog("Error", "Reauthentication failed: " + task.getException().getLocalizedMessage(), false); // ✅ Fixed call
+                }
+            });
+        });
+
+        builder.setNegativeButton("CANCEL", (dialog, which) -> {
+            Sounds.playSwooshSound(getApplicationContext()); // 🔊 Play swoosh sound
+            dialog.dismiss();
+        });
+
+        AlertDialog passwordDialog = builder.create();
+        setDialogBackground(passwordDialog);
+        passwordDialog.show();
+
+        // ✅ Ensure button text is white
+        setDialogButtonColors(passwordDialog);
     }
 
     private void deleteUserProcess() {
         FirebaseUser user = mAuth.getCurrentUser();
 
-        if (user != null) {
-            String userID = user.getUid();
-            String userFullName = user.getDisplayName() != null ? user.getDisplayName() : "Unknown";
-            String email = user.getEmail() != null ? user.getEmail() : "Unknown";
-
-            logDeletedUser(userFullName, email);
-
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user").child(userID);
-            Log.d("DatabaseDeletion", "Attempting to remove user data for userID: " + userID);
-
-            ref.removeValue((error, ref1) -> {
-                if (error != null) {
-                    Log.e("DatabaseDeletionError", "Error removing user data: " + error.getMessage());
-                    showInformationalAlertDialog("Error", "Something went wrong: " + error.getMessage());
-                    return;
-                }
-
-                Log.d("DatabaseDeletion", "User data removed successfully.");
-
-                user.delete().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d("AuthDeletion", "User account deleted successfully.");
-                        Sounds.playMagicalSound(getApplicationContext());
-                        showCustomAlertDialog("Success", "User and data successfully deleted. Bye Bye", this::navigateToMenuPrincipal);
-                    } else {
-                        Log.e("AuthDeletionError", "Failed to delete user account: " + task.getException().getMessage());
-                        showInformationalAlertDialog("Error", "Failed to delete user account: " + task.getException().getMessage());
-                    }
-                });
-            });
-        } else {
+        if (user == null) {
             Log.e("DeletionProcess", "User not logged in.");
-            showInformationalAlertDialog("Error", "User not logged in.");
+            showInformationalAlertDialog("Error", "User not logged in.", false); // ❌ Error case
+            return;
         }
+
+        String userID = user.getUid();
+        String userFullName = user.getDisplayName() != null ? user.getDisplayName() : "Unknown";
+        String email = user.getEmail() != null ? user.getEmail() : "Unknown";
+
+        logDeletedUser(userFullName, email);
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user").child(userID);
+        Log.d("DatabaseDeletion", "Attempting to remove user data for userID: " + userID);
+
+        ref.removeValue((error, ref1) -> {
+            if (error != null) {
+                Log.e("DatabaseDeletionError", "Error removing user data: " + error.getMessage());
+                showInformationalAlertDialog("Error", "Something went wrong: " + error.getMessage(), false); // ❌ Error case
+                return;
+            }
+
+            Log.d("DatabaseDeletion", "User data removed successfully.");
+
+            user.delete().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Log.d("AuthDeletion", "User account deleted successfully.");
+
+                    // 🔊 Play success sound
+                    Sounds.playMagicalSound(getApplicationContext());
+
+                    // ✅ Show success message & navigate to main menu
+                    showInformationalAlertDialog("Success", "User and data successfully deleted. Bye Bye", true); // ✅ Success case
+                    navigateToMenuPrincipal();
+                } else {
+                    Log.e("AuthDeletionError", "Failed to delete user account: " + task.getException().getMessage());
+                    showInformationalAlertDialog("Error", "Failed to delete user account: " + task.getException().getMessage(), false); // ❌ Error case
+                }
+            });
+        });
     }
 
     private void logDeletedUser(String userFullName, String email) {
@@ -498,22 +594,28 @@ public class ProfileActivity extends AppCompatActivity {
         finish();
     }
     private void getImageInImageView() {
-        Bitmap bitmap;
+        if (imagePath == null) {
+            Log.e("getImageInImageView", "imagePath is null. Cannot set image.");
+            return;
+        }
+
         try {
-            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imagePath);
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imagePath);
             profilepic.setImageBitmap(bitmap);
-            isImageSet = true;  // Set flag to true as image is now set
+            isImageSet = true;  // ✅ Set flag to true since image is now set
         } catch (IOException e) {
-            isImageSet = false; // Reset flag as there was an error loading the image
-            throw new RuntimeException(e);
+            Log.e("getImageInImageView", "Error loading image: " + e.getMessage());
+            isImageSet = false;  // ✅ Reset flag due to error
+            setProfilePicturePlaceholder(); // ✅ Set placeholder if loading fails
         }
     }
 
     private void uploadImage() {
         // Check if an image has been selected
         if (imagePath == null) {
+            Sounds.playWarningSound(getApplicationContext()); // 🔊 Play warning sound for missing image
             Log.e("UploadImage", "Image path is null, cannot upload");
-            showInformationalAlertDialog("Attention", "No image selected.");
+            showInformationalAlertDialog("Attention", "No image selected.", false); // ❌ Pass 'false' to indicate failure
             return;
         }
 
@@ -544,26 +646,28 @@ public class ProfileActivity extends AppCompatActivity {
                             saveProfilePictureToPreferences(profilePicUrl);
                             hideUploadButton();
 
-                            // Notify the user of success
+                            // 🔊 Play success sound
                             Sounds.playMagicalSound(getApplicationContext());
-                            showSuccessDialog("Your profile pic has been set!");
-                            isImageSet = true; // Update the flag
+
+                            // ✅ Show success message
+                            showInformationalAlertDialog("Success", "Your profile pic has been set!", true); // ✅ Pass 'true' for success
+                            isImageSet = true;
                         } else {
                             Log.e("UploadImage", "Failed to get download URL", urlTask.getException());
-                            showInformationalAlertDialog("Error", "Unable to retrieve the image URL.");
+                            showInformationalAlertDialog("Error", "Unable to retrieve the image URL.", false); // ❌ Pass 'false' for failure
                             isImageSet = false;
                         }
                     });
                 })
                 .addOnFailureListener(e -> {
                     Log.e("UploadImage", "Upload failed: ", e);
-                    showInformationalAlertDialog("Error", "Failed to upload image: " + e.getLocalizedMessage());
+                    showInformationalAlertDialog("Error", "Failed to upload image: " + e.getLocalizedMessage(), false); // ❌ Failure case
                     isImageSet = false;
                 })
                 .addOnCompleteListener(task -> {
                     uploadDialog.dismiss();
                     Log.d("UploadImage", "Upload task complete. Success: " + task.isSuccessful());
-                    isUpdatingPicture = false; // Reset the flag
+                    isUpdatingPicture = false;
                 })
                 .addOnProgressListener(snapshot -> {
                     double progress = 100.0 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount();
@@ -590,6 +694,7 @@ public class ProfileActivity extends AppCompatActivity {
         btn_upload.setVisibility(View.INVISIBLE);
         btn_upload.setAlpha(1f); // Reset alpha to avoid lingering effects
     }
+
     private void saveProfilePictureToPreferences(String profilePicUrl) {
         SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -599,7 +704,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showSuccessDialog(String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this)
+        AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this, R.style.CustomAlertDialogTheme)
                 .setTitle("Djudju Black Magic")
                 .setMessage(message)
                 .setPositiveButton("OK", (dialog, which) -> {
@@ -611,6 +716,8 @@ public class ProfileActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         setDialogBackground(dialog);
         dialog.show();
+
+        setDialogButtonColors(dialog);
     }
 
     private void updateProfilePicture(String url) {
@@ -620,101 +727,115 @@ public class ProfileActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.e("ProfilePicture", "Failed to update profile picture in database", e));
     }
 
-
-
     private AlertDialog createUploadDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // Set up the input
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme);
         final ProgressBar progressBar = new ProgressBar(this);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         progressBar.setLayoutParams(lp);
         builder.setView(progressBar);
-
-        // Set up the buttons
         builder.setTitle("Uploading ...")
                 .setIcon(R.drawable.afrikanaonelogo);
 
         AlertDialog dialog = builder.create();
-
-        // Get the Window of the AlertDialog and set the custom background
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setBackgroundDrawableResource(R.drawable.dialog_background);
-        }
-
+        setDialogBackground(dialog);
         return dialog;
     }
 
-    private void showInformationalAlertDialog(String title, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss())
-                .setIcon(R.drawable.afrikanaonelogo); // Set the custom icon
-
-        // Create the AlertDialog from the builder
-        AlertDialog dialog = builder.create();
-
-        // Check if the Window for the AlertDialog is available and set the custom background
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+    private void showInformationalAlertDialog(String title, String message, boolean isSuccess) {
+        // ✅ Play success or warning sound based on the flag
+        if (isSuccess) {
+            Sounds.playMagicalSound(getApplicationContext()); // ✅ Play success sound
+        } else {
+            Sounds.playWarningSound(getApplicationContext()); // ✅ Play warning sound
         }
 
-        // Show the dialog to the user
-        dialog.show();
-    }
-
-
-    private void showCustomAlertDialog(String title, String message, final Runnable onDismiss) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme)
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton("OK", (dialogInterface, i) -> {
-                    if (onDismiss != null) {
-                        onDismiss.run();
-                    }
+                    // ✅ Play swoosh sound when dialog is dismissed
+                    Sounds.playSwooshSound(getApplicationContext());
+                    dialogInterface.dismiss();
                 })
                 .setIcon(R.drawable.afrikanaonelogo);
 
         AlertDialog dialog = builder.create();
+        setDialogBackground(dialog);
+        dialog.show();
+        setDialogButtonColors(dialog); // Ensure white text
+    }
+    private void showCustomAlertDialog(String title, String message, Runnable onDismiss, boolean isSuccess) {
+        // ✅ Play the appropriate sound based on success or warning
+        if (isSuccess) {
+            Sounds.playMagicalSound(getApplicationContext()); // ✅ Success Sound
+        } else {
+            Sounds.playWarningSound(getApplicationContext()); // 🚨 Warning Sound
+        }
+
+        AlertDialog dialog = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (dialogInterface, i) -> {
+                    // ✅ Play swoosh sound when dialog is dismissed
+                    Sounds.playSwooshSound(getApplicationContext());
+                    if (onDismiss != null) {
+                        onDismiss.run();
+                    }
+                })
+                .setIcon(R.drawable.afrikanaonelogo)
+                .create();
+
+        // Ensure action is performed when dismissed
         dialog.setOnDismissListener(dialogInterface -> {
-            // The Runnable runs after the dialog is dismissed, including
-            // when the positive button is pressed or the dialog is canceled.
             if (onDismiss != null) {
                 onDismiss.run();
             }
         });
 
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setBackgroundDrawableResource(R.drawable.dialog_background);
-        }
-
+        setDialogBackground(dialog);
         dialog.show();
+        setDialogButtonColors(dialog); // Ensure white text
     }
-
     private void showAlertDialogWithActions(String title, String message,
                                             DialogInterface.OnClickListener positiveAction,
-                                            DialogInterface.OnClickListener negativeAction) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                                            DialogInterface.OnClickListener negativeAction,
+                                            boolean isSuccess) {
+        // ✅ Play success or warning sound before showing the dialog
+        if (isSuccess) {
+            Sounds.playMagicalSound(getApplicationContext()); // ✅ Success sound
+        } else {
+            Sounds.playWarningSound(getApplicationContext()); // 🚨 Warning sound
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme)
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton("NO", positiveAction)
                 .setNegativeButton("YES", negativeAction != null ? negativeAction : (dialogInterface, i) -> dialogInterface.dismiss())
                 .setIcon(R.drawable.afrikanaonelogo);
+
         AlertDialog dialog = builder.create();
         setDialogBackground(dialog);
         dialog.show();
+        setDialogButtonColors(dialog); // Ensure white text
     }
-
     private void setDialogBackground(AlertDialog dialog) {
         Window window = dialog.getWindow();
         if (window != null) {
             window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+    }
 
+    private void setDialogButtonColors(AlertDialog dialog) {
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        if (positiveButton != null) {
+            positiveButton.setTextColor(Color.WHITE);
+        }
+        if (negativeButton != null) {
+            negativeButton.setTextColor(Color.WHITE);
         }
     }
 
@@ -751,24 +872,28 @@ public class ProfileActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            // Get the URI of the selected image
+            // ✅ Get the selected image URI
             imagePath = data.getData();
 
             try {
-                // Convert the selected image to a Bitmap and display it in the profile picture view
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imagePath);
-                profilepic.setImageBitmap(bitmap);
+                // ✅ Convert the image URI into a Bitmap and display it
+                getImageInImageView(); // ✅ Call the method here
 
-                // Make the upload button visible and start the flashing effect
+                // ✅ Show the upload button & start animation
                 showUploadButton();
-            } catch (IOException e) {
-                // Handle any errors that occur while loading the image
+            } catch (Exception e) {
+                // ❌ Handle any errors that occur while loading the image
                 e.printStackTrace();
-                Toast.makeText(this, "Failed to load image.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "⚠️ Failed to load image.", Toast.LENGTH_SHORT).show();
+                Sounds.playWarningSound(getApplicationContext()); // 🔊 Play warning sound on error
             }
+        } else {
+            // ❌ Handle the case where no image was selected
+            Log.w("onActivityResult", "⚠️ No image selected.");
+            Toast.makeText(this, "⚠️ No image selected.", Toast.LENGTH_SHORT).show();
+            Sounds.playWarningSound(getApplicationContext()); // 🔊 Play warning sound on error
         }
     }
-
     public void getPositionInLeaderboard() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {

@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/textviewtiempo"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="50dp"
         android:orientation="vertical"
         android:layout_centerHorizontal="true">
 
@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:text="CORRECT ANSWERS : 0 "
         android:textColor="@color/black"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:layout_marginLeft="10dp"
         android:textStyle="bold"
         android:freezesText="true"
@@ -98,7 +98,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:fontFamily="?android:attr/fontFamily"
         android:freezesText="true"
         android:shadowColor="@color/black"

@@ -2,6 +2,7 @@ package com.iniciativaselebi.afrikanaone;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -148,7 +149,7 @@ public class Login extends AppCompatActivity {
     }
 
     private void showAlert(String title, String message, DialogInterface.OnClickListener positiveClickListener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(Login.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(Login.this, R.style.CustomAlertDialogTheme); // Apply theme
         builder.setTitle(title)
                 .setMessage(message)
                 .setPositiveButton("OK", positiveClickListener != null ? positiveClickListener : new DialogInterface.OnClickListener() {
@@ -170,6 +171,10 @@ public class Login extends AppCompatActivity {
         }
 
         dialog.show();
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (positiveButton != null) {
+            positiveButton.setTextColor(Color.WHITE);
+        }
     }
 
     private void showAlert(String title, String message) {

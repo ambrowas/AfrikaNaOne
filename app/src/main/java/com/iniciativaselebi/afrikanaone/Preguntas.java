@@ -27,6 +27,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -161,7 +162,7 @@ import java.util.Map;
                         // Update the appearance of the selected RadioButton
                         RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
                         if (selectedRadioButton != null) {
-                            selectedRadioButton.setBackgroundResource(R.drawable.radio_normal3);
+                            selectedRadioButton.setBackgroundResource(R.drawable.toast_background);
                         } else {
                             // Handle unexpected error: Show a warning dialog
                             Warning errorWarning = new Warning(
@@ -357,7 +358,7 @@ import java.util.Map;
                     textviewtiempo.setText(timeLeftFormatted);
 
                     if (seconds <= 10) {
-                        textviewtiempo.setTextColor(Color.RED);
+                        textviewtiempo.setTextColor(ContextCompat.getColor(Preguntas.this, R.color.toastBackgroundColor));
                     } else {
                         textviewtiempo.setTextColor(Color.BLACK);
                     }
@@ -499,32 +500,41 @@ import java.util.Map;
                 radio_group.getChildAt(i).setEnabled(false);
             }
         }
+
         private void adjustButtonVisibilityForNext() {
             buttonconfirmar.setVisibility(View.GONE); // Hide "Confirm"
             buttonsiguiente.setVisibility(View.VISIBLE); // Show "Next"
             buttonterminar.setVisibility(View.VISIBLE); // Show "Finish"
         }
 
-
         private void showCustomDialog(String title, String message, DialogInterface.OnClickListener positiveClickListener) {
             Sounds.playWarningSound(getApplicationContext());
-            AlertDialog.Builder builder = new AlertDialog.Builder(Preguntas.this);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(Preguntas.this, R.style.CustomAlertDialogTheme); // ✅ Apply custom theme
             builder.setTitle(title)
                     .setMessage(message)
                     .setPositiveButton("OK", positiveClickListener)
                     .setIcon(R.drawable.afrikanaonelogo);
 
             AlertDialog dialog = builder.create();
+
+            // ✅ Apply custom background
             if (dialog.getWindow() != null) {
-                dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background); // Your custom shape drawable
+                dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background);
             }
+
             dialog.show();
+
+            // ✅ Set button text color manually
+            Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            if (positiveButton != null) {
+                positiveButton.setTextColor(Color.WHITE);
+            }
         }
 
         private void showCustomDialog(String title, String message) {
             showCustomDialog(title, message, null);
         }
-
         private void playSwoosh() {
             if (swooshPlayer != null) {
                 swooshPlayer.seekTo(0);
@@ -543,14 +553,14 @@ import java.util.Map;
 
                 if (selectedOption != null && selectedOption.equals(correctAnswer)) {
                     textviewpregunta.setText("CORRECT ANSWER");
-                    textviewpregunta.setTextColor(getColor(R.color.green));
+                    textviewpregunta.setTextColor(getColor(R.color.selected_radio_button_background));
                     resultImage.setImageResource(R.drawable.baseline_check_24);
-                    resultImage.setColorFilter(getColor(R.color.green));
+                    resultImage.setColorFilter(getColor(R.color.selected_radio_button_background));
                 } else {
                     textviewpregunta.setText("INCORRECT ANSWER");
-                    textviewpregunta.setTextColor(getColor(R.color.red));
+                    textviewpregunta.setTextColor(getColor(R.color.toastBackgroundColor));
                     resultImage.setImageResource(R.drawable.baseline_clear_24);
-                    resultImage.setColorFilter(getColor(R.color.red));
+                    resultImage.setColorFilter(getColor(R.color.toastBackgroundColor));
                 }
 
                 // Animation for image
@@ -618,28 +628,25 @@ import java.util.Map;
                     }
 
                     // Show an AlertDialog when buttonterminar is pressed
+                    // Show an AlertDialog when buttonterminar is pressed
                     Sounds.playWarningSound(getApplicationContext());
-                    AlertDialog dialog = new AlertDialog.Builder(Preguntas.this)
+                    AlertDialog dialog = new AlertDialog.Builder(Preguntas.this, R.style.CustomAlertDialogTheme) // Apply custom theme
                             .setTitle("Confirm")
                             .setMessage("You sure you want to end the game?")
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // User clicked "Sí" button. Finish the game.
-                                    isProcessing = true;
-                                    finishGameStats();
-                                    isProcessing = false;
-                                }
+                            .setPositiveButton("Yes", (dialogInterface, which) -> {
+                                // User clicked "Yes" button. Finish the game.
+                                isProcessing = true;
+                                finishGameStats();
+                                isProcessing = false;
                             })
-                            .setNegativeButton("No", null) // null listener results in dismissing the dialog without additional actions
+                            .setNegativeButton("No", null) // Null listener dismisses the dialog
                             .setIcon(R.drawable.afrikanaonelogo)
-                            .create(); // create the AlertDialog to manipulate its window properties
+                            .create(); // Create the AlertDialog
 
-                    Window window = dialog.getWindow(); // Get the Window object of the dialog
-                    if (window != null) {
-                        window.setBackgroundDrawableResource(R.drawable.dialog_background); // Set your custom background drawable here
-                    }
-
-                    dialog.show(); // Show the dialog
+// Apply background & button colors
+                    setDialogBackground(dialog);
+                    dialog.show();
+                    setDialogButtonColors(dialog);
                 }
             });
 
@@ -664,8 +671,8 @@ import java.util.Map;
 
                     // Set the background of the selected RadioButton to radio_selector3, and text color to black, if not null
                     if (selectedRadioButton != null) {
-                        selectedRadioButton.setBackgroundResource(R.drawable.radio_normal3);
-                        selectedRadioButton.setTextColor(Color.BLACK);
+                        selectedRadioButton.setBackgroundResource(R.drawable.toast_background);
+                        selectedRadioButton.setTextColor(Color.WHITE);
                     }
                 }
             });
@@ -815,14 +822,31 @@ import java.util.Map;
 
         private void showExitConfirmation() {
             Sounds.playWarningSound(getApplicationContext());
-            new AlertDialog.Builder(this)
+
+            AlertDialog dialog = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme) // ✅ Apply custom theme
                     .setTitle("Exit Confirmation")
                     .setMessage("You sure you want to exit?")
-                    .setPositiveButton("Yes", (dialog, which) -> finish())
-                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                    .setPositiveButton("Yes", (dialogInterface, which) -> finish())
+                    .setNegativeButton("No", (dialogInterface, which) -> dialogInterface.dismiss())
                     .setIcon(R.drawable.afrikanaonelogo) // Set the icon here
-                    .create()
-                    .show();
+                    .create();
+
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background); // ✅ Apply custom background
+            }
+
+            dialog.show(); // Display the dialog
+
+            // ✅ Set button text color manually
+            Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+            if (positiveButton != null) {
+                positiveButton.setTextColor(Color.WHITE);
+            }
+            if (negativeButton != null) {
+                negativeButton.setTextColor(Color.WHITE);
+            }
         }
 
         private Runnable backButtonRunnable = new Runnable() {
@@ -1051,7 +1075,7 @@ import java.util.Map;
             // Play the warning sound when the dialog appears
             Sounds.playWarningSound(getApplicationContext());
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme) // Apply custom style
                     .setTitle(title)
                     .setMessage(message)
                     .setPositiveButton("OK", (dialog, which) -> {
@@ -1067,11 +1091,31 @@ import java.util.Map;
 
             AlertDialog dialog = builder.create();
 
-            if (dialog.getWindow() != null) {
-                dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background); // Set custom background
-            }
+            // Apply custom background
+            setDialogBackground(dialog);
 
-            dialog.show(); // Display the dialog
+            // Show the dialog
+            dialog.show();
+
+            // Ensure text and button colors are set correctly
+            setDialogButtonColors(dialog);
+        }
+        private void setDialogBackground(AlertDialog dialog) {
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.setBackgroundDrawableResource(R.drawable.dialog_background); // Ensure you have this drawable
+            }
+        }
+
+        private void setDialogButtonColors(AlertDialog dialog) {
+            Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+            if (positiveButton != null) {
+                positiveButton.setTextColor(Color.WHITE); // Set white text for OK button
+            }
+            if (negativeButton != null) {
+                negativeButton.setTextColor(Color.WHITE); // Set white text for NO button (if exists)
+            }
         }
 
     }

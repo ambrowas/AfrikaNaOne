@@ -292,11 +292,11 @@ public class Modocompeticion extends AppCompatActivity {
     }
 
     private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener onPositiveClickListener) {
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(title) // Set the title
+        AlertDialog dialog = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme) // ✅ Apply custom theme
+                .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton(android.R.string.ok, onPositiveClickListener)
-                .setIcon(R.drawable.afrikanaonelogo) // Include the icon
+                .setIcon(R.drawable.afrikanaonelogo)
                 .create();
 
         Window window = dialog.getWindow();
@@ -305,6 +305,17 @@ public class Modocompeticion extends AppCompatActivity {
         }
 
         dialog.show();
+
+        // ✅ Ensure the "OK" button text is white
+        setDialogButtonColors(dialog);
+    }
+
+    // ✅ Apply white text color to buttons
+    private void setDialogButtonColors(AlertDialog dialog) {
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (positiveButton != null) {
+            positiveButton.setTextColor(Color.WHITE);
+        }
     }
 
     private void showAlert(String message) {
@@ -313,19 +324,21 @@ public class Modocompeticion extends AppCompatActivity {
     }
 
     private void confirmLogout() {
-
         DialogInterface.OnClickListener positiveClickListener = (dialog, which) -> {
             auth.signOut();
             playSwoosh();
             TextViewSaludo2.setText("LOG IN OR REGISTER");
-            TextViewSaludo2.setTextColor(Color.WHITE); //
+            TextViewSaludo2.setTextColor(Color.WHITE);
             TextViewRecord.setVisibility(View.GONE);
-           // showAlert("User loged out");
         };
 
-        DialogInterface.OnClickListener negativeClickListener = (dialog, which) -> dialog.dismiss();
+        DialogInterface.OnClickListener negativeClickListener = (dialog, which) -> {
+            playSwoosh(); // 🔊 Play swoosh sound when "No" is pressed
+            dialog.dismiss();
+        };
 
-        AlertDialog dialog = new AlertDialog.Builder(Modocompeticion.this)
+        // Apply the custom theme for the dialog
+        AlertDialog dialog = new AlertDialog.Builder(Modocompeticion.this, R.style.CustomAlertDialogTheme)
                 .setTitle("Attention")
                 .setMessage("You sure you want to log out?")
                 .setPositiveButton("Yes", positiveClickListener)
@@ -340,6 +353,16 @@ public class Modocompeticion extends AppCompatActivity {
 
         Sounds.playWarningSound(getApplicationContext());
         dialog.show();
+
+        // Ensure both buttons have white text
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        if (positiveButton != null) {
+            positiveButton.setTextColor(Color.WHITE);
+        }
+        if (negativeButton != null) {
+            negativeButton.setTextColor(Color.WHITE);
+        }
     }
 
     private void playSwoosh() {

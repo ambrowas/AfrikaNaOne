@@ -119,7 +119,7 @@ public class QRcodeActivity extends AppCompatActivity {
 
 
             } else {
-                showCustomAlertDialog("Attention", "You have to log in", null);
+                showCustomAlertDialog("Attention", "You have to log in", null, false); // ⚠ Add `false` for warning/error
             }
 
             buttonvolver = findViewById(R.id.buttonvolver);
@@ -136,18 +136,18 @@ public class QRcodeActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     if (isWithinCoolDownPeriod()) {
-                        // If the user has saved a QR code within the last three minutes, show a toast message
+                        // If the user has saved a QR code within the last three minutes, show an alert
                         Sounds.playWarningSound(getApplicationContext());
-                        showCustomAlertDialog("Atention", "This QR Code has already been saved. U may have to wait a bit", null);
-                        return; // Exit the method early
+                        showCustomAlertDialog("Attention", "This QR Code has already been saved.", null, false);
+                        return; // Exit early
                     }
 
                     // Check for storage permissions to save the QR code to the gallery
                     if (ContextCompat.checkSelfPermission(QRcodeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                        // Save the image to gallery
+                        // ✅ Save the image to the gallery
                         saveImageToGallery(QRcodeActivity.this, qrCodeBitmap);
                     } else {
-                        // Permission is not granted, show an explanation to the user, etc.
+                        // Permission not granted, show explanation or request permission
                         if (ActivityCompat.shouldShowRequestPermissionRationale(QRcodeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                             showPermissionRationaleDialog();
                         } else {
@@ -159,38 +159,67 @@ public class QRcodeActivity extends AppCompatActivity {
 
         }
 
-        private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener positiveClickListener) {
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setTitle(title)
-                    .setMessage(message)
-                    .setPositiveButton(android.R.string.ok, positiveClickListener != null ? positiveClickListener : (dialogInterface, i) -> dialogInterface.dismiss())
-                    .setIcon(R.drawable.afrikanaonelogo)
-                    .create();
-
-            Window window = dialog.getWindow();
-            if (window != null) {
-                window.setBackgroundDrawableResource(R.drawable.dialog_background);
-            }
-
-            dialog.show();
+    private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener positiveClickListener, boolean isSuccess) {
+        // 🔊 Play success or warning sound based on the flag
+        if (isSuccess) {
+            Sounds.playMagicalSound(getApplicationContext()); // ✅ Success sound
+        } else {
+            Sounds.playWarningSound(getApplicationContext()); // ⚠ Warning sound
         }
 
-        private void showPermissionRationaleDialog() {
-            AlertDialog dialog = new AlertDialog.Builder(QRcodeActivity.this)
-                    .setTitle("Permission Needed")
-                    .setMessage("Permission needed to save the image")
-                    .setPositiveButton("OK", (dialogInterface, i) -> ActivityCompat.requestPermissions(QRcodeActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1))
-                    .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss())
-                    .setIcon(R.drawable.afrikanaonelogo)
-                    .create();
+        AlertDialog dialog = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme) // ✅ Apply theme
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, positiveClickListener != null ? positiveClickListener : (dialogInterface, i) -> {
+                    Sounds.playSwooshSound(getApplicationContext()); // 🔄 Play swoosh sound on dismissal
+                    dialogInterface.dismiss();
+                })
+                .setIcon(R.drawable.afrikanaonelogo)
+                .create();
 
-            Window window = dialog.getWindow();
-            if (window != null) {
-                window.setBackgroundDrawableResource(R.drawable.dialog_background);
-            }
+        // ✅ Apply custom background styling
+        setDialogBackground(dialog);
 
-            dialog.show();
+        // ✅ Show the dialog
+        dialog.show();
+
+        // ✅ Ensure button text is white
+        setDialogButtonColors(dialog);
+    }
+
+    private void showPermissionRationaleDialog() {
+        // 🔊 Play warning sound when dialog appears
+        Sounds.playWarningSound(getApplicationContext());
+
+        AlertDialog dialog = new AlertDialog.Builder(QRcodeActivity.this, R.style.CustomAlertDialogTheme)
+                .setTitle("Permission Needed")
+                .setMessage("Permission is required to save the image. Grant access?")
+                .setPositiveButton("OK", (dialogInterface, i) -> {
+                    ActivityCompat.requestPermissions(QRcodeActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                    Sounds.playSwooshSound(getApplicationContext()); // 🔄 Play swoosh sound on confirmation
+                })
+                .setNegativeButton("Cancel", (dialogInterface, i) -> {
+                    Sounds.playSwooshSound(getApplicationContext()); // 🔄 Play swoosh sound on dismissal
+                    dialogInterface.dismiss();
+                })
+                .setIcon(R.drawable.afrikanaonelogo)
+                .create();
+
+        // ✅ Apply custom background styling
+        setDialogBackground(dialog);
+
+        // ✅ Show the dialog
+        dialog.show();
+
+        // ✅ Ensure button text is white
+        setDialogButtonColors(dialog);
+    }
+    private void setDialogBackground(AlertDialog dialog) {
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
         }
+    }
 
         private Bitmap generateQRCode(String key) {
             try {
@@ -212,50 +241,52 @@ public class QRcodeActivity extends AppCompatActivity {
             return null;
         }
 
-        private void saveImageToGallery(Context context, Bitmap bitmap) {
-            OutputStream outputStream;
+    private void saveImageToGallery(Context context, Bitmap bitmap) {
+        OutputStream outputStream;
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                ContentResolver resolver = context.getContentResolver();
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "QRCode_" + System.currentTimeMillis() + ".jpg");
-                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
-                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentResolver resolver = context.getContentResolver();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "QRCode_" + System.currentTimeMillis() + ".jpg");
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
 
-                Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-                try {
-                    outputStream = resolver.openOutputStream(Objects.requireNonNull(imageUri));
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-                    Objects.requireNonNull(outputStream).close();
-                        playSwoosh();
-                    showCustomAlertDialog("Success", "QR Code saved in your gallery", null);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    showCustomAlertDialog("Error", "Something went wrong", null);
-                    }
-                } else {
-                    File imagesDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "YourAppName");
+            Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+            try {
+                outputStream = resolver.openOutputStream(Objects.requireNonNull(imageUri));
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                Objects.requireNonNull(outputStream).close();
 
-                    if (!imagesDir.exists()) {
-                        if (!imagesDir.mkdirs()) {
-                            showCustomAlertDialog("Error", "Something went wrong", null);
-                            return;
-                        }
-                    }
-
-                    String fileName = "QRCode_" + System.currentTimeMillis() + ".jpg";
-                    File imageFile = new File(imagesDir, fileName);
-                    try {
-                        outputStream = new FileOutputStream(imageFile);
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-                        outputStream.close();
-                        showCustomAlertDialog("Success", "QR Code saved in your gallery", null);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        showCustomAlertDialog("Error", "Something went wrong", null);
-                    }
-                }
+                // ✅ Play success sound & show success dialog
+                playSwoosh();
+                showCustomAlertDialog("Success", "QR Code saved in your gallery", null, true); // ✅ Add `true` for success
+            } catch (IOException e) {
+                e.printStackTrace();
+                showCustomAlertDialog("Error", "Something went wrong", null, false); // ✅ Add `false` for error
             }
+        } else {
+            File imagesDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "YourAppName");
+
+            if (!imagesDir.exists() && !imagesDir.mkdirs()) {
+                showCustomAlertDialog("Error", "Something went wrong", null, false); // ✅ Add `false` for error
+                return;
+            }
+
+            String fileName = "QRCode_" + System.currentTimeMillis() + ".jpg";
+            File imageFile = new File(imagesDir, fileName);
+            try {
+                outputStream = new FileOutputStream(imageFile);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                outputStream.close();
+
+                // ✅ Play success sound & show success dialog
+                showCustomAlertDialog("Success", "QR Code saved in your gallery", null, true); // ✅ Add `true` for success
+            } catch (IOException e) {
+                e.printStackTrace();
+                showCustomAlertDialog("Error", "Something went wrong", null, false); // ✅ Add `false` for error
+            }
+        }
+    }
 
         @Override
         public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -269,23 +300,21 @@ public class QRcodeActivity extends AppCompatActivity {
                         showCustomAlertDialog(
                                 "Permission needed",
                                 "You need permission to save image in the gallery.",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        ActivityCompat.requestPermissions(QRcodeActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                                    }
-                                });
+                                (dialog, which) -> ActivityCompat.requestPermissions(QRcodeActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1),
+                                false
+                        );
                     } else {
                         // User has denied permission and selected "Don't ask again"
                         showCustomAlertDialog(
                                 "Permission Denied",
                                 "You need to change your settings",
-                                null);
+                                (dialog, which) -> dialog.dismiss(),
+                                false
+                        );
                     }
                 }
             }
         }
-
         private String getCurrentDateTime() {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
             return dateFormat.format(new Date());
@@ -318,85 +347,115 @@ public class QRcodeActivity extends AppCompatActivity {
             return base64QRCode.substring(0, 24);
         }
 
-        private Task<String> saveQRCodeToDatabase(String userId, String base64QRCode, String fullname, String email, int lastGameScore, int lastGamePuntuacion, String timestamp) {
-            TaskCompletionSource<String> tcs = new TaskCompletionSource<>();
+    private Task<String> saveQRCodeToDatabase(String userId, String base64QRCode, String fullname, String email, int lastGameScore, int lastGamePuntuacion, String timestamp) {
+        TaskCompletionSource<String> tcs = new TaskCompletionSource<>();
 
-            if (isWithinCoolDownPeriod()) {
-                showCustomAlertDialog("Attention", "You've just generates a code.Wait a few minutes.");
-                tcs.setException(new RuntimeException("Cooldown period active"));
-                return tcs.getTask();
-            }
-
-            DatabaseReference qrCodesRef = FirebaseDatabase.getInstance().getReference("qrCodes");
-
-            Query query = qrCodesRef.orderByChild("userId").equalTo(userId);
-            query.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        for (DataSnapshot qrCodeSnapshot : dataSnapshot.getChildren()) {
-                            QRCodeData qrCodeData = new QRCodeData(qrCodeSnapshot.getKey(), userId, base64QRCode, fullname, email, lastGameScore, lastGamePuntuacion, timestamp);
-
-                            qrCodesRef.child(qrCodeSnapshot.getKey()).setValue(qrCodeData).addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    Sounds.playMagicalSound(getApplicationContext());
-                                    showCustomAlertDialog("Success", "QR Code updated. Go get your money");
-                                    tcs.setResult(qrCodeSnapshot.getKey());
-                                    lastSavedTimestamp = System.currentTimeMillis();
-                                } else {
-                                    showCustomAlertDialog("Error", "Something went wrong");
-                                    tcs.setException(task.getException());
-                                }
-                            });
-                        }
-                    } else {
-                        qrCodeKey = qrCodesRef.push().getKey();
-                        if (qrCodeKey != null) {
-                            QRCodeData qrCodeData = new QRCodeData(qrCodeKey, userId, base64QRCode, fullname, email, lastGameScore, lastGamePuntuacion, timestamp);
-
-                            qrCodesRef.child(qrCodeKey).setValue(qrCodeData).addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    Sounds.playMagicalSound(getApplicationContext());
-                                    showCustomAlertDialog("Success", "QR Code generated. Go get your money");
-                                    tcs.setResult(qrCodeKey);
-                                    lastSavedTimestamp = System.currentTimeMillis();
-                                } else {
-                                    showCustomAlertDialog("Error", "Something went wrong");
-                                    tcs.setException(task.getException());
-                                }
-                            });
-                        } else {
-                            showCustomAlertDialog("Error", "Something went wrong");
-                            tcs.setException(new RuntimeException("Error generating QR code key"));
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    showCustomAlertDialog("Error", error.getMessage());
-                    tcs.setException(error.toException());
-                }
-            });
+        if (isWithinCoolDownPeriod()) {
+            showCustomAlertDialog("Attention", "You've just generated a code. Wait a few minutes.", false);
+            tcs.setException(new RuntimeException("Cooldown period active"));
             return tcs.getTask();
         }
 
-        private void showCustomAlertDialog(String title, String message) {
-            AlertDialog dialog = new AlertDialog.Builder(QRcodeActivity.this)
-                    .setTitle(title)
-                    .setMessage(message)
-                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> dialogInterface.dismiss())
-                    .setIcon(R.drawable.afrikanaonelogo)
-                    .create();
+        DatabaseReference qrCodesRef = FirebaseDatabase.getInstance().getReference("qrCodes");
 
-            Window window = dialog.getWindow();
-            if (window != null) {
-                window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        Query query = qrCodesRef.orderByChild("userId").equalTo(userId);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot qrCodeSnapshot : dataSnapshot.getChildren()) {
+                        QRCodeData qrCodeData = new QRCodeData(qrCodeSnapshot.getKey(), userId, base64QRCode, fullname, email, lastGameScore, lastGamePuntuacion, timestamp);
+
+                        qrCodesRef.child(qrCodeSnapshot.getKey()).setValue(qrCodeData).addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Sounds.playMagicalSound(getApplicationContext());
+                                showCustomAlertDialog("Success", "QR Code updated. Go get your money", true);
+                                tcs.setResult(qrCodeSnapshot.getKey());
+                                lastSavedTimestamp = System.currentTimeMillis();
+                            } else {
+                                showCustomAlertDialog("Error", "Something went wrong", false);
+                                tcs.setException(task.getException());
+                            }
+                        });
+                    }
+                } else {
+                    qrCodeKey = qrCodesRef.push().getKey();
+                    if (qrCodeKey != null) {
+                        QRCodeData qrCodeData = new QRCodeData(qrCodeKey, userId, base64QRCode, fullname, email, lastGameScore, lastGamePuntuacion, timestamp);
+
+                        qrCodesRef.child(qrCodeKey).setValue(qrCodeData).addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Sounds.playMagicalSound(getApplicationContext());
+                                showCustomAlertDialog("Success", "QR Code generated. Go get your money", true);
+                                tcs.setResult(qrCodeKey);
+                                lastSavedTimestamp = System.currentTimeMillis();
+                            } else {
+                                showCustomAlertDialog("Error", "Something went wrong", false);
+                                tcs.setException(task.getException());
+                            }
+                        });
+                    } else {
+                        showCustomAlertDialog("Error", "Something went wrong", false);
+                        tcs.setException(new RuntimeException("Error generating QR code key"));
+                    }
+                }
             }
 
-            dialog.show();
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                showCustomAlertDialog("Error", error.getMessage(), false);
+                tcs.setException(error.toException());
+            }
+        });
+
+        return tcs.getTask();
+    }
+    private void showCustomAlertDialog(String title, String message, boolean isSuccess) {
+        // 🔊 Play appropriate sound based on success or warning
+        if (isSuccess) {
+            Sounds.playMagicalSound(getApplicationContext()); // ✅ Success sound
+        } else {
+            Sounds.playWarningSound(getApplicationContext()); // ⚠ Warning sound
         }
 
+        AlertDialog dialog = new AlertDialog.Builder(QRcodeActivity.this, R.style.CustomAlertDialogTheme)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    Sounds.playSwooshSound(getApplicationContext()); // 🔄 Swoosh on dismissal
+                    dialogInterface.dismiss();
+                })
+                .setIcon(R.drawable.afrikanaonelogo)
+                .create();
+
+        // ✅ Apply background styling
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+
+        // ✅ Show the dialog
+        dialog.show();
+
+        // ✅ Ensure button text is white
+        setDialogButtonColors(dialog);
+    }
+
+    private void setDialogButtonColors(AlertDialog dialog) {
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+
+        if (positiveButton != null) {
+            positiveButton.setTextColor(Color.WHITE); // ✅ Ensure white text
+        }
+        if (negativeButton != null) {
+            negativeButton.setTextColor(Color.WHITE); // ✅ Ensure white text
+        }
+        if (neutralButton != null) {
+            neutralButton.setTextColor(Color.WHITE); // ✅ Ensure white text
+        }
+    }
         private boolean isWithinCoolDownPeriod() {
             long currentTimeMillis = System.currentTimeMillis();
             long threeMinutesInMillis = 3 * 60 * 1000;

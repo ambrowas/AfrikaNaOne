@@ -1,6 +1,7 @@
 package com.iniciativaselebi.afrikanaone;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -159,11 +160,10 @@ public class Register extends AppCompatActivity {
                 .setValue(newUser)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Sounds.playMagicalSound(getApplicationContext()); // Play magical sound
-                        showCustomAlertDialog("Success", "User created successfully! Set a profile pic.", this::navigateToProfileActivity);
+                        showCustomAlertDialog("Success", "User created successfully! Set a profile pic.", this::navigateToProfileActivity, true); // ✅ Pass `true` to play success sound
                     } else {
                         Log.e("DatabaseError", "Error saving user data: ", task.getException());
-                        showCustomAlertDialog("Error", "Failed to save user data.");
+                        showCustomAlertDialog("Error", "Failed to save user data.", null, false); // ✅ Pass `false` to play warning sound
                     }
                 });
     }
@@ -258,20 +258,26 @@ public class Register extends AppCompatActivity {
     }
 
     private void showCustomAlertDialog(String title, String message) {
-        showCustomAlertDialog(title, message, null);
+        showCustomAlertDialog(title, message, null, false); // Default to warning sound
     }
 
     private void showCustomAlertDialog(String title, String message, Runnable onDismiss) {
-        // Play the warning sound when the dialog is displayed
-        Sounds.playWarningSound(this);
+        showCustomAlertDialog(title, message, onDismiss, false); // Default to warning sound
+    }
 
-        AlertDialog dialog = new AlertDialog.Builder(Register.this)
+    private void showCustomAlertDialog(String title, String message, Runnable onDismiss, boolean isSuccess) {
+        // ✅ Play the appropriate sound based on success or warning
+        if (isSuccess) {
+            Sounds.playMagicalSound(this); // ✅ Play success sound
+        } else {
+            Sounds.playWarningSound(this); // ✅ Play warning sound
+        }
+
+        AlertDialog dialog = new AlertDialog.Builder(Register.this, R.style.CustomAlertDialogTheme) // ✅ Apply theme
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
-                    // Play the swoosh sound on dismissal
-                    Sounds.playSwooshSound(this);
-
+                    Sounds.playSwooshSound(this); // ✅ Play swoosh sound on dismissal
                     dialogInterface.dismiss();
                     if (onDismiss != null) onDismiss.run();
                 })
@@ -284,8 +290,16 @@ public class Register extends AppCompatActivity {
         }
 
         dialog.show();
-    }
 
+        // ✅ Ensure the buttons also have white text
+        setDialogButtonColors(dialog);
+    }
+    private void setDialogButtonColors(AlertDialog dialog) {
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (positiveButton != null) {
+            positiveButton.setTextColor(Color.WHITE);
+        }
+    }
     private void navigateToProfileActivity() {
         playSwoosh();
         Intent intent = new Intent(Register.this, ProfileActivity.class);

@@ -245,81 +245,99 @@ public class    ClassficationActivity extends AppCompatActivity {
         return (currentTimeMillis - lastSavedTimestamp) < threeMinutesInMillis;
     }
     private void showTerminationDialog() {
-        Sounds.playWarningSound(getApplicationContext());
-        AlertDialog dialog = new AlertDialog.Builder(ClassficationActivity.this)
-                .setTitle("EXIT")
-                .setMessage("You sure you want to end this game? ")
-                .setPositiveButton("YEP", (dialog1, which) -> {
+        showCustomAlertDialog(
+                "EXIT",
+                "You sure you want to end this game?",
+                (dialog, which) -> {
                     Sounds.playSwooshSound(ClassficationActivity.this);
                     Intent intent = new Intent(ClassficationActivity.this, Modocompeticion.class);
                     startActivity(intent);
                     finish();
-                })
-                .setNegativeButton("NOPE", null)
-                .setIcon(R.drawable.afrikanaonelogo)
-                .create();
-
-        // Set swoosh sound when dialog is dismissed
-        dialog.setOnDismissListener(dialogInterface -> Sounds.playSwooshSound(ClassficationActivity.this));
-
-        customizeDialogBackground(dialog);
-        dialog.show();
+                },
+                null,
+                false
+        );
     }
 
     private void showLeaderboardDialog() {
-        Sounds.playWarningSound(getApplicationContext());
-        AlertDialog dialog = new AlertDialog.Builder(ClassficationActivity.this)
-                .setTitle("LEADERBOARD")
-                .setMessage("U sure you want to leave?")
-                .setPositiveButton("YEP", (dialog1, which) -> {
+        showCustomAlertDialog(
+                "LEADERBOARD",
+                "U sure you want to leave?",
+                (dialog, which) -> {
                     Sounds.playSwooshSound(ClassficationActivity.this);
                     Intent intent = new Intent(ClassficationActivity.this, RankingActivity.class);
                     startActivity(intent);
-                    finish(); // Optional: Finish the current activity if required
-                })
-                .setNegativeButton("NOPE", null)
-                .setIcon(R.drawable.afrikanaonelogo)
-                .create();
-
-        // Set swoosh sound when dialog is dismissed
-        dialog.setOnDismissListener(dialogInterface -> Sounds.playSwooshSound(ClassficationActivity.this));
-
-        customizeDialogBackground(dialog); // Apply custom background if needed
-        dialog.show();
+                    finish(); // Optional: Finish current activity
+                },
+                (dialog, which) -> dialog.dismiss(), // "NOPE" button just dismisses the dialog
+                false
+        );
     }
 
     private void showMinimumCobroDialog() {
-        Sounds.playWarningSound(getApplicationContext());
-        AlertDialog dialog = new AlertDialog.Builder(ClassficationActivity.this)
-                .setTitle("MINIMUM CHECKOUT")
-                .setMessage("You've got to make at least 2500 AFROS to cash out.")
-                .setPositiveButton(android.R.string.ok, null)
-                .setOnDismissListener(dialogInterface -> Sounds.playSwooshSound(ClassficationActivity.this))
-                .setIcon(R.drawable.afrikanaonelogo)
-                .create();
-
-        customizeDialogBackground(dialog);
-        dialog.show();
+        showCustomAlertDialog(
+                "MINIMUM CHECKOUT",
+                "You've got to make at least 2500 AFROS to cash out.",
+                null,
+                null,
+                false
+        );
     }
 
     private void showCooldownAlertDialog() {
-        Sounds.playWarningSound(getApplicationContext());
-        AlertDialog dialog = new AlertDialog.Builder(ClassficationActivity.this)
-                .setTitle("Attention")
-                .setMessage("You've already generated this code.")
-                .setPositiveButton(android.R.string.ok, null)
-                .setOnDismissListener(dialogInterface -> Sounds.playSwooshSound(ClassficationActivity.this))
-                .setIcon(R.drawable.afrikanaonelogo)
-                .create();
+        showCustomAlertDialog(
+                "Attention",
+                "You've already generated this code.",
+                null,
+                null,
+                false
+        );
+    }
 
+    private void showCustomAlertDialog(String title, String message,
+                                       DialogInterface.OnClickListener positiveClickListener,
+                                       DialogInterface.OnClickListener negativeClickListener,
+                                       boolean isSuccess) {
+        // 🔊 Play success or warning sound
+        if (isSuccess) {
+            Sounds.playMagicalSound(getApplicationContext()); // 🎶 Success sound
+        } else {
+            Sounds.playWarningSound(getApplicationContext()); // ⚠ Warning sound
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("YES", positiveClickListener)
+                .setIcon(R.drawable.afrikanaonelogo);
+
+        if (negativeClickListener != null) {
+            builder.setNegativeButton("NOPE", negativeClickListener);
+        }
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnDismissListener(dialogInterface -> Sounds.playSwooshSound(getApplicationContext()));
         customizeDialogBackground(dialog);
         dialog.show();
+        setDialogButtonColors(dialog); // Ensure white text
     }
 
     private void customizeDialogBackground(AlertDialog dialog) {
         Window window = dialog.getWindow();
         if (window != null) {
             window.setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+    }
+
+    private void setDialogButtonColors(AlertDialog dialog) {
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        if (positiveButton != null) {
+            positiveButton.setTextColor(Color.WHITE);
+        }
+        if (negativeButton != null) {
+            negativeButton.setTextColor(Color.WHITE);
         }
     }
 

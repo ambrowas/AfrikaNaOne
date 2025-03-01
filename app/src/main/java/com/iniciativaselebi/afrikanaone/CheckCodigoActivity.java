@@ -2,6 +2,7 @@ package com.iniciativaselebi.afrikanaone;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -81,22 +82,46 @@ public class CheckCodigoActivity extends AppCompatActivity {
                 }
             });
         }
-    private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener onPositiveClickListener) {
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(title) // Set the title here
+    private void showCustomAlertDialog(String title, String message, DialogInterface.OnClickListener onPositiveClickListener, boolean isSuccess) {
+        // ✅ Play the appropriate sound based on success or warning
+        if (isSuccess) {
+            Sounds.playMagicalSound(getApplicationContext()); // ✅ Play success sound
+        } else {
+            Sounds.playWarningSound(getApplicationContext()); // ✅ Play warning sound
+        }
+
+        AlertDialog dialog = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme) // ✅ Apply theme
+                .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton(android.R.string.ok, onPositiveClickListener)
-                .setIcon(R.drawable.afrikanaonelogo) // Set the icon here
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                    Sounds.playSwooshSound(getApplicationContext()); // ✅ Play swoosh sound on dismissal
+                    dialogInterface.dismiss();
+                    if (onPositiveClickListener != null) {
+                        onPositiveClickListener.onClick(dialogInterface, i);
+                    }
+                })
+                .setIcon(R.drawable.afrikanaonelogo)
                 .create();
 
+        // ✅ Set custom background
         Window window = dialog.getWindow();
         if (window != null) {
-            window.setBackgroundDrawableResource(R.drawable.dialog_background); // Set the background here
+            window.setBackgroundDrawableResource(R.drawable.dialog_background);
         }
 
         dialog.show();
+
+        // ✅ Ensure button text is white
+        setDialogButtonColors(dialog);
     }
 
+    // ✅ Ensure button text is white
+    private void setDialogButtonColors(AlertDialog dialog) {
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (positiveButton != null) {
+            positiveButton.setTextColor(Color.WHITE);
+        }
+    }
     private void validateCode(String userId, String fullName, String enteredCode) {
         DatabaseReference gameCodesRef = FirebaseDatabase.getInstance().getReference("gamecodes");
         gameCodesRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -115,30 +140,26 @@ public class CheckCodigoActivity extends AppCompatActivity {
                 }
 
                 if (!codeFound) {
-                    Sounds.playWarningSound(getApplicationContext());
-                    showCustomAlertDialog("Attention", "THIS GAME CODE DOESN'T EXIST", null);
+                    showCustomAlertDialog("Attention", "THIS GAME CODE DOESN'T EXIST", null, false);
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Sounds.playWarningSound(getApplicationContext());
-                showCustomAlertDialog("Error", "Error: " + databaseError.getMessage(), null);
+                showCustomAlertDialog("Error", "Error: " + databaseError.getMessage(), null, false);
             }
         });
     }
     private void handleCodeValidation(DataSnapshot snapshot, String userId, String fullName) {
         if (snapshot.hasChild("StaticCode")) {
             resetGameData(userId);
-            Sounds.playMagicalSound(getApplicationContext());
-            showCustomAlertDialog("Attention", "YOUR PROMO CODE HAS BEEN VALIDATED", (dialogInterface, i) -> navigateToModocompeticion());
+            showCustomAlertDialog("Success", "YOUR PROMO CODE HAS BEEN VALIDATED", (dialogInterface, i) -> navigateToModocompeticion(), true);
             return;
         }
 
         Boolean isUsed = snapshot.child("used").getValue(Boolean.class);
         if (isUsed != null && isUsed) {
-            Sounds.playWarningSound(getApplicationContext());
-            showCustomAlertDialog("Attention", "THIS CODE HAS ALREADY BEEN USED. ENTER A NEW ONE", (dialogInterface, i) -> {});
+            showCustomAlertDialog("Attention", "THIS CODE HAS ALREADY BEEN USED. ENTER A NEW ONE", (dialogInterface, i) -> {}, false);
             navigateToModocompeticionWithDelay();
             return;
         }
@@ -155,15 +176,14 @@ public class CheckCodigoActivity extends AppCompatActivity {
             snapshot.getRef().child("usedByfullname").setValue("Unknown User");
         }
 
-        // Set code as used and the timestamp here
+        // Set code as used and timestamp
         snapshot.getRef().child("used").setValue(true);
         DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm", Locale.getDefault());
         String usedTimestamp = df.format(new Date());
         snapshot.getRef().child("usedTimestamp").setValue(usedTimestamp);
-        Sounds.playMagicalSound(getApplicationContext());
-        showCustomAlertDialog("Attention", "GAME CODE HAS BEEN VALIDATED. GOOD LUCK", (dialogInterface, i) -> navigateToModocompeticion());
-    }
 
+        showCustomAlertDialog("Success", "GAME CODE HAS BEEN VALIDATED. GOOD LUCK", (dialogInterface, i) -> navigateToModocompeticion(), true);
+    }
     private void navigateToModocompeticion() {
         playSwoosh();
         Intent intent = new Intent(getApplicationContext(), Modocompeticion.class);

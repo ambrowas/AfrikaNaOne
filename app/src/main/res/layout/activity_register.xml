@@ -23,8 +23,8 @@
         android:textSize="24sp"
         android:layout_marginTop="20dp"
         android:gravity="center"
-        android:textColor="@color/white"
-        android:shadowColor="@color/black"
+        android:textColor="@color/black"
+        android:shadowColor="@color/white"
         android:shadowRadius="4"
         android:layout_marginBottom="20dp"/>
 
@@ -208,6 +208,7 @@
             android:layout_height="55dp"
             android:text="VOLVER"
             android:gravity="center"
+            android:layout_marginTop="10dp"
             android:textStyle="bold"
             android:textColor="@color/white"
             android:shadowDx="4"
