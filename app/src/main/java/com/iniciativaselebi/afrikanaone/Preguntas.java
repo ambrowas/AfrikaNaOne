@@ -2,19 +2,26 @@ package com.iniciativaselebi.afrikanaone;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -101,6 +108,11 @@ import java.util.Map;
         private WarningManager warningManager;
         private boolean gameOverTriggered = false;
 
+        private Handler attentionHandler = new Handler();
+        private Runnable vibrationRunnable;
+        private ValueAnimator confirmButtonAnimator;
+        private boolean isAnimating = false; // Prevent multiple animations from stacking
+
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -136,46 +148,27 @@ import java.util.Map;
             questionDataSource.open();
             resetTextView();
             moveToNextQuestion();
-
+            setupRadioGroupListener();
 
             buttonconfirmar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (!isSolutionDisplayed) {
-                        // Check if an answer is selected
                         int selectedRadioButtonId = radio_group.getCheckedRadioButtonId();
                         if (selectedRadioButtonId == -1) {
-                            // Show the "Fear Not, Make a Choice" dialog with sound effects
-                            showCustomDialogWithSounds(
-                                    "ATTENTION",
-                                    "Fear not, make a choice",
-                                    null // No action required on dismissal
-                            );
-                            return; // Prevent further execution if no answer is selected
+                            showCustomDialogWithSounds("ATTENTION", "Fear not, make a choice", null);
+                            return;
                         }
+
+                        // ✅ Stop reminder effect
+                        stopConfirmReminder();
 
                         // Cancel the timer if it's running
                         if (timer != null) {
                             timer.cancel();
                         }
 
-                        // Update the appearance of the selected RadioButton
-                        RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
-                        if (selectedRadioButton != null) {
-                            selectedRadioButton.setBackgroundResource(R.drawable.toast_background);
-                        } else {
-                            // Handle unexpected error: Show a warning dialog
-                            Warning errorWarning = new Warning(
-                                    Preguntas.this,
-                                    1, // Low priority because this is unexpected but not critical
-                                    "Error",
-                                    "Unexpected error occurred. Please try again."
-                            );
-                            warningManager.addWarning(errorWarning);
-                            return; // Prevent further execution on error
-                        }
-
-                        // Process the answer, show the solution, and update button visibility
+                        // ✅ Process the answer and show the solution
                         processAnswer();
                         showSolution();
                         isSolutionDisplayed = true;
@@ -185,7 +178,6 @@ import java.util.Map;
                     }
                 }
             });
-
 
             buttonsiguiente.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -204,24 +196,126 @@ import java.util.Map;
             });
         }
 
+
+        private void setupRadioGroupListener() {
+            radio_group.setOnCheckedChangeListener((group, checkedId) -> {
+                if (checkedId != -1) {  // ✅ Only proceed if an option is selected
+                    Log.d("RadioGroup", "Selection made, updating UI and starting Confirm Reminder");
+
+                    // ✅ Reset all radio buttons to default color
+                    resetRadioButtonColors();
+
+                    // ✅ Highlight the selected radio button
+                    selectedRadioButton = findViewById(checkedId);
+                    if (selectedRadioButton != null) {
+                        selectedRadioButton.setBackgroundResource(R.drawable.toast_background);
+                        selectedRadioButton.setTextColor(Color.WHITE);
+                    }
+
+                    // ✅ Stop any existing confirm reminders before starting a new one
+                    stopConfirmReminder();
+
+                    // ✅ Delay animation start slightly to avoid UI blocking issues
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        if (buttonconfirmar.getVisibility() == View.VISIBLE) { // ✅ Ensure button is visible
+                            startConfirmReminder();
+                        }
+                    }, 300);
+                }
+            });
+        }
+
+        private void startConfirmReminder() {
+            if (confirmButtonAnimator != null && confirmButtonAnimator.isRunning()) {
+                return; // Prevent duplicate triggers
+            }
+
+            Log.d("ConfirmButton", "Starting confirm button reminder effect");
+
+            confirmButtonAnimator = ValueAnimator.ofFloat(1.0f, 1.2f, 1.0f);
+            confirmButtonAnimator.setDuration(600); // Animation duration
+            confirmButtonAnimator.setRepeatCount(ValueAnimator.INFINITE); // ✅ Keep looping indefinitely
+            confirmButtonAnimator.setRepeatMode(ValueAnimator.REVERSE); // ✅ Smooth looping effect
+            confirmButtonAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            confirmButtonAnimator.addUpdateListener(animation -> {
+                float scale = (float) animation.getAnimatedValue();
+                buttonconfirmar.setScaleX(scale);
+                buttonconfirmar.setScaleY(scale);
+            });
+
+            confirmButtonAnimator.start();
+
+            // ✅ **Vibration Reminder Every 3 Seconds**
+            stopVibrationReminder(); // Ensure no duplicate callbacks
+            vibrationRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (confirmButtonAnimator == null || !confirmButtonAnimator.isRunning()) return;
+
+                    Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    if (vibrator != null) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                        } else {
+                            vibrator.vibrate(200);
+                        }
+                    }
+
+                    attentionHandler.postDelayed(this, 3000); // ✅ Repeat every 3 seconds
+                }
+            };
+
+            attentionHandler.postDelayed(vibrationRunnable, 3000); // Start after delay
+        }
+
+        private void stopConfirmReminder() {
+            if (confirmButtonAnimator != null) {
+                confirmButtonAnimator.cancel();
+                buttonconfirmar.setScaleX(1.0f);
+                buttonconfirmar.setScaleY(1.0f);
+                confirmButtonAnimator = null;
+            }
+            stopVibrationReminder(); // ✅ Stop vibration when stopping reminder
+        }
+
+        private void stopVibrationReminder() {
+            if (vibrationRunnable != null) {
+                attentionHandler.removeCallbacks(vibrationRunnable); // ✅ Stop pending vibration callbacks
+                vibrationRunnable = null; // ✅ Clear reference to prevent leaks
+            }
+        }
+
         public void moveToNextQuestion() {
+            // ✅ Stop confirm reminder & reset UI states before loading a new question
+            stopConfirmReminder();
+            resetConfirmButton();
+            resetRadioButtonColors();
+            radio_group.setOnCheckedChangeListener(null); // ✅ Remove previous listener
+
             int unusedQuestionsCount = questionDataSource.getUnusedQuestionsCount();
             Log.d("QuestionFlow", "Checking unused questions count: " + unusedQuestionsCount);
 
             resetPenaltyState();
-            displayNextUnusedQuestion();
+            displayNextUnusedQuestion(); // ✅ Display next question properly
 
-            // If we are at the threshold to prepare the next batch, do so
+            setupRadioGroupListener(); // ✅ Reattach listener for fresh behavior
+
             if (unusedQuestionsCount == 8) {
                 Log.d("QuestionFlow", "Threshold for preparing next batch reached at count: " + unusedQuestionsCount);
                 prepareNextBatch();
             }
 
-            // If we have reached the count where we need to fetch the new questions, do so
             if (unusedQuestionsCount == 5) {
                 Log.d("QuestionFlow", "Low unused questions count reached, count: " + unusedQuestionsCount + ". Fetching new batch.");
                 fetchAndSaveNewQuestions();
             }
+        }
+
+        private void resetConfirmButton() {
+            buttonconfirmar.setScaleX(1.0f); // Reset scale
+            buttonconfirmar.setScaleY(1.0f);
+            buttonconfirmar.setVisibility(View.VISIBLE); // Ensure it's visible
+            stopConfirmReminder(); // Stop any ongoing animation or vibration
         }
 
         private void prepareNextBatch() {
@@ -314,51 +408,70 @@ import java.util.Map;
 
             if (currentQuestion == null) {
                 Log.e("DisplayQuestionError", "No current question to display!");
-                // Optional: Show a user-friendly error message or load a fallback question.
                 return;
             }
 
             questionInProgress = true;
 
-            // Update UI with question data
+            // Set question data
             textviewpregunta.setText(currentQuestion.getQUESTION());
             radio_button1.setText(currentQuestion.getOPTION_A());
             radio_button2.setText(currentQuestion.getOPTION_B());
             radio_button3.setText(currentQuestion.getOPTION_C());
             textviewcategoria.setText(currentQuestion.getCATEGORY());
 
-            // Load Image (Use dynamic URL from question)
-            String gsUrl = currentQuestion.getIMAGE(); // Ensure the question object provides a valid image URL
+            // Load Image
+            String gsUrl = currentQuestion.getIMAGE();
             if (gsUrl != null && !gsUrl.isEmpty()) {
                 displayQuestionImage(gsUrl, quizImage);
             } else {
-                Log.w("DisplayQuestion", "Image URL is empty or null. Setting default image.");
-                quizImage.setImageResource(R.drawable.afrikanaonelogo); // Show placeholder image if URL is missing
+                quizImage.setImageResource(R.drawable.afrikanaonelogo);
             }
 
-            // Reset Radio Buttons
+            // Ensure radio buttons are selectable
             radio_group.clearCheck();
             resetRadioButtonColors();
+
             for (int i = 0; i < radio_group.getChildCount(); i++) {
-                radio_group.getChildAt(i).setEnabled(true);
+                View option = radio_group.getChildAt(i);
+                option.setEnabled(true); // Ensure they are enabled
+                option.setVisibility(View.VISIBLE); // Ensure they are visible
             }
 
-            // Timer Setup
+            // Reset confirm button and hide next/finish
+            buttonconfirmar.setVisibility(View.VISIBLE);
+            buttonsiguiente.setVisibility(View.GONE);
+            buttonterminar.setVisibility(View.GONE);
+
+            // Stop previous reminders to prevent stacking
+            stopConfirmReminder();
+
+            // Attach listener to start reminder when an answer is selected
+            radio_group.setOnCheckedChangeListener((group, checkedId) -> {
+                if (checkedId != -1) {
+                    Log.d("RadioGroup", "Selection made, starting Confirm Button Reminder");
+                    stopConfirmReminder(); // Ensure only one reminder at a time
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        if (buttonconfirmar.getVisibility() == View.VISIBLE) {
+                            startConfirmReminder(); // Start effect after slight delay
+                        }
+                    }, 300);
+                }
+            });
+
+            // Restore the 15-second Timer
             if (timer != null) {
                 timer.cancel();
             }
-            timerWasActive = true; // Timer is about to start
+            timerWasActive = true;
             timer = new CountDownTimer(16000, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     int seconds = (int) (millisUntilFinished / 1000) % 60;
-                    String timeLeftFormatted = (seconds < 10)
-                            ? String.format(Locale.getDefault(), "0%d", seconds)
-                            : String.format(Locale.getDefault(), "%d", seconds);
-                    textviewtiempo.setText(timeLeftFormatted);
+                    textviewtiempo.setText(String.format(Locale.getDefault(), "%02d", seconds));
 
                     if (seconds <= 10) {
-                        textviewtiempo.setTextColor(ContextCompat.getColor(Preguntas.this, R.color.toastBackgroundColor));
+                        textviewtiempo.setTextColor(ContextCompat.getColor(Preguntas.this, R.color.SelectedOptionColor));
                     } else {
                         textviewtiempo.setTextColor(Color.BLACK);
                     }
@@ -371,24 +484,18 @@ import java.util.Map;
                         mediaPlayer.start();
                     }
                 }
+
                 @Override
                 public void onFinish() {
                     timerWasActive = false;
-
-                    // Show "Time's Up!" dialog with warning sound
                     showCustomDialogWithSounds(
                             "TIME'S UP!",
                             "You need to make up your mind faster!",
                             () -> {
-                                // Apply penalty after dialog is dismissed
-                                //applyPenalty();
-
-                                // Process answer and show solution after the penalty is applied
                                 processAnswer();
                                 showSolution();
-                                buttonconfirmar.setVisibility(View.GONE);
-                                buttonsiguiente.setVisibility(View.VISIBLE);
-                                buttonterminar.setVisibility(View.VISIBLE);
+                                disableOptionButtons();
+                                adjustButtonVisibilityForNext();
                             }
                     );
                 }
@@ -440,10 +547,10 @@ import java.util.Map;
 
             int selectedRadioButtonId = radio_group.getCheckedRadioButtonId();
             if (selectedRadioButtonId == -1) {
-                // No answer selected - apply penalty
                 applyPenalty();
                 return;
             }
+
 
             RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
             if (selectedRadioButton != null) {
@@ -463,7 +570,6 @@ import java.util.Map;
                 }
             }
 
-            // Mark the question as used and update UI
             currentQuestion.setUsed(true);
             questionDataSource.markQuestionAsUsed(currentQuestion.getNUMBER());
             questionInProgress = false;
@@ -473,14 +579,13 @@ import java.util.Map;
             textviewpuntuacion.setText("SCORE: " + score);
 
             if (incorrectAnswers >= 4) {
-                textviewfallos.setTextColor(Color.RED);
+                textviewfallos.setTextColor(ContextCompat.getColor(this, R.color.SelectedOptionColor));
             } else {
                 textviewfallos.setTextColor(Color.BLACK);
             }
 
             disableOptionButtons();
 
-            // Handle 4 or 5 mistake alerts
             if (incorrectAnswers == 4 && !hasShownToast) {
                 hasShownToast = true;
                 showFourErrorsAlert();
@@ -497,10 +602,11 @@ import java.util.Map;
 
         private void disableOptionButtons() {
             for (int i = 0; i < radio_group.getChildCount(); i++) {
-                radio_group.getChildAt(i).setEnabled(false);
+                View option = radio_group.getChildAt(i);
+                option.setEnabled(false);
+                option.setVisibility(View.INVISIBLE); // Hide options
             }
         }
-
         private void adjustButtonVisibilityForNext() {
             buttonconfirmar.setVisibility(View.GONE); // Hide "Confirm"
             buttonsiguiente.setVisibility(View.VISIBLE); // Show "Next"
@@ -535,6 +641,7 @@ import java.util.Map;
         private void showCustomDialog(String title, String message) {
             showCustomDialog(title, message, null);
         }
+
         private void playSwoosh() {
             if (swooshPlayer != null) {
                 swooshPlayer.seekTo(0);
@@ -704,10 +811,12 @@ import java.util.Map;
             }
         }
 
-         private void resetRadioButtonColors() {
-            radio_button1.setBackgroundResource(R.drawable.radio_selector);
-            radio_button2.setBackgroundResource(R.drawable.radio_selector);
-            radio_button3.setBackgroundResource(R.drawable.radio_selector);
+        private void resetRadioButtonColors() {
+            for (int i = 0; i < radio_group.getChildCount(); i++) {
+                RadioButton rb = (RadioButton) radio_group.getChildAt(i);
+                rb.setBackgroundResource(R.drawable.radio_selector);
+                rb.setTextColor(Color.WHITE);
+            }
         }
 
         private void updateAccumulatedValues(String userId, int newAciertos, int newFallos, int newPuntuacion) {
@@ -931,7 +1040,7 @@ import java.util.Map;
         private void showFourErrorsAlert() {
             showCustomDialogWithSounds(
                     "ATTENTION",
-                    "Four errors: One more and you're done!",
+                    "4 errors: One more and you're done!",
                     () -> {
                         // Ensure only "Next" and "Finish" buttons are visible
                         disableOptionButtons();

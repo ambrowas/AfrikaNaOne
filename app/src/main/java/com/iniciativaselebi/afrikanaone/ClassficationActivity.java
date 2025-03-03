@@ -195,6 +195,7 @@ public class    ClassficationActivity extends AppCompatActivity {
                 showMinimumCobroDialog();
             } else {
                 String code = generateRandomAlphanumericCode(12);
+                saveGameStats(aciertos, puntuacion, errores);
                 Intent intent = new Intent(ClassficationActivity.this, QRcodeActivity.class);
                 intent.putExtra("aciertos", aciertos);
                 intent.putExtra("puntuacion", puntuacion);
@@ -250,6 +251,7 @@ public class    ClassficationActivity extends AppCompatActivity {
                 "You sure you want to end this game?",
                 (dialog, which) -> {
                     Sounds.playSwooshSound(ClassficationActivity.this);
+                    saveGameStats(aciertos, puntuacion, errores);
                     Intent intent = new Intent(ClassficationActivity.this, Modocompeticion.class);
                     startActivity(intent);
                     finish();
@@ -353,12 +355,6 @@ public class    ClassficationActivity extends AppCompatActivity {
         return sharedPreferences.getLong("last_saved_timestamp", 0);
     }
 
-    private void playSwoosh() {
-        if (swooshPlayer != null) {
-            swooshPlayer.seekTo(0);
-            swooshPlayer.start();
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -444,6 +440,14 @@ private void updateTextViewsFromIntent() {
     textiviewganancias.setText("CASH                                      " + puntuacion + " AFROS");
     textiviewganancias.setGravity(Gravity.LEFT);
 }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // ✅ Save game stats when the activity is paused
+        saveGameStats(aciertos, puntuacion, errores);
+    }
 
 
     @Override

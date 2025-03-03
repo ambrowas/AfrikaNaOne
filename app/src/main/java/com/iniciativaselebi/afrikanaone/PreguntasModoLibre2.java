@@ -125,62 +125,65 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
     }
     private void startVibrationReminder() {
         vibrationRunnable = new Runnable() {
-            private boolean hasVibrated = false; // Flag to track if vibration has occurred
-            private int elapsedTime = 0; // Track elapsed time in milliseconds
+            private boolean hasVibrated = false; // ✅ Ensure vibration happens only once after 10 seconds
+            private int elapsedTime = 0; // ✅ Track time elapsed
 
             @Override
             public void run() {
-                if (!answered) { // Only animate if the user hasn't answered
-                    // Animate button (scale effect)
+                if (!answered) { // ✅ Continue effect only if user hasn't confirmed
+                    Log.d("VibrationReminder", "Flashing confirm button. Time elapsed: " + elapsedTime);
+
+                    // ✅ Flash confirm button (Scaling Effect)
                     buttonconfirmar.animate()
                             .scaleX(1.1f).scaleY(1.1f).setDuration(300)
                             .withEndAction(() -> buttonconfirmar.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300));
 
-                    elapsedTime += 3000; // Increase elapsed time by 3 seconds
+                    elapsedTime += 3000; // ✅ Increase elapsed time by 3 seconds
 
-                    if (!hasVibrated && elapsedTime >= 10000) { // Vibrate only after 10 seconds
+                    // ✅ Trigger vibration after 10 seconds (only once)
+                    if (!hasVibrated && elapsedTime >= 10000) {
                         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
                         if (vibrator != null) {
                             vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
                         }
-                        hasVibrated = true; // Prevent further vibrations
+                        hasVibrated = true; // ✅ Prevent further vibrations
+                        Log.d("VibrationReminder", "Vibration triggered at 10 seconds.");
                     }
 
-                    // Continue animating every 3 seconds
+                    // ✅ Continue effect every 3 seconds
                     vibrationHandler.postDelayed(this, 3000);
                 }
             }
         };
 
-        vibrationHandler.postDelayed(vibrationRunnable, 3000); // Initial delay of 3 seconds
+        // ✅ Initial delay before the first effect starts
+        vibrationHandler.postDelayed(vibrationRunnable, 3000);
     }
 
     // Function to stop the vibration reminder
     private void stopVibrationReminder() {
-        vibrationHandler.removeCallbacks(vibrationRunnable);
+        vibrationHandler.removeCallbacks(vibrationRunnable); // ✅ Stop pending callbacks
+        Log.d("VibrationReminder", "Vibration effect stopped.");
     }
-
     // Modify `setupButtonListeners` to integrate the vibration feature
     private void setupButtonListeners() {
-        startVibrationReminder(); // Start vibrating the button when the question is displayed
-
         buttonconfirmar.setOnClickListener(view -> {
-            if (!answered) {
+            if (!answered) { // ✅ User is confirming answer
                 if (radio_button1.isChecked() || radio_button2.isChecked() || radio_button3.isChecked()) {
                     countDownTimer.cancel();
                     checkAnswer();
-                    stopVibrationReminder(); // Stop vibrating once the user confirms
+                    stopVibrationReminder(); // ✅ Stop vibration when confirmed
                     buttonconfirmar.setText(questionCounter < QUESTIONS_PER_BATCH ? "NEXT" : "FINISH");
                 } else {
                     Sounds.playWarningSound(getApplicationContext());
-                    showCustomToast("FEAR NOT.MAKE A CHOICE");
+                    showCustomToast("FEAR NOT. MAKE A CHOICE.");
                 }
-            } else {
+            } else { // ✅ User is proceeding to next question
                 if (questionCounter < QUESTIONS_PER_BATCH) {
                     buttonconfirmar.setText("CONFIRM");
                     Sounds.playSwooshSound(getApplicationContext());
                     showNextQuestion();
-                    startVibrationReminder(); // Restart vibration for the next question
+                    stopVibrationReminder(); // ✅ Reset vibration before the next question
                 } else {
                     Sounds.playSwooshSound(getApplicationContext());
                     finishQuiz();
@@ -381,18 +384,23 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
 
     private void setupRadioButtonListeners() {
         radio_group.setOnCheckedChangeListener((group, checkedId) -> {
-            for (int i = 0; i < group.getChildCount(); i++) {
-                View child = group.getChildAt(i);
-                if (child instanceof RadioButton) {
-                    RadioButton radioButton = (RadioButton) child;
-                    if (radioButton.getId() == checkedId) {
-                        // Apply the selected background
-                        radioButton.setBackgroundResource(R.drawable.radio_normal2);
-                    } else {
-                        // Reset to default background
-                        radioButton.setBackgroundResource(R.drawable.radio_selector);
-                    }
+            if (checkedId != -1) { // ✅ Start effect only after a selection is made
+                Log.d("RadioGroup", "Selection made, starting vibration reminder.");
+
+                // ✅ Reset all radio buttons to default appearance
+                resetRadioButtonColors();
+
+                // ✅ Highlight selected option
+                RadioButton selectedRadioButton = findViewById(checkedId); // ✅ Declare variable here
+                if (selectedRadioButton != null) {
+                    selectedRadioButton.setBackgroundResource(R.drawable.radio_normal2);
                 }
+
+                // ✅ Stop any previous reminders before starting a new one
+                stopVibrationReminder();
+
+                // ✅ Start the reminder effect
+                startVibrationReminder();
             }
         });
     }
@@ -563,6 +571,7 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
         // Proceed to the next question
         if (questionCounter < QUESTIONS_PER_BATCH) {
             currentQuestion = currentBatch.get(questionCounter);
+            stopVibrationReminder();
             updateUIWithCurrentQuestion();
             updateQuestionCounterUI();
             resetFeedbackTextColor();
