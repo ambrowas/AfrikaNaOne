@@ -104,7 +104,6 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
         setContentView(R.layout.activity_preguntas_modo_libre);
 
 
-
         batchManager = new BatchManager(this);
         batchManager.saveTotalBatches(totalBatches, questionBatches);
 
@@ -125,18 +124,32 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
     }
     private void startVibrationReminder() {
         vibrationRunnable = new Runnable() {
-            private boolean hasVibrated = false; // ✅ Ensure vibration happens only once after 10 seconds
-            private int elapsedTime = 0; // ✅ Track time elapsed
+            private boolean hasVibrated = false;
+            private int elapsedTime = 0;
 
             @Override
             public void run() {
                 if (!answered) { // ✅ Continue effect only if user hasn't confirmed
                     Log.d("VibrationReminder", "Flashing confirm button. Time elapsed: " + elapsedTime);
 
-                    // ✅ Flash confirm button (Scaling Effect)
+                    // ✅ First expansion (faster)
                     buttonconfirmar.animate()
-                            .scaleX(1.1f).scaleY(1.1f).setDuration(300)
-                            .withEndAction(() -> buttonconfirmar.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300));
+                            .scaleX(1.15f).scaleY(1.15f).setDuration(150)
+                            .withEndAction(() -> {
+                                // ✅ First contraction (slower)
+                                buttonconfirmar.animate()
+                                        .scaleX(0.9f).scaleY(0.9f).setDuration(200)
+                                        .withEndAction(() -> {
+                                            // ✅ Second expansion (faster)
+                                            buttonconfirmar.animate()
+                                                    .scaleX(1.1f).scaleY(1.1f).setDuration(150)
+                                                    .withEndAction(() -> {
+                                                        // ✅ Second contraction (back to normal, slower)
+                                                        buttonconfirmar.animate()
+                                                                .scaleX(1.0f).scaleY(1.0f).setDuration(200);
+                                                    });
+                                        });
+                            });
 
                     elapsedTime += 3000; // ✅ Increase elapsed time by 3 seconds
 
@@ -156,16 +169,14 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
             }
         };
 
-        // ✅ Initial delay before the first effect starts
-        vibrationHandler.postDelayed(vibrationRunnable, 3000);
+        // ✅ Start the first animation immediately
+        vibrationRunnable.run();
     }
 
-    // Function to stop the vibration reminder
     private void stopVibrationReminder() {
         vibrationHandler.removeCallbacks(vibrationRunnable); // ✅ Stop pending callbacks
         Log.d("VibrationReminder", "Vibration effect stopped.");
     }
-    // Modify `setupButtonListeners` to integrate the vibration feature
     private void setupButtonListeners() {
         buttonconfirmar.setOnClickListener(view -> {
             if (!answered) { // ✅ User is confirming answer
@@ -384,22 +395,19 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
 
     private void setupRadioButtonListeners() {
         radio_group.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId != -1) { // ✅ Start effect only after a selection is made
+            if (checkedId != -1) {
                 Log.d("RadioGroup", "Selection made, starting vibration reminder.");
 
-                // ✅ Reset all radio buttons to default appearance
+                // ✅ Reset all radio buttons before highlighting the new one
                 resetRadioButtonColors();
 
-                // ✅ Highlight selected option
-                RadioButton selectedRadioButton = findViewById(checkedId); // ✅ Declare variable here
+                // ✅ Highlight the selected option
+                RadioButton selectedRadioButton = findViewById(checkedId);
                 if (selectedRadioButton != null) {
                     selectedRadioButton.setBackgroundResource(R.drawable.radio_normal2);
                 }
 
-                // ✅ Stop any previous reminders before starting a new one
-                stopVibrationReminder();
-
-                // ✅ Start the reminder effect
+                // ✅ Start the vibration reminder ONLY after an option is selected
                 startVibrationReminder();
             }
         });
@@ -524,64 +532,121 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
     }
 
     private void updateUIWithCurrentQuestion() {
-        textviewpregunta.setText(currentQuestion.getQuestion());
-        radio_button1.setText(currentQuestion.getOPTION_A());
-        radio_button2.setText(currentQuestion.getOPTION_B());
-        radio_button3.setText(currentQuestion.getOPTION_C());
-        radio_group.clearCheck();
-    }
-
-    private void showNextQuestion() {
-        RadioGroup radioGroup = findViewById(R.id.radio_group);
-        TextView textViewExplanation = findViewById(R.id.textViewExplanation);
-        Button buttonConfirmar = findViewById(R.id.buttonconfirmar);
-
-        // Ensure smooth removal of explanation
-        if (textViewExplanation.getVisibility() == View.VISIBLE) {
-            Animation fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out);
-            fadeOut.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    textViewExplanation.setVisibility(View.GONE);
-
-                    // ✅ Move button immediately back under radioGroup
-                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) buttonConfirmar.getLayoutParams();
-                    params.addRule(RelativeLayout.BELOW, R.id.radio_group);
-                    buttonConfirmar.setLayoutParams(params);
-
-                    // ✅ Restore radio group with a fade-in effect
-                    radioGroup.setVisibility(View.VISIBLE);
-                    Animation fadeIn = AnimationUtils.loadAnimation(PreguntasModoLibre2.this, R.anim.fade_in);
-                    radioGroup.startAnimation(fadeIn);
-                }
-
-                @Override public void onAnimationStart(Animation animation) {}
-                @Override public void onAnimationRepeat(Animation animation) {}
-            });
-
-            textViewExplanation.startAnimation(fadeOut);
-        } else {
-            // If no explanation was shown, directly reposition button and show radio buttons
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) buttonConfirmar.getLayoutParams();
-            params.addRule(RelativeLayout.BELOW, R.id.radio_group);
-            buttonConfirmar.setLayoutParams(params);
-            radioGroup.setVisibility(View.VISIBLE);
+        if (currentQuestion == null) {
+            Log.e("UIUpdate", "updateUIWithCurrentQuestion: currentQuestion is null.");
+            return;
         }
 
-        // Proceed to the next question
+        Log.d("QuestionFlow", "Displaying question: " + currentQuestion.getQuestion());
+        Log.d("QuestionFlow", "Option A: " + currentQuestion.getOPTION_A());
+        Log.d("QuestionFlow", "Option B: " + currentQuestion.getOPTION_B());
+        Log.d("QuestionFlow", "Option C: " + currentQuestion.getOPTION_C());
+
+        textviewpregunta.setText(currentQuestion.getQuestion());
+        textviewpregunta.setAlpha(0f);
+        textviewpregunta.animate().alpha(1f).setDuration(300).start();
+
+        radio_group.setVisibility(View.VISIBLE);
+        radio_group.clearCheck(); // Reset selection
+        enableRadioButtons();
+
+        // ✅ Fade in options smoothly
+        animateRadioButtonText(radio_button1, currentQuestion.getOPTION_A());
+        animateRadioButtonText(radio_button2, currentQuestion.getOPTION_B());
+        animateRadioButtonText(radio_button3, currentQuestion.getOPTION_C());
+
+        adjustButtonPlacement();
+        resetRadioButtonColors();
+    }
+
+    private void animateRadioButtonText(RadioButton radioButton, String text) {
+        radioButton.setAlpha(0f);
+        radioButton.setText(text);
+        radioButton.animate().alpha(1f).setDuration(300).start();
+    }
+
+    private void adjustButtonPlacement() {
+        buttonconfirmar.setVisibility(View.VISIBLE);
+        buttonconfirmar.setScaleX(1.0f);
+        buttonconfirmar.setScaleY(1.0f);
+        buttonconfirmar.setAlpha(1f);
+        buttonconfirmar.setText("CONFIRM");
+    }
+
+
+
+    private void showNextQuestion() {
+        stopVibrationReminder(); // ✅ Stop any vibration reminders
+
+        // ✅ Ensure the explanation is reset before displaying a new question
+        textViewExplanation.setText("");
+        textViewExplanation.setVisibility(View.GONE);
+
+        // ✅ Reset the confirm button's position before the next question
+        repositionConfirmButton();
+
+        // ✅ Ensure we still have questions in the batch
         if (questionCounter < QUESTIONS_PER_BATCH) {
             currentQuestion = currentBatch.get(questionCounter);
-            stopVibrationReminder();
+
+            // ✅ Reset UI for new question
             updateUIWithCurrentQuestion();
             updateQuestionCounterUI();
             resetFeedbackTextColor();
             resetRadioButtonColors();
+            radio_group.clearCheck(); // ✅ Ensure no previous selection remains
+            enableRadioButtons(); // ✅ Ensure options are enabled
+            startCountDown();
+            flipImage(quizImageLibre);
+
+            answered = false;
+            questionCounter++;
+        } else {
+            finishQuiz();
+        }
+    }
+
+
+    private void displayNextQuestion() {
+        if (questionCounter < QUESTIONS_PER_BATCH) {
+            currentQuestion = currentBatch.get(questionCounter);
+            updateUIWithCurrentQuestion();
+            updateQuestionCounterUI();
+            resetFeedbackTextColor();
+            resetRadioButtonColors();
+            radio_group.clearCheck();
+            enableRadioButtons();
             startCountDown();
             flipImage(quizImageLibre);
             answered = false;
             questionCounter++;
         } else {
             finishQuiz();
+        }
+    }
+
+    private void repositionConfirmButton() {
+        Button buttonConfirmar = findViewById(R.id.buttonconfirmar);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) buttonConfirmar.getLayoutParams();
+        params.addRule(RelativeLayout.BELOW, R.id.radio_group);
+        buttonConfirmar.setLayoutParams(params);
+    }
+
+    private void enableRadioButtons() {
+        for (int i = 0; i < radio_group.getChildCount(); i++) {
+            View option = radio_group.getChildAt(i);
+            option.setEnabled(true);  // ✅ Ensure radio buttons are selectable
+            option.setVisibility(View.VISIBLE);  // ✅ Ensure radio buttons are visible
+        }
+    }
+
+    private void resetRadioButtonColors() {
+        for (int i = 0; i < radio_group.getChildCount(); i++) {
+            RadioButton rb = (RadioButton) radio_group.getChildAt(i);
+            rb.setEnabled(true); // ✅ Ensure re-enabled
+            rb.setVisibility(View.VISIBLE); // ✅ Ensure visible
+            rb.setBackgroundResource(R.drawable.radio_selector); // ✅ Reset to default background
+            rb.setTextColor(Color.WHITE); // ✅ Reset to default text color
         }
     }
 
@@ -661,6 +726,7 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
             radioGroup.startAnimation(fadeOut);
         }
     }
+
     private void playCorrectAnswerSound() {
         if (mediaPlayerRight == null) {
             mediaPlayerRight = MediaPlayer.create(this, R.raw.right);
@@ -675,13 +741,6 @@ public class PreguntasModoLibre2 extends AppCompatActivity {
         mediaPlayerNotRight.start();
     }
 
-    private void resetRadioButtonColors() {
-        // Set the background resource to your drawable for all radio buttons
-        radio_button1.setButtonDrawable(R.drawable.radio_selector);
-        radio_button2.setButtonDrawable(R.drawable.radio_selector);
-        radio_button3.setButtonDrawable(R.drawable.radio_selector);
-
-    }
 
 
     private void finishQuiz() {

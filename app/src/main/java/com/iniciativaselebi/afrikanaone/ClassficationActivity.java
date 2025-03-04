@@ -97,18 +97,25 @@ public class    ClassficationActivity extends AppCompatActivity {
     }
 
     private void retrieveGameStatsFromIntent() {
+        // ✅ First, try to retrieve stats from the Intent (primary source)
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             aciertos = extras.getInt("aciertos", 0);
             puntuacion = extras.getInt("puntuacion", 0);
             errores = extras.getInt("errores", 0);
+
+            // ✅ Save retrieved stats into SharedPreferences for persistence
+            saveGameStats(aciertos, puntuacion, errores);
+        } else {
+            // ✅ If no Intent data, fallback to SharedPreferences
+            loadGameStatsFromSharedPreferences();
         }
 
         Log.d("DEBUG_TAG", "Aciertos: " + aciertos);
         Log.d("DEBUG_TAG", "Puntuacion: " + puntuacion);
         Log.d("DEBUG_TAG", "Errores: " + errores);
 
-        textviewaciertos2.setText( "CORRECT ANSWERS " + aciertos);
+        textviewaciertos2.setText("CORRECT ANSWERS " + aciertos);
         TextViewFallos.setText("INCORRECT ANSWERS " + errores);
         textviewpuntuacion2.setText("SCORE " + puntuacion + " POINTS");
         textiviewganancias.setText("CASH " + puntuacion + " AFROS");
@@ -183,7 +190,11 @@ public class    ClassficationActivity extends AppCompatActivity {
     }
 
     private void setupButtonListeners() {
-        buttonmenuprincipal.setOnClickListener(v -> showTerminationDialog());
+        buttonmenuprincipal.setOnClickListener(v -> {
+            // ✅ Clear stats before returning to main menu
+            clearGameStats();
+            showTerminationDialog();
+        });
 
         buttoncodigocobro.setOnClickListener(v -> {
             if (isWithinCoolDownPeriod()) {
@@ -195,7 +206,10 @@ public class    ClassficationActivity extends AppCompatActivity {
                 showMinimumCobroDialog();
             } else {
                 String code = generateRandomAlphanumericCode(12);
+
+                // ✅ Save latest stats before proceeding
                 saveGameStats(aciertos, puntuacion, errores);
+
                 Intent intent = new Intent(ClassficationActivity.this, QRcodeActivity.class);
                 intent.putExtra("aciertos", aciertos);
                 intent.putExtra("puntuacion", puntuacion);
@@ -206,7 +220,11 @@ public class    ClassficationActivity extends AppCompatActivity {
             }
         });
 
-        buttonleaderboard.setOnClickListener(v -> showLeaderboardDialog());
+        buttonleaderboard.setOnClickListener(v -> {
+            // ✅ Save stats before navigating to leaderboard
+            saveGameStats(aciertos, puntuacion, errores);
+            showLeaderboardDialog();
+        });
     }
 
     private void loadProfilePicture() {
@@ -235,7 +253,14 @@ public class    ClassficationActivity extends AppCompatActivity {
         editor.putInt("aciertos", aciertos);
         editor.putInt("puntuacion", puntuacion);
         editor.putInt("errores", errores);
-        editor.apply();
+        editor.apply(); // ✅ Save to storage
+    }
+
+    private void loadGameStatsFromSharedPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("GameStats", Context.MODE_PRIVATE);
+        aciertos = sharedPreferences.getInt("aciertos", 0);
+        puntuacion = sharedPreferences.getInt("puntuacion", 0);
+        errores = sharedPreferences.getInt("errores", 0);
     }
 
     private boolean isWithinCoolDownPeriod() {
@@ -355,14 +380,11 @@ public class    ClassficationActivity extends AppCompatActivity {
         return sharedPreferences.getLong("last_saved_timestamp", 0);
     }
 
-
-    @Override
-    protected void onDestroy() {
-        if (swooshPlayer != null) {
-            swooshPlayer.release();
-            swooshPlayer = null;
-        }
-        super.onDestroy();
+    private void clearGameStats() {
+        SharedPreferences sharedPreferences = getSharedPreferences("GameStats", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear(); // ✅ Clears saved stats
+        editor.apply();
     }
 
     private String generateRandomAlphanumericCode(int length) {
@@ -419,14 +441,6 @@ public class    ClassficationActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Update text views with the values retrieved from the intent during onCreate()
-        updateTextViewsFromIntent();
-    }
-//Data from intent is the primary source of truth
 private void updateTextViewsFromIntent() {
     textviewaciertos2.setText("CORRECT ANSWERS                                " + aciertos);
     textviewaciertos2.setGravity(Gravity.LEFT);
@@ -447,6 +461,24 @@ private void updateTextViewsFromIntent() {
 
         // ✅ Save game stats when the activity is paused
         saveGameStats(aciertos, puntuacion, errores);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (swooshPlayer != null) {
+            swooshPlayer.release();
+            swooshPlayer = null;
+        }
+        super.onDestroy();
+        saveGameStats(aciertos, puntuacion, errores);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Update text views with the values retrieved from the intent during onCreate()
+        updateTextViewsFromIntent();
     }
 
 

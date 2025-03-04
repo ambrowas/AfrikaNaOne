@@ -196,17 +196,16 @@ import java.util.Map;
             });
         }
 
-
         private void setupRadioGroupListener() {
             radio_group.setOnCheckedChangeListener((group, checkedId) -> {
-                if (checkedId != -1) {  // ✅ Only proceed if an option is selected
+                if (checkedId != -1) {  // ✅ Only proceed if a valid option is selected
                     Log.d("RadioGroup", "Selection made, updating UI and starting Confirm Reminder");
 
-                    // ✅ Reset all radio buttons to default color
+                    // ✅ Reset all radio buttons to default appearance before applying new style
                     resetRadioButtonColors();
 
-                    // ✅ Highlight the selected radio button
-                    selectedRadioButton = findViewById(checkedId);
+                    // ✅ Get the selected radio button
+                    RadioButton selectedRadioButton = findViewById(checkedId);
                     if (selectedRadioButton != null) {
                         selectedRadioButton.setBackgroundResource(R.drawable.toast_background);
                         selectedRadioButton.setTextColor(Color.WHITE);
@@ -215,9 +214,9 @@ import java.util.Map;
                     // ✅ Stop any existing confirm reminders before starting a new one
                     stopConfirmReminder();
 
-                    // ✅ Delay animation start slightly to avoid UI blocking issues
+                    // ✅ Start the reminder effect (if confirm button is visible)
                     new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                        if (buttonconfirmar.getVisibility() == View.VISIBLE) { // ✅ Ensure button is visible
+                        if (buttonconfirmar.getVisibility() == View.VISIBLE) {
                             startConfirmReminder();
                         }
                     }, 300);
@@ -227,7 +226,7 @@ import java.util.Map;
 
         private void startConfirmReminder() {
             if (confirmButtonAnimator != null && confirmButtonAnimator.isRunning()) {
-                return; // Prevent duplicate triggers
+                return; // ✅ Prevent duplicate triggers
             }
 
             Log.d("ConfirmButton", "Starting confirm button reminder effect");
@@ -246,19 +245,28 @@ import java.util.Map;
             confirmButtonAnimator.start();
 
             // ✅ **Vibration Reminder Every 3 Seconds**
-            stopVibrationReminder(); // Ensure no duplicate callbacks
+            stopVibrationReminder(); // ✅ Ensure no duplicate callbacks
+
             vibrationRunnable = new Runnable() {
+                private boolean hasVibrated = false;
+                private int elapsedTime = 0;
+
                 @Override
                 public void run() {
                     if (confirmButtonAnimator == null || !confirmButtonAnimator.isRunning()) return;
 
-                    Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                    if (vibrator != null) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
-                        } else {
-                            vibrator.vibrate(200);
+                    elapsedTime += 3000; // ✅ Track elapsed time
+
+                    if (!hasVibrated && elapsedTime >= 10000) { // ✅ Vibrate only after 10 seconds
+                        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                        if (vibrator != null) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                            } else {
+                                vibrator.vibrate(200);
+                            }
                         }
+                        hasVibrated = true; // ✅ Prevent further vibrations
                     }
 
                     attentionHandler.postDelayed(this, 3000); // ✅ Repeat every 3 seconds
@@ -814,11 +822,10 @@ import java.util.Map;
         private void resetRadioButtonColors() {
             for (int i = 0; i < radio_group.getChildCount(); i++) {
                 RadioButton rb = (RadioButton) radio_group.getChildAt(i);
-                rb.setBackgroundResource(R.drawable.radio_selector);
-                rb.setTextColor(Color.WHITE);
+                rb.setBackgroundResource(R.drawable.radio_selector); // ✅ Default background
+                rb.setTextColor(Color.WHITE); // ✅ Default text color
             }
         }
-
         private void updateAccumulatedValues(String userId, int newAciertos, int newFallos, int newPuntuacion) {
             DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("user").child(userId);
 
